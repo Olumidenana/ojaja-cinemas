@@ -80,7 +80,7 @@
     }
   </script>
 </head>
-<body class="bg-[#080B12] text-slate-100 font-body selection:bg-amber-400 selection:text-slate-950 antialiased overflow-x-hidden min-h-screen flex flex-col">
+<body class="bg-[#080B12] text-slate-100 font-body selection:bg-amber-400 selection:text-slate-950 antialiased overflow-x-hidden min-h-screen flex flex-col pb-16 sm:pb-0">
 
   <!-- Top Announcement Bar with Royal Crest & Audio Mute Toggle -->
   <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 py-1 sm:py-1.5 px-3 sm:px-4 text-center text-slate-950 font-black text-[10px] sm:text-xs tracking-wider uppercase flex items-center justify-between sm:justify-center gap-2 sm:gap-4 font-headline shadow-md relative z-50">
@@ -105,24 +105,24 @@
   </div>
 
   <!-- Floating Curved Glassmorphic Navbar (Inspired by Olive Branch School OS) -->
-  <header class="sticky top-2 sm:top-4 z-40 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 w-full">
-    <nav class="bg-[#0E1524]/90 backdrop-blur-xl border border-white/10 hover:border-amber-500/40 transition-all rounded-2xl sm:rounded-3xl px-3 sm:px-6 py-2 sm:py-3 shadow-cinema-soft flex items-center justify-between">
+  <header class="sticky top-1 sm:top-4 z-40 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 w-full">
+    <nav class="bg-[#0E1524]/90 backdrop-blur-xl border border-white/10 hover:border-amber-500/40 transition-all rounded-2xl sm:rounded-3xl px-2.5 sm:px-6 py-2 sm:py-3 shadow-cinema-soft flex items-center justify-between">
       
       <!-- Brand Logo & Royal Title -->
-      <a href="#" class="flex items-center gap-2.5 sm:gap-3.5 group">
-        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white p-1 shadow-md border-2 border-amber-400 group-hover:scale-105 group-hover:rotate-2 transition-all flex items-center justify-center flex-shrink-0">
+      <a href="#" class="flex items-center gap-2 sm:gap-3.5 group flex-shrink-0">
+        <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white p-1 shadow-md border-2 border-amber-400 group-hover:scale-105 group-hover:rotate-2 transition-all flex items-center justify-center flex-shrink-0">
           <img 
             src="assets/ojaja-official-logo.png" 
             alt="Ojaja Cinemas Official Logo" 
             class="w-full h-full object-contain"
           >
         </div>
-        <div>
-          <span class="font-headline text-lg sm:text-2xl font-black tracking-wide text-white group-hover:text-amber-400 transition-colors flex items-center gap-1 leading-none">
+        <div class="leading-tight">
+          <span class="font-headline text-base sm:text-2xl font-black tracking-wide text-white group-hover:text-amber-400 transition-colors flex items-center gap-1 leading-none">
             OJAJA <span class="text-amber-400">CINEMAS</span>
           </span>
-          <span class="text-[9px] sm:text-[11px] font-eyebrow tracking-wider text-amber-300/80 uppercase block mt-0.5">
-            African Village • Ife Grand Resort
+          <span class="text-[8.5px] sm:text-[11px] font-eyebrow tracking-wider text-amber-300/80 uppercase block mt-0.5 truncate max-w-[140px] sm:max-w-none">
+            African Village • Ife Grand
           </span>
         </div>
       </a>
@@ -142,11 +142,11 @@
       </div>
 
       <!-- Quick Actions -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
         <button 
           type="button" 
           onclick="openAdminModal()"
-          class="px-4 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-amber-500/30 text-amber-300 hover:text-white text-xs font-mono font-bold flex items-center gap-2 transition-all active:scale-95"
+          class="hidden sm:flex px-4 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-amber-500/30 text-amber-300 hover:text-white text-xs font-mono font-bold items-center gap-2 transition-all active:scale-95"
           title="Box Office Dispatch Ledger & Turnstile Scanner"
         >
           <i data-lucide="terminal" class="w-4 h-4"></i>
@@ -156,21 +156,23 @@
 
         <a 
           href="#movies-section"
-          class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-headline font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-400/20 transition-all hover:scale-105 active:scale-95"
+          class="px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-headline font-black text-xs uppercase tracking-wider flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-amber-400/20 transition-all hover:scale-105 active:scale-95 flex-shrink-0"
         >
-          <i data-lucide="ticket" class="w-4 h-4"></i>
-          <span>Book Tickets</span>
+          <i data-lucide="ticket" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+          <span>Tickets</span>
         </a>
       </div>
     </nav>
   </header>
 
   <!-- Hero Spotlight Showcase with Netflix-Style Ambient Video & Atmospheric Beams -->
-  <section class="relative min-h-[680px] flex items-center justify-center overflow-hidden border-b border-white/10 pt-10">
+  <section class="relative min-h-[580px] sm:min-h-[680px] flex items-center justify-center overflow-hidden border-b border-white/10 pt-4 sm:pt-10">
     
-    <!-- Ambient Projector Light Beams -->
-    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[700px] anim-projector-beam pointer-events-none z-0">
-      <div class="w-full h-full bg-gradient-to-b from-amber-400/20 via-amber-500/5 to-transparent clip-path-polygon"></div>
+    <!-- Ambient Projector Light Beams (Strictly Contained) -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[340px] sm:w-[800px] h-[700px] anim-projector-beam">
+        <div class="w-full h-full bg-gradient-to-b from-amber-400/20 via-amber-500/5 to-transparent clip-path-polygon"></div>
+      </div>
     </div>
 
     <!-- Native Netflix-Style Ambient Background Movie Trailer Player (Zero External Errors) -->
@@ -193,16 +195,16 @@
     <div class="absolute inset-0 z-[1] bg-gradient-to-r from-[#080B12] via-[#080B12]/60 to-transparent"></div>
 
     <!-- Spotlight Content (2-Column Desktop Grid for Live Trailer Showcase) -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 w-full">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+    <div class="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
         
         <!-- Left Column: Copy & Booking CTAs (7 Cols) -->
         <div class="lg:col-span-7">
           
           <!-- Royal Crest Eyebrow Badge -->
-          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-400/10 border-2 border-amber-400/40 text-amber-300 text-sm font-eyebrow tracking-wide mb-5 shadow-lg anim-bobble">
-            <img src="assets/ojaja-official-logo.png" alt="Logo" class="w-5 h-5 rounded-full object-contain">
-            <span>African Village • Ife Grand Resort & Industrial Hub</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-amber-400/10 border-2 border-amber-400/40 text-amber-300 text-xs sm:text-sm font-eyebrow tracking-wide mb-3 sm:mb-5 shadow-lg anim-bobble">
+            <img src="assets/ojaja-official-logo.png" alt="Logo" class="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-contain">
+            <span class="truncate">African Village • Ife Grand Resort</span>
           </div>
 
           <h1 class="font-headline text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08] mb-3 sm:mb-5">
@@ -212,12 +214,12 @@
             </span>
           </h1>
 
-          <p class="text-sm sm:text-lg text-slate-300 font-normal max-w-2xl leading-relaxed mb-5 sm:mb-7 font-body">
+          <p class="text-xs sm:text-lg text-slate-300 font-normal max-w-2xl leading-relaxed mb-4 sm:mb-7 font-body">
             Welcome to Ojaja Cinemas. World-class auditorium entertainment featuring the <strong class="text-amber-400 font-bold">Red Room (Christie 4K Laser)</strong> and <strong class="text-cyan-400 font-bold">Blue Room (Dolby Atmos 7.1)</strong> with real-time capacity intelligence, automated alternative suggestions, and instant Paystack verification.
           </p>
 
           <!-- CTA Buttons (Unified Luxury Palette) -->
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 mb-6 sm:mb-10">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 mb-5 sm:mb-10">
             <a 
               href="#movies-section"
               class="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-headline font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 sm:gap-2.5 shadow-2xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95"
@@ -239,7 +241,7 @@
             <button 
               type="button" 
               onclick="openBookingModal('spiderman-brand-new-day', 'spidey-2')"
-              class="px-5 py-3.5 rounded-2xl bg-black/60 hover:bg-slate-900/90 border border-white/10 hover:border-red-500/50 text-slate-300 hover:text-white font-headline font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
+              class="hidden sm:flex px-5 py-3.5 rounded-2xl bg-black/60 hover:bg-slate-900/90 border border-white/10 hover:border-red-500/50 text-slate-300 hover:text-white font-headline font-bold text-sm items-center gap-2 transition-all active:scale-95"
               title="Experience the Explainable Full-Hall Recommender"
             >
               <i data-lucide="alert-octagon" class="w-4 h-4 text-red-400 animate-pulse"></i>
@@ -248,29 +250,29 @@
           </div>
 
           <!-- Floating Interactive Badges (Refined Glassmorphic Cards) -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/10">
-            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
-              <div class="text-amber-400 font-headline font-black text-lg">4K DUAL</div>
-              <div class="text-slate-400 text-[11px] font-eyebrow">Christie Laser</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-white/10">
+            <div class="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble text-center sm:text-left">
+              <div class="text-amber-400 font-headline font-black text-base sm:text-lg">4K DUAL</div>
+              <div class="text-slate-400 text-[10px] sm:text-[11px] font-eyebrow">Christie Laser</div>
             </div>
-            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
-              <div class="text-cyan-400 font-headline font-black text-lg">DOLBY 7.1</div>
-              <div class="text-slate-400 text-[11px] font-eyebrow">Atmos Sound</div>
+            <div class="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed text-center sm:text-left">
+              <div class="text-cyan-400 font-headline font-black text-base sm:text-lg">DOLBY 7.1</div>
+              <div class="text-slate-400 text-[10px] sm:text-[11px] font-eyebrow">Atmos Sound</div>
             </div>
-            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
-              <div class="text-amber-400 font-headline font-black text-lg">PAYSTACK</div>
-              <div class="text-slate-400 text-[11px] font-eyebrow">Instant NGN</div>
+            <div class="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble text-center sm:text-left">
+              <div class="text-amber-400 font-headline font-black text-base sm:text-lg">PAYSTACK</div>
+              <div class="text-slate-400 text-[10px] sm:text-[11px] font-eyebrow">Instant NGN</div>
             </div>
-            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
-              <div class="text-amber-400 font-headline font-black text-lg">VIP SUYA</div>
-              <div class="text-slate-400 text-[11px] font-eyebrow">Concessions</div>
+            <div class="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed text-center sm:text-left">
+              <div class="text-amber-400 font-headline font-black text-base sm:text-lg">VIP SUYA</div>
+              <div class="text-slate-400 text-[10px] sm:text-[11px] font-eyebrow">Concessions</div>
             </div>
           </div>
         </div>
 
         <!-- Right Column: Netflix-Style Rotating Trending Billboard (5 Cols) -->
         <div class="lg:col-span-5" id="hero-trending-showcase-container">
-          <div class="rounded-3xl bg-[#0E1524]/95 backdrop-blur-xl border-2 border-amber-400/50 p-4 sm:p-5 shadow-2xl shadow-amber-400/20 overflow-hidden relative">
+          <div class="rounded-2xl sm:rounded-3xl bg-[#0E1524]/95 backdrop-blur-xl border-2 border-amber-400/50 p-3 sm:p-5 shadow-2xl shadow-amber-400/20 overflow-hidden relative">
             
             <!-- Top Bar: Trending Badge & Next/Prev Navigation -->
             <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
@@ -400,7 +402,7 @@
                 <span>TRENDING REELS IN VOGUE:</span>
                 <span class="text-amber-400 font-bold">Auto-Cycles • Tap to Switch</span>
               </div>
-              <div class="grid grid-cols-4 gap-1.5 text-[10px] font-headline font-bold" id="trending-pills-row">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] font-headline font-bold" id="trending-pills-row">
                 <!-- Dynamically generated by TrendingReelManager -->
               </div>
             </div>
@@ -412,34 +414,34 @@
     </div>
 
     <!-- Ambient Background Video Controls & Title Pill -->
-    <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-black/85 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 text-xs font-mono shadow-2xl">
-      <div class="flex items-center gap-2">
+    <div class="absolute bottom-3 right-3 sm:bottom-6 sm:right-6 z-20 flex items-center gap-2 sm:gap-3 bg-black/85 backdrop-blur-md px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl border border-white/10 text-xs font-mono shadow-2xl">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-        <span class="text-slate-300 text-[11px] hidden sm:inline">CINEMA SOUND: <strong id="ambient-pill-title" class="text-white">Dolby Atmos</strong></span>
+        <span class="text-slate-300 text-[10px] sm:text-[11px] hidden xs:inline sm:inline">CINEMA: <strong id="ambient-pill-title" class="text-white">Dolby Atmos</strong></span>
       </div>
       <button 
         type="button" 
         id="hero-mute-toggle"
         onclick="toggleHeroCinemaAudio()"
-        class="px-2.5 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-bold transition-all flex items-center gap-1.5"
+        class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-bold transition-all flex items-center gap-1 text-[11px] sm:text-xs"
       >
         <span id="hero-mute-icon">🔇</span>
-        <span id="hero-mute-label">Unmute</span>
+        <span id="hero-mute-label">Sound</span>
       </button>
     </div>
   </section>
 
   <!-- Main Screenings Section -->
-  <main id="movies-section" class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+  <main id="movies-section" class="flex-1 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-16 w-full">
     
     <!-- Section Header & Filter Tabs -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-white/10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-10 pb-4 sm:pb-6 border-b border-white/10">
       <div>
-        <div class="flex items-center gap-2 text-xs font-headline font-black uppercase text-amber-400 tracking-wider mb-2">
+        <div class="flex items-center gap-2 text-xs font-headline font-black uppercase text-amber-400 tracking-wider mb-1.5 sm:mb-2">
           <i data-lucide="sparkles" class="w-4 h-4"></i>
           <span>Curated Daily Schedules</span>
         </div>
-        <h2 class="font-headline text-3xl sm:text-4xl font-black text-white">
+        <h2 class="font-headline text-2xl sm:text-4xl font-black text-white">
           Now Showing at <span id="current-branch-label" class="text-amber-400">Ojaja Ile-Ife (Grand Resort Flagship)</span>
         </h2>
         <p class="text-xs sm:text-sm text-slate-400 mt-1 font-body">
@@ -447,13 +449,13 @@
         </p>
       </div>
 
-      <!-- Filters -->
-      <div class="flex flex-wrap items-center gap-2 text-xs font-headline font-bold">
+      <!-- Filters (Horizontal Native Scrolling on Mobile) -->
+      <div class="flex items-center gap-2 text-xs font-headline font-bold overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
         <button 
           id="filter-all"
           type="button" 
           onclick="setFilter('all')"
-          class="filter-btn px-4 py-2.5 rounded-2xl bg-amber-400 text-slate-950 border-2 border-amber-400 font-black transition-all active:scale-95"
+          class="filter-btn flex-shrink-0 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-amber-400 text-slate-950 border-2 border-amber-400 font-black transition-all active:scale-95"
         >
           All Films
         </button>
@@ -461,7 +463,7 @@
           id="filter-nollywood"
           type="button" 
           onclick="setFilter('nollywood')"
-          class="filter-btn px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
+          class="filter-btn flex-shrink-0 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
         >
           Nollywood & Epics
         </button>
@@ -469,7 +471,7 @@
           id="filter-hollywood"
           type="button" 
           onclick="setFilter('hollywood')"
-          class="filter-btn px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
+          class="filter-btn flex-shrink-0 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
         >
           Hollywood Action
         </button>
@@ -477,48 +479,48 @@
           id="filter-red-room"
           type="button" 
           onclick="setFilter('red-room')"
-          class="filter-btn px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
+          class="filter-btn flex-shrink-0 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
         >
-          Red Room (4K Laser)
+          Red Room (4K)
         </button>
         <button 
           id="filter-blue-room"
           type="button" 
           onclick="setFilter('blue-room')"
-          class="filter-btn px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
+          class="filter-btn flex-shrink-0 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 border-2 border-white/10 font-bold transition-all active:scale-95"
         >
-          Blue Room (Dolby Atmos)
+          Blue Room (Atmos)
         </button>
       </div>
     </div>
 
     <!-- Movies Grid -->
-    <div id="movies-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div id="movies-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
       <!-- Injected by renderMoviesGrid() -->
     </div>
 
     <!-- Interactive Auditorium Experience Comparator (Explainable UI/UX) -->
-    <section class="mt-24 pt-12 border-t border-white/10">
-      <div class="text-center max-w-2xl mx-auto mb-12">
+    <section class="mt-12 sm:mt-24 pt-8 sm:pt-12 border-t border-white/10" id="signature-auditoriums">
+      <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
         <span class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider">Acoustic & Visual Engineering</span>
-        <h3 class="font-headline text-3xl sm:text-4xl font-black text-white mt-1">Our Signature Auditoriums</h3>
-        <p class="text-xs sm:text-sm text-slate-400 mt-2 font-body">Carefully engineered for pristine contrast, immersion, and VIP luxury.</p>
+        <h3 class="font-headline text-2xl sm:text-4xl font-black text-white mt-1">Our Signature Auditoriums</h3>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1.5 font-body">Carefully engineered for pristine contrast, immersion, and VIP luxury.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         <!-- Red Room Card -->
-        <div class="p-8 rounded-3xl bg-gradient-to-br from-red-950/40 via-slate-900 to-[#080B12] border-2 border-red-500/40 relative overflow-hidden shadow-xl">
+        <div class="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-red-950/40 via-slate-900 to-[#080B12] border-2 border-red-500/40 relative overflow-hidden shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="px-3.5 py-1 rounded-full bg-red-600/30 text-red-300 border border-red-500/50 text-xs font-headline font-black uppercase">
+            <span class="px-3 py-1 rounded-full bg-red-600/30 text-red-300 border border-red-500/50 text-[11px] sm:text-xs font-headline font-black uppercase">
               Auditorium 1 • 84 Luxury Seats
             </span>
-            <span class="text-red-400 text-3xl font-black font-headline">RED ROOM</span>
+            <span class="text-red-400 text-2xl sm:text-3xl font-black font-headline">RED ROOM</span>
           </div>
-          <h4 class="font-headline text-2xl font-black text-white mb-2">Christie Dual 4K Laser Projection</h4>
+          <h4 class="font-headline text-xl sm:text-2xl font-black text-white mb-2">Christie Dual 4K Laser Projection</h4>
           <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 font-body">
             Ultra-high lumen dual laser projection delivering pure blacks, vibrant Yoruba regalia colors, and pristine sharpness. Fitted with plush velvet rockers and royal couple loungers.
           </p>
-          <div class="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-black/40 border border-white/5 font-mono text-[11px] text-slate-300 text-center">
+          <div class="grid grid-cols-3 gap-2 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-black/40 border border-white/5 font-mono text-[10px] sm:text-[11px] text-slate-300 text-center">
             <div>
               <span class="text-slate-500 block">RESOLUTION</span>
               <strong class="text-amber-400">4K Ultra HD</strong>
@@ -535,18 +537,18 @@
         </div>
 
         <!-- Blue Room Card -->
-        <div class="p-8 rounded-3xl bg-gradient-to-br from-sky-950/40 via-slate-900 to-[#080B12] border-2 border-sky-500/40 relative overflow-hidden shadow-xl">
+        <div class="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-950/40 via-slate-900 to-[#080B12] border-2 border-sky-500/40 relative overflow-hidden shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <span class="px-3.5 py-1 rounded-full bg-sky-600/30 text-sky-300 border border-sky-500/50 text-xs font-headline font-black uppercase">
+            <span class="px-3 py-1 rounded-full bg-sky-600/30 text-sky-300 border border-sky-500/50 text-[11px] sm:text-xs font-headline font-black uppercase">
               Auditorium 2 • 72 Immersion Seats
             </span>
-            <span class="text-sky-400 text-3xl font-black font-headline">BLUE ROOM</span>
+            <span class="text-sky-400 text-2xl sm:text-3xl font-black font-headline">BLUE ROOM</span>
           </div>
-          <h4 class="font-headline text-2xl font-black text-white mb-2">Dolby Atmos 64-Channel Spatial Audio</h4>
+          <h4 class="font-headline text-xl sm:text-2xl font-black text-white mb-2">Dolby Atmos 64-Channel Spatial Audio</h4>
           <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 font-body">
             3D multi-dimensional sound with full overhead acoustic arrays. Feel explosions, footsteps, and symphonic film scores sweep across the room with spine-tingling clarity.
           </p>
-          <div class="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-black/40 border border-white/5 font-mono text-[11px] text-slate-300 text-center">
+          <div class="grid grid-cols-3 gap-2 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-black/40 border border-white/5 font-mono text-[10px] sm:text-[11px] text-slate-300 text-center">
             <div>
               <span class="text-slate-500 block">CHANNELS</span>
               <strong class="text-sky-400">64-Ch Atmos</strong>
@@ -628,12 +630,12 @@
   <!-- ================= MODALS & POPUPS ================= -->
 
   <!-- 1. Interactive Booking & Seat Selection Modal -->
-  <div id="booking-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4 overflow-y-auto">
-    <div class="relative bg-[#0E1524] rounded-3xl border-2 border-amber-400/40 max-w-5xl w-full shadow-2xl flex flex-col max-h-[96vh] overflow-hidden my-auto">
+  <div id="booking-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-0 sm:p-4 overflow-y-auto">
+    <div class="relative bg-[#0E1524] rounded-none sm:rounded-3xl border-0 sm:border-2 border-amber-400/40 max-w-5xl w-full h-full sm:h-auto sm:max-h-[96vh] shadow-2xl flex flex-col overflow-hidden my-auto">
       <button 
         type="button" 
         onclick="closeBookingModal()"
-        class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-slate-950/80 hover:bg-slate-900 text-slate-300 flex items-center justify-center border border-white/10 active:scale-90 transition-transform"
+        class="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-950/80 hover:bg-slate-900 text-slate-300 flex items-center justify-center border border-white/10 active:scale-90 transition-transform shadow-lg"
       >
         ✕
       </button>
@@ -645,44 +647,64 @@
   </div>
 
   <!-- 2. Smart "Hall is Full" & Alternative Times Recommendation Modal -->
-  <div id="hall-full-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
+  <div id="hall-full-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4">
     <div id="hall-full-content" class="w-full flex justify-center">
       <!-- Injected by showHallFullAlert() -->
     </div>
   </div>
 
   <!-- 3. Digital E-Ticket Pass, E-Invoice & Reservation Confirmation Portal -->
-  <div id="ticket-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md p-3 sm:p-5 overflow-y-auto">
+  <div id="ticket-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md p-0 sm:p-5 overflow-y-auto">
     <div id="ticket-modal-content" class="w-full max-w-2xl my-auto">
       <!-- Injected by openTicketModal() -->
     </div>
   </div>
 
   <!-- 4. Netflix-Style Movie Scenes, Trailer & Synopsis Lightbox Modal -->
-  <div id="movie-details-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-5 overflow-y-auto">
+  <div id="movie-details-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-0 sm:p-5 overflow-y-auto">
     <div id="movie-details-content" class="w-full max-w-4xl flex justify-center my-auto">
       <!-- Injected by openMovieDetails() & openMovieScenes() -->
     </div>
   </div>
 
   <!-- 5. High-Fidelity Paystack Simulation Modal -->
-  <div id="paystack-simulator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
+  <div id="paystack-simulator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4">
     <div id="paystack-simulator-content" class="w-full flex justify-center">
       <!-- Injected by openSimulatedPaystackModal() -->
     </div>
   </div>
 
   <!-- 6. Box Office Admin & Turnstile Scanner Modal -->
-  <div id="admin-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
+  <div id="admin-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
     <div id="admin-modal-content" class="w-full flex justify-center my-auto">
       <!-- Injected by renderAdminHub() -->
     </div>
   </div>
 
+  <!-- Mobile App Sticky Bottom Bar (Visible on mobile only: sm:hidden) -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E1524]/95 backdrop-blur-xl border-t border-white/10 px-4 py-2 flex items-center justify-around text-[10px] font-headline font-bold shadow-2xl">
+    <a href="#movies-section" class="flex flex-col items-center gap-1 text-amber-400 active:scale-95 transition-transform">
+      <i data-lucide="film" class="w-4 h-4"></i>
+      <span>Movies</span>
+    </a>
+    <button type="button" onclick="openBookingModal('spiderman-brand-new-day')" class="flex flex-col items-center gap-1 text-slate-300 hover:text-amber-400 active:scale-95 transition-transform">
+      <i data-lucide="ticket" class="w-4 h-4"></i>
+      <span>Book</span>
+    </button>
+    <a href="#signature-auditoriums" class="flex flex-col items-center gap-1 text-slate-300 hover:text-amber-400 active:scale-95 transition-transform">
+      <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <span>Halls</span>
+    </a>
+    <button type="button" onclick="openAdminModal()" class="flex flex-col items-center gap-1 text-slate-300 hover:text-amber-400 active:scale-95 transition-transform">
+      <i data-lucide="terminal" class="w-4 h-4"></i>
+      <span>Dispatch</span>
+    </button>
+  </nav>
+
   <!-- Toast Notification Stack Container -->
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-16 sm:bottom-6 right-3 sm:right-6 z-50 flex flex-col gap-2 max-w-xs sm:max-w-sm w-full pointer-events-none"></div>
 
   <!-- Application Logic (Cache-busted for Instant Live Reload) -->
-  <script src="app.js?v=20261026_1615"></script>
+  <script src="app.js?v=20261026_1830"></script>
 </body>
 </html>

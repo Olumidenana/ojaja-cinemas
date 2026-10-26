@@ -1177,6 +1177,7 @@ function openBookingModal(movieId, preselectedShowtimeId = null) {
 
   AppState.selectedSeats = [];
   AppState.selectedConcessions = {};
+  AppState.bookingStep = 'seats';
 
   renderBookingModalContent();
 
@@ -1200,6 +1201,14 @@ function closeBookingModal() {
   VideoSyncManager.resumeAllHeroVideos();
 }
 
+function setBookingStep(step) {
+  AppState.bookingStep = step;
+  if (window.SoundFX) SoundFX.playSeatClick();
+  renderBookingModalContent();
+  const b = document.getElementById('booking-modal-body');
+  if (b) b.scrollTop = 0;
+}
+
 // Render the Entire Interactive Booking Modal
 function renderBookingModalContent() {
   const container = document.getElementById('booking-modal-body');
@@ -1207,30 +1216,31 @@ function renderBookingModalContent() {
 
   const movie = AppState.selectedMovie;
   const currentShowtime = AppState.selectedShowtime;
+  AppState.bookingStep = AppState.bookingStep || 'seats';
 
   container.innerHTML = `
     <!-- Top Movie Banner Summary -->
-    <div class="relative p-6 bg-gradient-to-r from-slate-900 via-[#101726] to-slate-900 border-b border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <img src="${movie.poster}" alt="${movie.title}" class="w-16 h-24 object-cover rounded-2xl shadow-lg border border-white/10">
+    <div class="relative p-3.5 sm:p-6 bg-gradient-to-r from-slate-900 via-[#101726] to-slate-900 border-b border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <img src="${movie.poster}" alt="${movie.title}" class="w-12 h-16 sm:w-16 sm:h-24 object-cover rounded-xl sm:rounded-2xl shadow-lg border border-white/10 flex-shrink-0">
         <div>
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-0.5 text-[10px] font-headline font-black uppercase rounded bg-amber-400 text-slate-950">${movie.rating}</span>
-            <span class="text-xs text-amber-300 font-mono font-bold">${movie.duration}</span>
-            <span class="text-xs text-slate-400">• ${movie.format}</span>
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="px-2 py-0.5 text-[9px] sm:text-[10px] font-headline font-black uppercase rounded bg-amber-400 text-slate-950">${movie.rating}</span>
+            <span class="text-[11px] sm:text-xs text-amber-300 font-mono font-bold">${movie.duration}</span>
+            <span class="text-[11px] sm:text-xs text-slate-400 truncate max-w-[120px] sm:max-w-none">• ${movie.format}</span>
           </div>
-          <h2 class="font-headline text-2xl font-black text-white mt-1 leading-tight">${movie.title}</h2>
-          <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1.5 font-mono">
-            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span>${AppState.currentBranch}</span>
+          <h2 class="font-headline text-lg sm:text-2xl font-black text-white mt-0.5 sm:mt-1 leading-tight">${movie.title}</h2>
+          <p class="text-[10px] sm:text-xs text-slate-300 mt-0.5 flex items-center gap-1 font-mono truncate">
+            <i data-lucide="map-pin" class="w-3 h-3 text-amber-400 flex-shrink-0"></i>
+            <span class="truncate">${AppState.currentBranch}</span>
           </p>
         </div>
       </div>
 
       <!-- Showtime Switcher Tabs -->
       <div class="w-full md:w-auto">
-        <span class="text-[11px] text-slate-400 block mb-1.5 font-bold uppercase tracking-wider font-headline">Showtimes:</span>
-        <div class="flex flex-wrap gap-2">
+        <span class="text-[10px] sm:text-[11px] text-slate-400 block mb-1 font-bold uppercase tracking-wider font-headline">Showtimes:</span>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full no-scrollbar">
           ${movie.showtimes.map(st => {
             const isSelected = st.id === currentShowtime.id;
             const isSoldOut = st.status === 'sold_out';
@@ -1240,7 +1250,7 @@ function renderBookingModalContent() {
                 <button 
                   type="button" 
                   onclick="showHallFullAlert(AppState.selectedMovie, AppState.selectedMovie.showtimes.find(s => s.id === '${st.id}'))"
-                  class="px-3 py-1.5 rounded-xl border-2 border-red-500/40 bg-red-950/40 text-red-300 text-xs font-mono font-bold opacity-80 hover:opacity-100 flex items-center gap-1.5"
+                  class="flex-shrink-0 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl border border-red-500/40 bg-red-950/40 text-red-300 text-[11px] sm:text-xs font-mono font-bold opacity-80 hover:opacity-100 flex items-center gap-1"
                   title="Hall Full - Click for alternatives"
                 >
                   <i data-lucide="lock" class="w-3 h-3 text-red-400"></i>
@@ -1253,9 +1263,9 @@ function renderBookingModalContent() {
               <button 
                 type="button" 
                 onclick="changeModalShowtime('${st.id}')"
-                class="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all border-2 ${
+                class="flex-shrink-0 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-mono font-bold transition-all border ${
                   isSelected 
-                    ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-lg shadow-amber-400/30 scale-105' 
+                    ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-lg shadow-amber-400/30 font-black' 
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-white/10'
                 }"
               >
@@ -1267,57 +1277,103 @@ function renderBookingModalContent() {
       </div>
     </div>
 
+    <!-- Mobile Step Tabs (lg:hidden) -->
+    <div class="lg:hidden flex items-center border-b border-white/10 bg-[#0B0F17] sticky top-0 z-20 font-headline text-xs">
+      <button 
+        type="button" 
+        onclick="setBookingStep('seats')"
+        class="flex-1 py-2.5 px-2 text-center font-black border-b-2 transition-all flex items-center justify-center gap-1.5 ${AppState.bookingStep === 'seats' ? 'border-amber-400 text-amber-400 bg-amber-400/10' : 'border-transparent text-slate-400'}"
+      >
+        <i data-lucide="armchair" class="w-3.5 h-3.5"></i>
+        <span>1. Seats (${AppState.selectedSeats.length})</span>
+      </button>
+      <button 
+        type="button" 
+        onclick="setBookingStep('checkout')"
+        class="flex-1 py-2.5 px-2 text-center font-black border-b-2 transition-all flex items-center justify-center gap-1.5 ${AppState.bookingStep === 'checkout' ? 'border-amber-400 text-amber-400 bg-amber-400/10' : 'border-transparent text-slate-400'}"
+      >
+        <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+        <span>2. Snacks & Pay (${formatNaira(calculateGrandTotal())})</span>
+      </button>
+    </div>
+
     <!-- Booking Body Grid: Seat Map Left, Summary & Checkout Right -->
     <div class="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-y-auto lg:overflow-hidden">
       
       <!-- Left Column: Interactive Seat Grid -->
-      <div class="lg:col-span-7 p-3 sm:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col items-center">
+      <div class="lg:col-span-7 p-2.5 sm:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col items-center ${AppState.bookingStep === 'checkout' ? 'hidden lg:flex' : 'flex'}">
         
         <!-- Screen Curve & Ambient Glow -->
-        <div class="w-full max-w-lg cinema-screen-container text-center mb-8">
-          <div class="text-[11px] font-mono font-bold tracking-[0.25em] text-amber-400 mb-2 uppercase flex items-center justify-center gap-2">
-            <i data-lucide="film" class="w-3.5 h-3.5"></i>
+        <div class="w-full max-w-sm sm:max-w-lg cinema-screen-container text-center mb-4 sm:mb-8">
+          <div class="text-[9px] sm:text-[11px] font-mono font-bold tracking-[0.2em] sm:tracking-[0.25em] text-amber-400 mb-1.5 sm:mb-2 uppercase flex items-center justify-center gap-1.5 sm:gap-2">
+            <i data-lucide="film" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i>
             <span>CHRISTIE 4K DUAL LASER CURVED SCREEN</span>
           </div>
           <div class="cinema-screen-curve w-full"></div>
-          <div class="screen-light-glow h-8 w-full"></div>
+          <div class="screen-light-glow h-5 sm:h-8 w-full"></div>
         </div>
 
         <!-- Seating Legend -->
-        <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-mono mb-6 text-slate-400">
-          <div class="flex items-center gap-1.5">
-            <div class="w-4 h-4 rounded bg-slate-800 border border-white/20"></div>
+        <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-[10px] sm:text-xs font-mono mb-4 sm:mb-6 text-slate-400">
+          <div class="flex items-center gap-1 sm:gap-1.5">
+            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-slate-800 border border-white/20"></div>
             <span>Standard (${formatNaira(currentShowtime.priceStandard)})</span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <div class="w-4 h-4 rounded bg-amber-950/60 border border-amber-500/80"></div>
-            <span>Royal VIP (${formatNaira(currentShowtime.priceVip)})</span>
+          <div class="flex items-center gap-1 sm:gap-1.5">
+            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-amber-950/60 border border-amber-500/80"></div>
+            <span>VIP (${formatNaira(currentShowtime.priceVip)})</span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <div class="w-4 h-4 rounded bg-amber-400 border border-amber-300 shadow-sm shadow-amber-400"></div>
+          <div class="flex items-center gap-1 sm:gap-1.5">
+            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-amber-400 border border-amber-300 shadow-sm shadow-amber-400"></div>
             <span class="text-amber-400 font-bold">Selected</span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <div class="w-4 h-4 rounded bg-slate-900 border border-red-500/40 text-red-500 flex items-center justify-center text-[9px]">✕</div>
+          <div class="flex items-center gap-1 sm:gap-1.5">
+            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-slate-900 border border-red-500/40 text-red-500 flex items-center justify-center text-[8px] sm:text-[9px]">✕</div>
             <span>Occupied</span>
           </div>
         </div>
 
         <!-- Seat Grid Renderer -->
-        <div class="w-full max-w-lg space-y-2.5">
+        <div class="w-full max-w-sm sm:max-w-lg space-y-1.5 sm:space-y-2.5 seat-grid-container">
           ${renderSeatRows(currentShowtime)}
         </div>
 
         <!-- Hall Capacity Indicator -->
-        <div class="mt-6 w-full max-w-lg p-3.5 rounded-2xl bg-slate-900/70 border border-white/10 flex items-center justify-between text-xs font-mono">
-          <span class="text-slate-400">Auditorium: <strong class="text-white">${currentShowtime.hall}</strong></span>
-          <span class="text-slate-400">Live Inventory: <strong class="text-emerald-400">${currentShowtime.totalSeats - currentShowtime.bookedSeats.length} / ${currentShowtime.totalSeats} seats open</strong></span>
+        <div class="mt-4 sm:mt-6 w-full max-w-sm sm:max-w-lg p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-900/70 border border-white/10 flex items-center justify-between text-[11px] sm:text-xs font-mono">
+          <span class="text-slate-400 truncate">Hall: <strong class="text-white">${currentShowtime.hall}</strong></span>
+          <span class="text-slate-400 flex-shrink-0"><strong class="text-emerald-400">${currentShowtime.totalSeats - currentShowtime.bookedSeats.length} / ${currentShowtime.totalSeats} open</strong></span>
+        </div>
+
+        <!-- Mobile Floating Next Action Bar -->
+        <div class="lg:hidden sticky bottom-0 left-0 right-0 w-full mt-4 p-2.5 rounded-xl bg-[#0E1524]/95 backdrop-blur-md border border-amber-400/30 flex items-center justify-between gap-3 shadow-2xl z-20">
+          <div>
+            <div class="text-[9px] font-mono text-slate-400">Total: <strong class="text-amber-400">${formatNaira(calculateGrandTotal())}</strong></div>
+            <div class="text-xs font-mono font-bold text-white">${AppState.selectedSeats.length > 0 ? AppState.selectedSeats.map(s => s.id).join(', ') : 'No seat chosen'}</div>
+          </div>
+          <button 
+            type="button" 
+            onclick="setBookingStep('checkout')"
+            ${AppState.selectedSeats.length === 0 ? 'disabled' : ''}
+            class="px-3.5 py-2 rounded-xl bg-amber-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-headline font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-amber-400/30 active:scale-95"
+          >
+            <span>Next: Snacks & Pay</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
         </div>
       </div>
 
       <!-- Right Column: Concessions + Customer Info + Paystack Checkout -->
-      <div class="lg:col-span-5 p-6 bg-[#0B0F17] flex flex-col justify-between overflow-y-auto">
-        <div class="space-y-6">
+      <div class="lg:col-span-5 p-3.5 sm:p-6 bg-[#0B0F17] flex flex-col justify-between overflow-y-auto ${AppState.bookingStep === 'seats' ? 'hidden lg:flex' : 'flex'}">
+        <div class="space-y-4 sm:space-y-6">
+          
+          <!-- Mobile Back to Seats Bar -->
+          <div class="lg:hidden flex items-center justify-between pb-2.5 mb-2.5 border-b border-white/10">
+            <button type="button" onclick="setBookingStep('seats')" class="text-xs text-amber-400 font-headline font-bold flex items-center gap-1 active:scale-95">
+              <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+              <span>Back to Seat Map</span>
+            </button>
+            <span class="text-[11px] font-mono text-slate-400">${AppState.selectedSeats.length} seats selected</span>
+          </div>
           
           <!-- Selected Seats Display -->
           <div>
@@ -1858,18 +1914,18 @@ function renderSimulatorModalContent() {
       </div>
 
       <!-- Merchant & Transaction Summary with Official Logo -->
-      <div class="my-3.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-white p-1 border border-slate-200 shadow-sm flex items-center justify-center">
+      <div class="my-3 p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-white p-1 border border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0">
             <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
           </div>
           <div>
-            <div class="text-[10px] text-slate-500 uppercase font-mono font-bold">Merchant</div>
+            <div class="text-[9px] text-slate-500 uppercase font-mono font-bold">Merchant</div>
             <div class="font-bold text-xs text-slate-900 font-headline">Ojaja Cinemas (Ife Grand Resort)</div>
             <div class="text-[11px] text-slate-600 font-body">${payload.movieTitle} • Seats: <strong class="text-slate-900 font-mono">${payload.seats.join(', ')}</strong></div>
           </div>
         </div>
-        <div class="text-right">
+        <div class="text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 flex items-center justify-between sm:block">
           <div class="text-[10px] text-slate-500 font-mono uppercase">Amount Due</div>
           <div class="font-black text-emerald-600 font-mono text-base">${formatNaira(payload.totalAmount)}</div>
         </div>
@@ -2207,25 +2263,25 @@ function openTicketModal(booking) {
       </div>
 
       <!-- View Switcher Tabs: E-Ticket Pass vs Official VAT Tax Invoice -->
-      <div class="px-6 pt-4 pb-2 bg-[#0B0F17] border-b border-white/5 flex items-center gap-3 font-headline text-xs">
+      <div class="px-3 sm:px-6 pt-3 pb-2 bg-[#0B0F17] border-b border-white/5 flex items-center gap-2 font-headline text-xs">
         <button 
           type="button" 
           onclick="switchConfirmationTab('ticket')"
           id="conf-tab-ticket"
-          class="px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 ${AppState.confirmationActiveTab === 'ticket' ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' : 'bg-slate-900 text-slate-400 hover:text-white'}"
+          class="flex-1 py-2 px-2.5 rounded-xl transition-all font-black flex items-center justify-center gap-1.5 ${AppState.confirmationActiveTab === 'ticket' ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' : 'bg-slate-900 text-slate-400 hover:text-white'}"
         >
-          <i data-lucide="ticket" class="w-4 h-4"></i>
-          <span>Digital E-Ticket Pass</span>
+          <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
+          <span>E-Ticket Pass</span>
         </button>
 
         <button 
           type="button" 
           onclick="switchConfirmationTab('invoice')"
           id="conf-tab-invoice"
-          class="px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 ${AppState.confirmationActiveTab === 'invoice' ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' : 'bg-slate-900 text-slate-400 hover:text-white'}"
+          class="flex-1 py-2 px-2.5 rounded-xl transition-all font-black flex items-center justify-center gap-1.5 ${AppState.confirmationActiveTab === 'invoice' ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' : 'bg-slate-900 text-slate-400 hover:text-white'}"
         >
-          <i data-lucide="receipt" class="w-4 h-4"></i>
-          <span>Official VAT Invoice / Receipt</span>
+          <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+          <span>VAT Invoice</span>
         </button>
       </div>
 
