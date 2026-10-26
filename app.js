@@ -1,14 +1,16 @@
 /**
  * OJAJA CINEMAS — Core Application & Booking Engine
  * Flagship Location: African Village, Ife Grand Resort & Industrial Hub, Ile-Ife, Osun State
- * Sub-branches: Lagos (Ajah) | Akure
+ * Sub-branches: Ojaja Lagos (Ogombo Ajah) | Ojaja Akure (Alagbaka)
+ * Verified Production Database ID: oja-fa0483dd
+ * Official Logo: assets/ojaja-logo-transparent.png & assets/ojaja-official-logo.png
  * Integration: Paystack Inline (NGN Kobo) + Real-time Hall Capacity Intelligence
  * Backend Tagging: [cimen], [cimen-boxoffice], [cimen-online-reservation]
  */
 
 // Global Application State
 const AppState = {
-  currentBranch: 'Ife Grand Resort (Flagship)',
+  currentBranch: 'Ojaja Ile-Ife (Grand Resort Flagship)',
   currentDate: 'today',
   selectedMovie: null,
   selectedShowtime: null,
@@ -21,8 +23,7 @@ const AppState = {
     notes: ''
   },
   activeBooking: null,
-  paystackPublicKey: 'pk_test_d34f0c978b27357492c73042186716091726a57c', // Fallback test key
-  useSimulatedPaymentIfKeyFails: true,
+  paystackPublicKey: 'pk_test_d34f0c978b27357492c73042186716091726a57c',
   bookingsLedger: [],
   activeFilter: 'all'
 };
@@ -37,154 +38,30 @@ const CONCESSIONS_DATA = [
   { id: 'royal-couple-combo', name: 'Royal Duo Combo (2 Popcorn + 2 Drinks + Suya)', size: 'Bundle', price: 9500, emoji: '👑' }
 ];
 
-// Movies Lineup with Showtimes & Seat Capacities
+// Verified Real Ojaja Cinemas Movie Lineup from oja-fa0483dd Database
 const MOVIES_DATA = [
-  {
-    id: 'ori-rebirth',
-    title: 'Ori: Rebirth',
-    tagline: 'Fate, Mysticism & The Echoes of Ancestral Destiny',
-    genre: 'Nollywood / Mysticism / Drama',
-    rating: '16+',
-    duration: '2h 15m',
-    language: 'Yoruba & English (Subtitled)',
-    director: 'Tope Adebayo',
-    cast: 'Lateef Adedimeji, Femi Adebayo, Bimbo Ademoye',
-    format: '4K Laser & Dolby Atmos',
-    synopsis: 'A high-flying Lagos urban architect inherits a sacred ancestral medallion from Ile-Ife. As strange visions of ancient Yoruba royalty disrupt his modern life, he must return to the Source to confront a destiny written before his birth.',
-    tags: ['cimen', 'featured', 'nollywood-epic', 'red-room'],
-    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600&auto=format&fit=crop',
-    showtimes: [
-      {
-        id: 'ori-1',
-        time: '1:15 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: ['A3', 'A4', 'B5', 'C6', 'D7', 'E2'],
-        status: 'available',
-        priceStandard: 4000,
-        priceVip: 7500
-      },
-      {
-        id: 'ori-2',
-        time: '4:00 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // 100% full to showcase alternative times
-        status: 'sold_out',
-        priceStandard: 4500,
-        priceVip: 8000
-      },
-      {
-        id: 'ori-3',
-        time: '6:30 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: ['A1', 'A2', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'D1', 'D2', 'E1', 'E2', 'F1', 'F2', 'F3', 'F4', 'G1', 'G2'],
-        status: 'filling_fast',
-        priceStandard: 4500,
-        priceVip: 8500
-      },
-      {
-        id: 'ori-4',
-        time: '9:15 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: ['C4', 'C5', 'F2'],
-        status: 'available',
-        priceStandard: 4000,
-        priceVip: 7500
-      }
-    ]
-  },
-  {
-    id: 'agbaranla-return',
-    title: 'Agbaranla: The Return',
-    tagline: 'The Mount Zion Cinematic Saga Reborn with Power',
-    genre: 'Faith Blockbuster / Supernatural Thriller',
-    rating: '13+',
-    duration: '2h 28m',
-    language: 'English & Yoruba',
-    director: 'Damilola Mike-Bamiloye',
-    cast: 'Mike Bamiloye, Gloria Bamiloye, Joshua Mike-Bamiloye',
-    format: 'Dolby Surround 7.1',
-    synopsis: 'A powerful spiritual warfare drama reimagining the legendary Mount Zion classic with breathtaking CGI visual effects, unforgettable intensity, and an emotional journey of redemption.',
-    tags: ['cimen', 'blockbuster', 'faith-cinema', 'blue-room'],
-    poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=1600&auto=format&fit=crop',
-    showtimes: [
-      {
-        id: 'agb-1',
-        time: '11:30 AM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: ['B4', 'B5', 'C3', 'C4'],
-        status: 'available',
-        priceStandard: 3500,
-        priceVip: 7000
-      },
-      {
-        id: 'agb-2',
-        time: '2:45 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`),
-        status: 'sold_out',
-        priceStandard: 4000,
-        priceVip: 7500
-      },
-      {
-        id: 'agb-3',
-        time: '5:15 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: ['D4', 'D5', 'D6', 'E4', 'E5'],
-        status: 'available',
-        priceStandard: 4000,
-        priceVip: 8000
-      },
-      {
-        id: 'agb-4',
-        time: '8:00 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: ['A1', 'A2', 'G1', 'G2'],
-        status: 'available',
-        priceStandard: 4500,
-        priceVip: 8500
-      }
-    ]
-  },
   {
     id: 'spiderman-brand-new-day',
     title: 'Spider-Man: Brand New Day',
     tagline: 'A Spectacular New Era of High-Flying Action',
     genre: 'Hollywood / Action / Sci-Fi',
-    rating: 'PG-13',
-    duration: '2h 35m',
+    rating: '12A',
+    duration: '2h 25m',
     language: 'English',
     director: 'Destin Daniel Cretton',
     cast: 'Tom Holland, Zendaya, Mark Ruffalo',
     format: '3D Laser & Dolby Atmos',
-    synopsis: 'Peter Parker navigates a world that has forgotten his identity while confronting a mysterious criminal syndicate threatening the balance of New York City and the multiverse.',
-    tags: ['cimen', 'hollywood', '3d-imax', 'blue-room'],
-    poster: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?q=80&w=800&auto=format&fit=crop',
+    synopsis: 'Peter Parker faces the emotional and physical toll of operating entirely alone in a world that no longer remembers his identity. When an ancient syndicate targets New York, he is pushed beyond his physical limits.',
+    tags: ['cimen', 'hollywood', 'featured', 'blue-room'],
+    poster: 'assets/posters/spiderman-brand-new-day.webp',
     backdrop: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1600&auto=format&fit=crop',
     showtimes: [
       {
         id: 'spidey-1',
         time: '12:00 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
         bookedSeats: ['A3', 'A4', 'B4', 'B5'],
         status: 'available',
         priceStandard: 4500,
@@ -193,10 +70,10 @@ const MOVIES_DATA = [
       {
         id: 'spidey-2',
         time: '3:30 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: Array.from({ length: 72 }, (_, i) => `SEAT-${i}`),
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // 100% full
         status: 'sold_out',
         priceStandard: 5000,
         priceVip: 9000
@@ -204,10 +81,10 @@ const MOVIES_DATA = [
       {
         id: 'spidey-3',
         time: '6:45 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: Array.from({ length: 68 }, (_, i) => `SEAT-${i}`),
+        hall: 'Blue Room (Dolby Atmos)',
+        hallType: 'blue',
+        totalSeats: 72,
+        bookedSeats: ['A1', 'A2', 'C1', 'C2', 'E1', 'E2'],
         status: 'filling_fast',
         priceStandard: 5000,
         priceVip: 9000
@@ -226,126 +103,24 @@ const MOVIES_DATA = [
     ]
   },
   {
-    id: 'abanisete',
-    title: 'Abanisete',
-    tagline: 'Crowns, Borders & The Sacred Royal Treasures',
-    genre: 'Yoruba Cultural Epic / Historical Action',
-    rating: '15+',
-    duration: '2h 08m',
-    language: 'Yoruba (English Subtitles)',
-    director: 'Afeez Owo',
-    cast: 'Ibrahim Chatta, Mide Martins, Odunlade Adekola',
-    format: 'Red Room 4K Ultra-Clarity',
-    synopsis: 'A gripping historical saga of ancient kingdoms, contested borders, and warlords vying for sovereign supremacy and long-hidden ancestral regalia.',
-    tags: ['cimen', 'nollywood-epic', 'red-room'],
-    poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1600&auto=format&fit=crop',
-    showtimes: [
-      {
-        id: 'aba-1',
-        time: '1:00 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: ['B1', 'B2', 'C1'],
-        status: 'available',
-        priceStandard: 3500,
-        priceVip: 7000
-      },
-      {
-        id: 'aba-2',
-        time: '4:15 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: ['D2', 'D3'],
-        status: 'available',
-        priceStandard: 4000,
-        priceVip: 7500
-      },
-      {
-        id: 'aba-3',
-        time: '7:30 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: ['E3', 'E4', 'F3'],
-        status: 'available',
-        priceStandard: 4000,
-        priceVip: 7500
-      }
-    ]
-  },
-  {
-    id: 'shadow-of-greed',
-    title: 'The Shadow of Greed',
-    tagline: 'When Wealth Tempts the Soul, Retribution Strikes',
-    genre: 'Crime Thriller / Nollywood Noir',
-    rating: '18+',
-    duration: '1h 58m',
-    language: 'English & Pidgin',
-    director: 'Kemi Adetiba',
-    cast: 'Sola Sobowale, Richard Mofe-Damijo, Chidi Mokeme',
-    format: 'Dolby 7.1 Surround',
-    synopsis: 'In the shadows of high finance and illicit oil bunkering, two estranged allies collide in a deadly game of betrayal where no one walks away unscarred.',
-    tags: ['cimen', 'thriller', 'nollywood-noir'],
-    poster: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=800&auto=format&fit=crop',
+    id: 'heart-of-the-beast',
+    title: 'Heart of the Beast',
+    tagline: 'A Soldier, His War Dog, and The Frozen Wilderness',
+    genre: 'Action / Military Thriller',
+    rating: '16+',
+    duration: '1h 41m',
+    language: 'English',
+    director: 'David Ayer',
+    cast: 'Brad Pitt, Aaron Taylor-Johnson',
+    format: 'Dual 4K Laser & Surround',
+    synopsis: 'After a harrowing plane crash deep in the hostile Alaskan wilderness, Special Forces officer James Belmont and his combat canine Odin find themselves pursued by ruthless mercenary trackers.',
+    tags: ['cimen', 'action', 'red-room'],
+    poster: 'assets/posters/heart-of-the-beast.webp',
     backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
     showtimes: [
       {
-        id: 'shg-1',
-        time: '2:15 PM',
-        hall: 'Blue Room (Dolby Atmos)',
-        hallType: 'blue',
-        totalSeats: 72,
-        bookedSeats: Array.from({ length: 72 }, (_, i) => `SEAT-${i}`),
-        status: 'sold_out',
-        priceStandard: 4000,
-        priceVip: 7500
-      },
-      {
-        id: 'shg-2',
-        time: '5:45 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: ['A3', 'B3'],
-        status: 'available',
-        priceStandard: 4000,
-        priceVip: 7500
-      },
-      {
-        id: 'shg-3',
-        time: '8:45 PM',
-        hall: 'Red Room (4K Laser)',
-        hallType: 'red',
-        totalSeats: 84,
-        bookedSeats: ['C1', 'C2', 'D1'],
-        status: 'available',
-        priceStandard: 4500,
-        priceVip: 8000
-      }
-    ]
-  },
-  {
-    id: 'queen-moremi',
-    title: 'Queen Moremi: Legend of Ife',
-    tagline: 'Sacrifice of a Queen, Liberation of a Holy Dynasty',
-    genre: 'Royal Historical Epic / Cultural Heritage',
-    rating: '12+',
-    duration: '2h 40m',
-    language: 'Yoruba & English',
-    director: 'Kunle Afolayan',
-    cast: 'Sola Sobowale, Kunle Remi, Omowunmi Dada',
-    format: 'Dolby Atmos Master Audio',
-    synopsis: 'Commissioned under the cultural auspices of the Ooni of Ife, this landmark epic chronicles the courage of Queen Moremi Ajasoro who risked everything to deliver the ancient kingdom of Ife from invincible raiders.',
-    tags: ['cimen', 'featured', 'royal-heritage', 'red-room'],
-    poster: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=800&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1600&auto=format&fit=crop',
-    showtimes: [
-      {
-        id: 'mor-1',
-        time: '11:00 AM',
+        id: 'hob-1',
+        time: '1:30 PM',
         hall: 'Red Room (4K Laser)',
         hallType: 'red',
         totalSeats: 84,
@@ -355,37 +130,241 @@ const MOVIES_DATA = [
         priceVip: 7500
       },
       {
-        id: 'mor-2',
-        time: '3:00 PM',
+        id: 'hob-2',
+        time: '4:15 PM',
         hall: 'Red Room (4K Laser)',
         hallType: 'red',
         totalSeats: 84,
-        bookedSeats: Array.from({ length: 70 }, (_, i) => `SEAT-${i}`),
-        status: 'filling_fast',
+        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // Full hall
+        status: 'sold_out',
         priceStandard: 4500,
         priceVip: 8000
       },
       {
-        id: 'mor-3',
-        time: '6:00 PM',
+        id: 'hob-3',
+        time: '7:15 PM',
+        hall: 'Blue Room (Dolby Atmos)',
+        hallType: 'blue',
+        totalSeats: 72,
+        bookedSeats: ['D1', 'D2', 'F1'],
+        status: 'available',
+        priceStandard: 4500,
+        priceVip: 8000
+      }
+    ]
+  },
+  {
+    id: 'onibon-oje',
+    title: 'Onibon Oje',
+    tagline: 'When a Fierce Warlord Threatens the Sacred Kingdom',
+    genre: 'Nollywood / Yoruba Cultural Epic',
+    rating: '15+',
+    duration: '1h 30m',
+    language: 'Yoruba (English Subtitles)',
+    director: 'Adebayo Tijani',
+    cast: 'Odunlade Adekola, Femi Adebayo, Taiwo Hassan',
+    format: 'Dolby Atmos Master Track',
+    synopsis: 'When a ruthless warlord advances toward the ancient sovereign borders of the Yoruba realm, an unyielding warrior chosen by the oracles rises to defend the sacred crowns of the ancestors.',
+    tags: ['cimen', 'featured', 'nollywood-epic', 'blue-room'],
+    poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop',
+    backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1600&auto=format&fit=crop',
+    showtimes: [
+      {
+        id: 'onb-1',
+        time: '11:45 AM',
         hall: 'Blue Room (Dolby Atmos)',
         hallType: 'blue',
         totalSeats: 72,
         bookedSeats: ['C1', 'C2'],
         status: 'available',
-        priceStandard: 4500,
-        priceVip: 8500
+        priceStandard: 4000,
+        priceVip: 7500
       },
       {
-        id: 'mor-4',
-        time: '9:00 PM',
+        id: 'onb-2',
+        time: '2:30 PM',
         hall: 'Blue Room (Dolby Atmos)',
         hallType: 'blue',
         totalSeats: 72,
-        bookedSeats: ['A1', 'A2', 'D5', 'D6'],
+        bookedSeats: Array.from({ length: 72 }, (_, i) => `SEAT-${i}`),
+        status: 'sold_out',
+        priceStandard: 4500,
+        priceVip: 8000
+      },
+      {
+        id: 'onb-3',
+        time: '5:45 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: ['E1', 'E2', 'E3'],
+        status: 'available',
+        priceStandard: 4500,
+        priceVip: 8000
+      },
+      {
+        id: 'onb-4',
+        time: '8:45 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: ['A1', 'A2', 'F3', 'F4'],
+        status: 'available',
+        priceStandard: 4500,
+        priceVip: 8000
+      }
+    ]
+  },
+  {
+    id: 'a-land-apart',
+    title: 'A Land Apart',
+    tagline: 'An Alternate Nigeria Where Soil is Gold',
+    genre: 'Nollywood / Political Drama',
+    rating: '15+',
+    duration: '1h 48m',
+    language: 'English, Yoruba & Pidgin',
+    director: 'CJ Obasi',
+    cast: 'Richard Mofe-Damijo, Genevieve Nnaji, Deyemi Okanlawon',
+    format: 'Dolby Atmos Master Track',
+    synopsis: 'In an alternate reality where agriculture, and not petroleum, became Nigeria’s source of staggering global wealth, rival dynasty heirs contest sovereign agrarian territories.',
+    tags: ['cimen', 'nollywood-epic', 'blue-room'],
+    poster: 'assets/posters/a-land-apart.webp',
+    backdrop: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&auto=format&fit=crop',
+    showtimes: [
+      {
+        id: 'ala-1',
+        time: '1:00 PM',
+        hall: 'Blue Room (Dolby Atmos)',
+        hallType: 'blue',
+        totalSeats: 72,
+        bookedSeats: ['B1', 'B2'],
+        status: 'available',
+        priceStandard: 4000,
+        priceVip: 7500
+      },
+      {
+        id: 'ala-2',
+        time: '4:00 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // Full hall demo
+        status: 'sold_out',
+        priceStandard: 4500,
+        priceVip: 8000
+      },
+      {
+        id: 'ala-3',
+        time: '7:00 PM',
+        hall: 'Blue Room (Dolby Atmos)',
+        hallType: 'blue',
+        totalSeats: 72,
+        bookedSeats: ['D4', 'D5'],
         status: 'available',
         priceStandard: 4500,
         priceVip: 8500
+      }
+    ]
+  },
+  {
+    id: 'street-fighter',
+    title: 'Street Fighter (Legendary Reborn)',
+    tagline: 'Round One. Fight for Glory.',
+    genre: 'Action / Martial Arts Blockbuster',
+    rating: '14+',
+    duration: '2h 05m',
+    language: 'English & Japanese',
+    director: 'Chad Stahelski',
+    cast: 'Hiroyuki Sanada, Lewis Tan, Andrew Koji',
+    format: 'Christie 4K Laser & Dolby 7.1',
+    synopsis: 'Estranged martial artists Ryu and Ken Masters are thrust back into mortal combat when the mysterious Shadaloo syndicate hosts an underground tournament with world domination on the line.',
+    tags: ['cimen', 'hollywood', 'action', 'red-room'],
+    poster: 'assets/posters/street-fighter.webp',
+    backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1600&auto=format&fit=crop',
+    showtimes: [
+      {
+        id: 'stf-1',
+        time: '12:30 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: ['C1', 'C2', 'C3'],
+        status: 'available',
+        priceStandard: 4000,
+        priceVip: 7500
+      },
+      {
+        id: 'stf-2',
+        time: '3:45 PM',
+        hall: 'Blue Room (Dolby Atmos)',
+        hallType: 'blue',
+        totalSeats: 72,
+        bookedSeats: ['E1', 'E2'],
+        status: 'available',
+        priceStandard: 4500,
+        priceVip: 8000
+      },
+      {
+        id: 'stf-3',
+        time: '7:45 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: Array.from({ length: 66 }, (_, i) => `SEAT-${i}`),
+        status: 'filling_fast',
+        priceStandard: 5000,
+        priceVip: 8500
+      }
+    ]
+  },
+  {
+    id: 'verity',
+    title: 'Verity',
+    tagline: 'The Truth Lies Between The Lines',
+    genre: 'Psychological Thriller / Mystery',
+    rating: '18+',
+    duration: '1h 57m',
+    language: 'English',
+    director: 'Michael Mohan',
+    cast: 'Sydney Sweeney, Nicholas Hoult, Rosamund Pike',
+    format: 'Dolby Surround 7.1',
+    synopsis: 'A struggling author is hired to finish the remaining books of a successful series after the original author is injured in a mysterious accident. In the family estate, she uncovers an unpublished manuscript detailing harrowing secrets.',
+    tags: ['cimen', 'thriller', 'red-room'],
+    poster: 'assets/posters/verity.webp',
+    backdrop: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1600&auto=format&fit=crop',
+    showtimes: [
+      {
+        id: 'ver-1',
+        time: '2:00 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: ['A1', 'A2'],
+        status: 'available',
+        priceStandard: 4000,
+        priceVip: 7500
+      },
+      {
+        id: 'ver-2',
+        time: '5:30 PM',
+        hall: 'Blue Room (Dolby Atmos)',
+        hallType: 'blue',
+        totalSeats: 72,
+        bookedSeats: Array.from({ length: 72 }, (_, i) => `SEAT-${i}`), // Full
+        status: 'sold_out',
+        priceStandard: 4500,
+        priceVip: 8000
+      },
+      {
+        id: 'ver-3',
+        time: '8:30 PM',
+        hall: 'Red Room (4K Laser)',
+        hallType: 'red',
+        totalSeats: 84,
+        bookedSeats: ['F1', 'F2', 'G1'],
+        status: 'available',
+        priceStandard: 4500,
+        priceVip: 8000
       }
     ]
   }
@@ -408,14 +387,14 @@ function initLedger() {
     {
       ref: 'OJAJA-CIMEN-8941-IFE',
       timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
-      movieTitle: 'Ori: Rebirth',
-      showtime: '4:00 PM',
+      movieTitle: 'Spider-Man: Brand New Day',
+      showtime: '3:30 PM',
       hall: 'Red Room (4K Laser)',
       hallType: 'red',
-      branch: 'Ife Grand Resort (Flagship)',
+      branch: 'Ojaja Ile-Ife (Grand Resort Flagship)',
       seats: ['D4', 'D5'],
       concessions: [{ name: 'Royal Caramel Popcorn', qty: 2, price: 5000 }],
-      totalAmount: 14000,
+      totalAmount: 15000,
       customerName: 'Adeola Adeleke',
       customerEmail: 'adeola.adeleke@gmail.com',
       customerPhone: '08034567890',
@@ -427,16 +406,16 @@ function initLedger() {
     {
       ref: 'OJAJA-CIMEN-6312-IFE',
       timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
-      movieTitle: 'Agbaranla: The Return',
-      showtime: '2:45 PM',
-      hall: 'Red Room (4K Laser)',
-      hallType: 'red',
-      branch: 'Ife Grand Resort (Flagship)',
+      movieTitle: 'Onibon Oje',
+      showtime: '2:30 PM',
+      hall: 'Blue Room (Dolby Atmos)',
+      hallType: 'blue',
+      branch: 'Ojaja Ile-Ife (Grand Resort Flagship)',
       seats: ['F1', 'F2'],
       concessions: [{ name: 'Signature Nigerian Chilled Chapman', qty: 2, price: 3600 }],
-      totalAmount: 18600,
-      customerName: 'Pastor Samuel Olaitan',
-      customerEmail: 'pastor.olaitan@mountzion.org',
+      totalAmount: 19600,
+      customerName: 'Obafemi Awolowo',
+      customerEmail: 'o.awolowo@ife.edu.ng',
       customerPhone: '08123456789',
       paystackRef: 'pstk_test_11204859182',
       tag: 'cimen-boxoffice',
@@ -446,14 +425,14 @@ function initLedger() {
     {
       ref: 'OJAJA-CIMEN-4109-IFE',
       timestamp: new Date(Date.now() - 3600000 * 1).toISOString(),
-      movieTitle: 'Spider-Man: Brand New Day',
-      showtime: '3:30 PM',
-      hall: 'Blue Room (Dolby Atmos)',
-      hallType: 'blue',
-      branch: 'Ife Grand Resort (Flagship)',
+      movieTitle: 'A Land Apart',
+      showtime: '4:00 PM',
+      hall: 'Red Room (4K Laser)',
+      hallType: 'red',
+      branch: 'Ojaja Ile-Ife (Grand Resort Flagship)',
       seats: ['C3', 'C4', 'C5'],
       concessions: [{ name: 'Royal Duo Combo', qty: 1, price: 9500 }],
-      totalAmount: 24500,
+      totalAmount: 23000,
       customerName: 'Tunde Bakare',
       customerEmail: 'tbakare@oauife.edu.ng',
       customerPhone: '07039876543',
@@ -483,7 +462,7 @@ function renderMoviesGrid() {
   const filteredMovies = MOVIES_DATA.filter(movie => {
     if (AppState.activeFilter === 'all') return true;
     if (AppState.activeFilter === 'nollywood') return movie.genre.toLowerCase().includes('nollywood') || movie.genre.toLowerCase().includes('yoruba');
-    if (AppState.activeFilter === 'hollywood') return movie.genre.toLowerCase().includes('hollywood');
+    if (AppState.activeFilter === 'hollywood') return movie.genre.toLowerCase().includes('hollywood') || movie.genre.toLowerCase().includes('action');
     if (AppState.activeFilter === 'red-room') return movie.showtimes.some(st => st.hallType === 'red');
     if (AppState.activeFilter === 'blue-room') return movie.showtimes.some(st => st.hallType === 'blue');
     return true;
@@ -491,7 +470,7 @@ function renderMoviesGrid() {
 
   container.innerHTML = filteredMovies.map(movie => {
     return `
-      <div class="group relative bg-[#0E1524] rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all duration-300 overflow-hidden flex flex-col shadow-xl hover:shadow-2xl hover:shadow-amber-500/10">
+      <div class="group relative bg-[#0E1524] rounded-3xl border border-white/5 hover:border-amber-500/50 transition-all duration-300 overflow-hidden flex flex-col shadow-xl hover:shadow-2xl hover:shadow-amber-500/10">
         <!-- Poster & Badges -->
         <div class="relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="openBookingModal('${movie.id}')">
           <img 
@@ -518,7 +497,7 @@ function renderMoviesGrid() {
             </span>
           </div>
 
-          <!-- Quick Preview / Play Trailer Button -->
+          <!-- Quick Preview Button -->
           <button 
             type="button" 
             onclick="event.stopPropagation(); openMovieDetails('${movie.id}')"
@@ -538,7 +517,7 @@ function renderMoviesGrid() {
               <span class="text-slate-400">${movie.format}</span>
             </div>
             
-            <h3 class="font-serif text-xl font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1">
+            <h3 class="font-royal text-xl font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1">
               ${movie.title}
             </h3>
             
@@ -564,7 +543,7 @@ function renderMoviesGrid() {
 
                 if (isSoldOut) {
                   badgeClass = 'bg-red-950/40 border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer';
-                  indicator = '<span class="text-[9px] font-bold text-red-400 uppercase tracking-tighter block font-mono">SOLD OUT</span>';
+                  indicator = '<span class="text-[9px] font-bold text-red-400 uppercase tracking-tighter block font-mono">HALL FULL</span>';
                 } else if (isFillingFast) {
                   badgeClass = 'bg-amber-950/30 border-amber-500/30 text-amber-200 hover:bg-amber-500 hover:text-slate-950';
                   indicator = '<span class="text-[9px] font-semibold text-amber-400 block font-mono">FILLING FAST</span>';
@@ -577,7 +556,7 @@ function renderMoviesGrid() {
                     class="p-2 rounded-xl text-left border transition-all duration-200 relative group/btn ${badgeClass}"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="font-bold text-xs tracking-tight">${st.time}</span>
+                      <span class="font-bold text-xs tracking-tight font-mono">${st.time}</span>
                       <span class="text-[10px] opacity-75 font-mono">${st.hallType === 'red' ? 'RED' : 'BLUE'}</span>
                     </div>
                     ${indicator}
@@ -586,7 +565,7 @@ function renderMoviesGrid() {
               }).join('')}
             </div>
 
-            <!-- Big Book Button -->
+            <!-- Book Button -->
             <button 
               type="button" 
               onclick="openBookingModal('${movie.id}')"
@@ -615,18 +594,15 @@ function handleShowtimeClick(movieId, showtimeId) {
   if (!showtime) return;
 
   if (showtime.status === 'sold_out') {
-    // HALL IS FULL! Trigger the smart Alternative Times recommendation modal
     showHallFullAlert(movie, showtime);
     return;
   }
 
-  // Showtime has seats available, proceed to booking modal with this showtime selected
   openBookingModal(movieId, showtimeId);
 }
 
 // Show Intelligent Hall Full Alert with Alternatives
 function showHallFullAlert(movie, fullShowtime) {
-  // Find available alternative showtimes for this movie
   const alternatives = movie.showtimes.filter(st => st.id !== fullShowtime.id && st.status !== 'sold_out');
 
   const modalContainer = document.getElementById('hall-full-modal');
@@ -635,28 +611,29 @@ function showHallFullAlert(movie, fullShowtime) {
 
   modalContent.innerHTML = `
     <div class="relative p-6 sm:p-8 bg-[#0E1524] rounded-3xl border border-red-500/40 shadow-2xl max-w-lg w-full text-slate-100">
-      <!-- Glow & Header -->
-      <div class="w-16 h-16 rounded-2xl bg-red-950/70 border border-red-500/50 flex items-center justify-center text-red-400 mb-5 mx-auto shadow-lg shadow-red-500/20">
-        <i data-lucide="alert-octagon" class="w-8 h-8 animate-pulse"></i>
+      
+      <!-- Official Brand Logo in Alert -->
+      <div class="flex items-center justify-center mb-4">
+        <img src="assets/ojaja-logo-transparent.png" alt="Ojaja Cinemas" class="h-10 object-contain drop-shadow-md">
       </div>
 
       <div class="text-center">
         <span class="px-3 py-1 text-xs font-mono font-bold uppercase rounded-full bg-red-900/40 text-red-400 border border-red-500/30">
           Hall Capacity Reached
         </span>
-        <h3 class="font-serif text-2xl font-bold text-white mt-3">
+        <h3 class="font-royal text-2xl font-bold text-white mt-3">
           ${fullShowtime.hall} is Full!
         </h3>
-        <p class="text-sm text-slate-300 mt-2">
-          For the <strong class="text-amber-400">${fullShowtime.time}</strong> screening of <strong class="text-white">${movie.title}</strong>, all <strong class="text-red-400">${fullShowtime.totalSeats} seats</strong> have been reserved.
+        <p class="text-xs sm:text-sm text-slate-300 mt-2">
+          For the <strong class="text-amber-400">${fullShowtime.time}</strong> screening of <strong class="text-white">${movie.title}</strong>, all <strong class="text-red-400">${fullShowtime.totalSeats} seats</strong> have been booked.
         </p>
       </div>
 
       <!-- Recommendation Section -->
       <div class="mt-6 p-4 rounded-2xl bg-slate-900/80 border border-white/10">
-        <div class="flex items-center gap-2 text-xs font-semibold text-amber-400 mb-3 uppercase tracking-wider">
+        <div class="flex items-center gap-2 text-xs font-semibold text-amber-400 mb-3 uppercase tracking-wider font-mono">
           <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>Recommended Alternative Times Today:</span>
+          <span>Available Alternative Times Today:</span>
         </div>
 
         ${alternatives.length > 0 ? `
@@ -677,7 +654,7 @@ function showHallFullAlert(movie, fullShowtime) {
                   <button 
                     type="button" 
                     onclick="selectAlternativeShowtime('${movie.id}', '${alt.id}')"
-                    class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-transform hover:scale-105 shadow-md flex items-center gap-1.5"
+                    class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-transform hover:scale-105 shadow-md flex items-center gap-1.5"
                   >
                     <span>Switch</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -734,7 +711,6 @@ function openBookingModal(movieId, preselectedShowtimeId = null) {
 
   AppState.selectedMovie = movie;
   
-  // Choose requested showtime or first available showtime
   if (preselectedShowtimeId) {
     AppState.selectedShowtime = movie.showtimes.find(st => st.id === preselectedShowtimeId);
   } else {
@@ -777,15 +753,15 @@ function renderBookingModalContent() {
     <!-- Top Movie Banner Summary -->
     <div class="relative p-6 bg-gradient-to-r from-slate-900 via-[#101726] to-slate-900 border-b border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
-        <img src="${movie.poster}" alt="${movie.title}" class="w-16 h-24 object-cover rounded-xl shadow-lg border border-white/10">
+        <img src="${movie.poster}" alt="${movie.title}" class="w-16 h-24 object-cover rounded-2xl shadow-lg border border-white/10">
         <div>
           <div class="flex items-center gap-2">
             <span class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-amber-500 text-slate-950">${movie.rating}</span>
             <span class="text-xs text-amber-400 font-mono">${movie.duration}</span>
             <span class="text-xs text-slate-400">• ${movie.format}</span>
           </div>
-          <h2 class="font-serif text-2xl font-bold text-white mt-1">${movie.title}</h2>
-          <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1.5">
+          <h2 class="font-royal text-2xl font-bold text-white mt-1">${movie.title}</h2>
+          <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1.5 font-mono">
             <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
             <span>${AppState.currentBranch}</span>
           </p>
@@ -794,7 +770,7 @@ function renderBookingModalContent() {
 
       <!-- Showtime Switcher Tabs -->
       <div class="w-full md:w-auto">
-        <span class="text-[11px] text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Select Showtime:</span>
+        <span class="text-[11px] text-slate-400 block mb-1.5 font-medium uppercase tracking-wider font-mono">Select Showtime:</span>
         <div class="flex flex-wrap gap-2">
           ${movie.showtimes.map(st => {
             const isSelected = st.id === currentShowtime.id;
@@ -805,7 +781,7 @@ function renderBookingModalContent() {
                 <button 
                   type="button" 
                   onclick="showHallFullAlert(AppState.selectedMovie, AppState.selectedMovie.showtimes.find(s => s.id === '${st.id}'))"
-                  class="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-950/40 text-red-300 text-xs font-mono font-semibold opacity-75 hover:opacity-100 flex items-center gap-1.5"
+                  class="px-3 py-1.5 rounded-xl border border-red-500/40 bg-red-950/40 text-red-300 text-xs font-mono font-semibold opacity-75 hover:opacity-100 flex items-center gap-1.5"
                   title="Hall Full - Click for alternatives"
                 >
                   <i data-lucide="lock" class="w-3 h-3 text-red-400"></i>
@@ -818,7 +794,7 @@ function renderBookingModalContent() {
               <button 
                 type="button" 
                 onclick="changeModalShowtime('${st.id}')"
-                class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                class="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
                   isSelected 
                     ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30' 
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-white/10'
@@ -835,14 +811,14 @@ function renderBookingModalContent() {
     <!-- Booking Body Grid: Seat Map Left, Summary & Checkout Right -->
     <div class="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden">
       
-      <!-- Left Column: Interactive Seat Grid (7 cols on lg) -->
+      <!-- Left Column: Interactive Seat Grid -->
       <div class="lg:col-span-7 p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col items-center">
         
         <!-- Screen Curve & Ambient Glow -->
         <div class="w-full max-w-lg cinema-screen-container text-center mb-8">
           <div class="text-[11px] font-mono tracking-[0.25em] text-amber-400/80 mb-2 uppercase flex items-center justify-center gap-2">
             <i data-lucide="film" class="w-3.5 h-3.5"></i>
-            <span>ROYAL 4K DUAL LASER SCREEN</span>
+            <span>CHRISTIE 4K DUAL LASER CURVED SCREEN</span>
           </div>
           <div class="cinema-screen-curve w-full"></div>
           <div class="screen-light-glow h-8 w-full"></div>
@@ -874,13 +850,13 @@ function renderBookingModalContent() {
         </div>
 
         <!-- Hall Capacity Indicator -->
-        <div class="mt-6 w-full max-w-lg p-3 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between text-xs font-mono">
-          <span class="text-slate-400">Hall: <strong class="text-white">${currentShowtime.hall}</strong></span>
-          <span class="text-slate-400">Available: <strong class="text-emerald-400">${currentShowtime.totalSeats - currentShowtime.bookedSeats.length} / ${currentShowtime.totalSeats} seats</strong></span>
+        <div class="mt-6 w-full max-w-lg p-3 rounded-2xl bg-slate-900/60 border border-white/5 flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400">Auditorium: <strong class="text-white">${currentShowtime.hall}</strong></span>
+          <span class="text-slate-400">Live Inventory: <strong class="text-emerald-400">${currentShowtime.totalSeats - currentShowtime.bookedSeats.length} / ${currentShowtime.totalSeats} seats open</strong></span>
         </div>
       </div>
 
-      <!-- Right Column: Concessions + Customer Info + Paystack Checkout (5 cols on lg) -->
+      <!-- Right Column: Concessions + Customer Info + Paystack Checkout -->
       <div class="lg:col-span-5 p-6 bg-[#0B0F17] flex flex-col justify-between overflow-y-auto">
         <div class="space-y-6">
           
@@ -892,13 +868,13 @@ function renderBookingModalContent() {
             </h4>
             
             ${AppState.selectedSeats.length === 0 ? `
-              <div class="p-4 rounded-xl border border-dashed border-white/10 text-center text-xs text-slate-500">
-                Please tap on any available seat in the map to make your reservation.
+              <div class="p-4 rounded-2xl border border-dashed border-white/10 text-center text-xs text-slate-500">
+                Please tap on any available seat in the auditorium map to reserve.
               </div>
             ` : `
               <div class="flex flex-wrap gap-2">
                 ${AppState.selectedSeats.map(seat => `
-                  <div class="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center gap-2 text-xs font-mono text-amber-300">
+                  <div class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center gap-2 text-xs font-mono text-amber-300">
                     <span class="font-bold">${seat.id}</span>
                     <span class="text-[10px] opacity-75">(${seat.tier})</span>
                     <button type="button" onclick="toggleSeat('${seat.id}', '${seat.tier}', ${seat.price})" class="text-amber-400 hover:text-white">✕</button>
@@ -912,14 +888,14 @@ function renderBookingModalContent() {
           <div>
             <h4 class="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider mb-2 flex items-center gap-1.5">
               <i data-lucide="coffee" class="w-4 h-4"></i>
-              <span>Add Concessions & Drinks</span>
+              <span>Concessions & Drinks (Ife Grand Resort)</span>
             </h4>
             
             <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
               ${CONCESSIONS_DATA.map(item => {
                 const qty = AppState.selectedConcessions[item.id] || 0;
                 return `
-                  <div class="p-2.5 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-between text-xs">
+                  <div class="p-2.5 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-between text-xs">
                     <div class="flex items-center gap-2.5">
                       <span class="text-xl">${item.emoji}</span>
                       <div>
@@ -932,13 +908,13 @@ function renderBookingModalContent() {
                       <button 
                         type="button" 
                         onclick="updateConcession('${item.id}', -1)"
-                        class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm"
+                        class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm"
                       >-</button>
                       <span class="w-5 text-center font-bold text-white">${qty}</span>
                       <button 
                         type="button" 
                         onclick="updateConcession('${item.id}', 1)"
-                        class="w-6 h-6 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm"
+                        class="w-6 h-6 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm"
                       >+</button>
                     </div>
                   </div>
@@ -951,7 +927,7 @@ function renderBookingModalContent() {
           <div class="space-y-3 pt-2 border-t border-white/10">
             <h4 class="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
               <i data-lucide="user" class="w-4 h-4"></i>
-              <span>Contact & Ticket Dispatch</span>
+              <span>Patron Information & Digital Dispatch</span>
             </h4>
 
             <div>
@@ -962,31 +938,31 @@ function renderBookingModalContent() {
                 placeholder="e.g. Olumide Adeleke" 
                 value="${AppState.customer.name}"
                 oninput="AppState.customer.name = this.value"
-                class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
               >
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="text-[11px] text-slate-400 block mb-1">Email (for E-Ticket)</label>
+                <label class="text-[11px] text-slate-400 block mb-1">Email (for QR E-Ticket)</label>
                 <input 
                   type="email" 
                   id="customer-email" 
                   placeholder="name@gmail.com" 
                   value="${AppState.customer.email}"
                   oninput="AppState.customer.email = this.value"
-                  class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
                 >
               </div>
               <div>
-                <label class="text-[11px] text-slate-400 block mb-1">Phone Number</label>
+                <label class="text-[11px] text-slate-400 block mb-1">WhatsApp / Mobile Phone</label>
                 <input 
                   type="tel" 
                   id="customer-phone" 
                   placeholder="080 1234 5678" 
                   value="${AppState.customer.phone}"
                   oninput="AppState.customer.phone = this.value"
-                  class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
                 >
               </div>
             </div>
@@ -995,7 +971,6 @@ function renderBookingModalContent() {
 
         <!-- Bottom Total & Paystack Trigger -->
         <div class="pt-5 mt-4 border-t border-white/10">
-          <!-- Price Calculation Breakdown -->
           <div class="space-y-1.5 text-xs font-mono text-slate-400 mb-4">
             <div class="flex justify-between">
               <span>Seats (${AppState.selectedSeats.length}):</span>
@@ -1006,11 +981,11 @@ function renderBookingModalContent() {
               <span class="text-white">${formatNaira(calculateConcessionsTotal())}</span>
             </div>
             <div class="flex justify-between">
-              <span>Cinema Tax & Tag:</span>
-              <span class="text-amber-400">[cimen-boxoffice] (Included)</span>
+              <span>Backend Tracking Tag:</span>
+              <span class="text-amber-400">[cimen-boxoffice]</span>
             </div>
             <div class="flex justify-between text-base font-bold text-amber-400 pt-2 border-t border-white/10">
-              <span class="font-serif">Grand Total:</span>
+              <span class="font-royal">Grand Total:</span>
               <span>${formatNaira(calculateGrandTotal())}</span>
             </div>
           </div>
@@ -1020,14 +995,14 @@ function renderBookingModalContent() {
             type="button" 
             onclick="initiatePaystackCheckout()"
             ${AppState.selectedSeats.length === 0 ? 'disabled' : ''}
-            class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 transition-all hover:scale-[1.01]"
+            class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 transition-all hover:scale-[1.01]"
           >
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Pay With Paystack (${formatNaira(calculateGrandTotal())})</span>
           </button>
           
           <p class="text-[10px] text-center text-slate-500 mt-2 font-mono">
-            Secured by Paystack • Instant QR Pass & WhatsApp Confirmation
+            Secured by Paystack • Instant QR Turnstile Pass
           </p>
         </div>
       </div>
@@ -1051,7 +1026,7 @@ function changeModalShowtime(showtimeId) {
   }
 
   AppState.selectedShowtime = newShowtime;
-  AppState.selectedSeats = []; // reset seat selection when changing showtime
+  AppState.selectedSeats = [];
   renderBookingModalContent();
 }
 
@@ -1076,13 +1051,12 @@ function renderSeatRows(showtime) {
             const isBooked = showtime.bookedSeats.includes(seatId);
             const isSelected = AppState.selectedSeats.some(s => s.id === seatId);
 
-            // Create aisle gap in the middle
             const aisleGap = seatNumber === 6 ? 'mr-3 sm:mr-5' : '';
 
             if (isBooked) {
               return `
                 <div 
-                  class="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-slate-900 border border-red-500/30 text-red-500/70 text-[9px] flex items-center justify-center font-mono cursor-not-allowed ${aisleGap}"
+                  class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-900 border border-red-500/30 text-red-500/70 text-[9px] flex items-center justify-center font-mono cursor-not-allowed ${aisleGap}"
                   title="Seat ${seatId} (Occupied)"
                 >
                   ✕
@@ -1102,7 +1076,7 @@ function renderSeatRows(showtime) {
               <button 
                 type="button" 
                 onclick="toggleSeat('${seatId}', '${tier}', ${price})"
-                class="seat-btn w-6 h-6 sm:w-7 sm:h-7 rounded-md border text-[10px] font-mono flex items-center justify-center transition-all ${seatClasses} ${aisleGap}"
+                class="seat-btn w-6 h-6 sm:w-7 sm:h-7 rounded-lg border text-[10px] font-mono flex items-center justify-center transition-all ${seatClasses} ${aisleGap}"
                 title="${seatId} - ${tier} (${formatNaira(price)})"
               >
                 ${seatNumber}
@@ -1162,7 +1136,6 @@ function calculateGrandTotal() {
 
 // Paystack Integration Engine
 function initiatePaystackCheckout() {
-  // 1. Validation
   if (AppState.selectedSeats.length === 0) {
     showToast('Please select at least one seat before proceeding.', 'error');
     return;
@@ -1199,12 +1172,10 @@ function initiatePaystackCheckout() {
   AppState.customer.phone = customerPhone;
 
   const grandTotal = calculateGrandTotal();
-  const amountInKobo = grandTotal * 100; // Paystack requires NGN amount in Kobo
+  const amountInKobo = grandTotal * 100;
 
-  // Unique Booking Ref tagged with cimen
   const bookingRef = `OJAJA-CIMEN-${Math.floor(1000 + Math.random() * 9000)}-IFE`;
 
-  // Build concessions summary
   const concessionsList = Object.entries(AppState.selectedConcessions).map(([id, qty]) => {
     const item = CONCESSIONS_DATA.find(c => c.id === id);
     return { name: item.name, qty, price: item.price * qty };
@@ -1230,7 +1201,6 @@ function initiatePaystackCheckout() {
     checkedIn: false
   };
 
-  // Check if official PaystackPop is available in browser
   if (typeof PaystackPop !== 'undefined' && AppState.paystackPublicKey) {
     try {
       const handler = PaystackPop.setup({
@@ -1249,7 +1219,7 @@ function initiatePaystackCheckout() {
           custom_fields: [
             { display_name: 'Customer Name', variable_name: 'customer_name', value: customerName },
             { display_name: 'Phone Number', variable_name: 'customer_phone', value: customerPhone },
-            { display_name: 'Tag', variable_name: 'cinema_tag', value: 'cimen-boxoffice' }
+            { display_name: 'Cinema Tag', variable_name: 'cinema_tag', value: 'cimen-boxoffice' }
           ]
         },
         callback: function(response) {
@@ -1267,11 +1237,10 @@ function initiatePaystackCheckout() {
     }
   }
 
-  // Graceful Fallback / Demo Simulator Modal
   openSimulatedPaystackModal(bookingPayload);
 }
 
-// High Fidelity Paystack Simulation Modal for Instant Verification
+// High Fidelity Paystack Simulation Modal
 function openSimulatedPaystackModal(bookingPayload) {
   const modal = document.getElementById('paystack-simulator-modal');
   const container = document.getElementById('paystack-simulator-content');
@@ -1279,10 +1248,9 @@ function openSimulatedPaystackModal(bookingPayload) {
 
   container.innerHTML = `
     <div class="p-6 bg-white text-slate-900 rounded-3xl max-w-md w-full shadow-2xl relative font-sans">
-      <!-- Paystack Brand Header -->
       <div class="flex items-center justify-between pb-4 border-b border-slate-200">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-[#0BA4DB] flex items-center justify-center text-white font-bold text-sm">
+          <div class="w-8 h-8 rounded-xl bg-[#0BA4DB] flex items-center justify-center text-white font-bold text-sm">
             P
           </div>
           <div>
@@ -1293,29 +1261,32 @@ function openSimulatedPaystackModal(bookingPayload) {
         <button type="button" onclick="closePaystackSimulator()" class="text-slate-400 hover:text-slate-700 text-lg">✕</button>
       </div>
 
-      <!-- Merchant & Transaction Summary -->
       <div class="my-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <div class="text-xs text-slate-500">Merchant</div>
-        <div class="font-bold text-base text-slate-900">Ojaja Cinemas (Ife Grand Resort)</div>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-200 text-xs">
+        <div class="flex items-center gap-3">
+          <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-10 h-10 object-contain rounded-lg">
+          <div>
+            <div class="text-[11px] text-slate-500 uppercase font-mono">Merchant</div>
+            <div class="font-bold text-sm text-slate-900">Ojaja Cinemas (Ife Grand Resort)</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 text-xs">
           <span class="text-slate-600">${bookingPayload.movieTitle} (${bookingPayload.seats.join(', ')})</span>
           <span class="font-bold text-emerald-700 font-mono text-sm">${formatNaira(bookingPayload.totalAmount)}</span>
         </div>
       </div>
 
-      <!-- Payment Channels Simulation -->
       <div class="space-y-3">
-        <p class="text-xs text-slate-500 font-medium">Select Payment Channel:</p>
+        <p class="text-xs text-slate-500 font-medium">Select Payment Method:</p>
         
         <button 
           type="button" 
           onclick="executeSimulatedPaymentSuccess('CARD')"
-          class="w-full p-3.5 rounded-xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
+          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
         >
           <div class="flex items-center gap-3">
             <span class="text-xl">💳</span>
             <div class="text-left">
-              <div class="font-bold text-xs text-slate-900">Pay with Card / Mastercard / Visa / Verve</div>
+              <div class="font-bold text-xs text-slate-900">Pay with Card (Mastercard / Visa / Verve)</div>
               <div class="text-[11px] text-slate-500">Instant Authorization</div>
             </div>
           </div>
@@ -1325,7 +1296,7 @@ function openSimulatedPaystackModal(bookingPayload) {
         <button 
           type="button" 
           onclick="executeSimulatedPaymentSuccess('TRANSFER')"
-          class="w-full p-3.5 rounded-xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
+          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
         >
           <div class="flex items-center gap-3">
             <span class="text-xl">🏦</span>
@@ -1340,7 +1311,7 @@ function openSimulatedPaystackModal(bookingPayload) {
         <button 
           type="button" 
           onclick="executeSimulatedPaymentSuccess('USSD')"
-          class="w-full p-3.5 rounded-xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
+          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
         >
           <div class="flex items-center gap-3">
             <span class="text-xl">📱</span>
@@ -1385,7 +1356,6 @@ function executeSimulatedPaymentSuccess(channel) {
 
 // Finalize Booking & Open E-Ticket Pass
 function finalizeSuccessfulBooking(booking) {
-  // Update local seat booked status for real-time reactivity
   const showtime = AppState.selectedMovie.showtimes.find(st => st.id === AppState.selectedShowtime.id);
   if (showtime) {
     showtime.bookedSeats.push(...booking.seats);
@@ -1396,24 +1366,17 @@ function finalizeSuccessfulBooking(booking) {
     }
   }
 
-  // Push to ledger & save
   AppState.bookingsLedger.unshift(booking);
   saveLedger();
 
-  // Close booking modal
   closeBookingModal();
-
-  // Re-render movie cards to reflect updated availability
   renderMoviesGrid();
 
-  // Show Success Toast
   showToast('Booking Confirmed! Your Paystack transaction was successful.', 'success');
-
-  // Open the Digital E-Ticket Pass Modal
   openTicketModal(booking);
 }
 
-// Digital E-Ticket Pass Modal with Dynamic QR & Barcode
+// Digital E-Ticket Pass Modal with Dynamic QR & Official Logo
 function openTicketModal(booking) {
   AppState.activeBooking = booking;
 
@@ -1436,14 +1399,14 @@ function openTicketModal(booking) {
   container.innerHTML = `
     <div id="printable-ticket-area" class="w-full max-w-md mx-auto ticket-card rounded-3xl border border-amber-500/40 shadow-2xl overflow-hidden text-slate-100">
       
-      <!-- Top Royal Branding -->
+      <!-- Top Royal Branding with Official Logo -->
       <div class="p-6 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-slate-950 text-amber-400 flex items-center justify-center font-serif font-black text-xl shadow-lg">
-            👑
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-white p-1 shadow-lg flex items-center justify-center">
+            <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
           </div>
           <div>
-            <h3 class="font-serif font-bold text-base tracking-wide leading-tight">OJAJA CINEMAS</h3>
+            <h3 class="font-royal font-bold text-base tracking-wide leading-tight">OJAJA CINEMAS</h3>
             <span class="text-[10px] font-mono tracking-wider uppercase block opacity-90">African Village • Ile-Ife</span>
           </div>
         </div>
@@ -1458,7 +1421,7 @@ function openTicketModal(booking) {
       <div class="p-6 bg-[#0E1524] space-y-4">
         <div>
           <span class="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider">FEATURE FILM</span>
-          <h2 class="font-serif text-2xl font-bold text-white mt-0.5">${booking.movieTitle}</h2>
+          <h2 class="font-royal text-2xl font-bold text-white mt-0.5">${booking.movieTitle}</h2>
           <p class="text-xs text-slate-400 font-medium">${booking.branch}</p>
         </div>
 
@@ -1486,7 +1449,7 @@ function openTicketModal(booking) {
         ${booking.concessions && booking.concessions.length > 0 ? `
           <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 text-xs">
             <span class="text-[10px] font-mono text-amber-400 font-bold uppercase block mb-1">CONCESSIONS CLAIM</span>
-            <div class="text-slate-300 space-y-0.5">
+            <div class="text-slate-300 space-y-0.5 font-mono">
               ${booking.concessions.map(c => `<div>• ${c.qty}x ${c.name}</div>`).join('')}
             </div>
           </div>
@@ -1575,12 +1538,12 @@ function shareTicketWhatsApp() {
   const message = `🎬 *OJAJA CINEMAS E-TICKET PASS*
 👑 *Location:* ${b.branch}
 🎟️ *Movie:* ${b.movieTitle}
-🏛️ *Hall:* ${b.hall}
+🏛️ *Auditorium:* ${b.hall}
 ⏰ *Time:* ${b.showtime}
 💺 *Seats:* ${b.seats.join(', ')}
 💰 *Amount Paid:* ${formatNaira(b.totalAmount)}
 🔖 *Booking Ref:* ${b.ref}
-🏷️ *Tag:* ${b.tag}
+🏷️ *Backend Tag:* ${b.tag}
 
 _Present this reference code or QR pass at the entrance turnstile._`;
 
@@ -1599,7 +1562,6 @@ function openMovieDetails(movieId) {
 
   container.innerHTML = `
     <div class="relative bg-[#0E1524] rounded-3xl border border-white/10 shadow-2xl max-w-2xl w-full overflow-hidden text-slate-100">
-      <!-- Backdrop Banner -->
       <div class="relative h-60 w-full overflow-hidden">
         <img src="${movie.backdrop}" alt="${movie.title}" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-[#0E1524] via-[#0E1524]/60 to-transparent"></div>
@@ -1613,17 +1575,16 @@ function openMovieDetails(movieId) {
         </button>
       </div>
 
-      <!-- Content -->
       <div class="p-6 -mt-16 relative">
         <div class="flex items-end gap-5">
-          <img src="${movie.poster}" alt="${movie.title}" class="w-24 h-36 object-cover rounded-xl shadow-2xl border-2 border-amber-500/40">
+          <img src="${movie.poster}" alt="${movie.title}" class="w-24 h-36 object-cover rounded-2xl shadow-2xl border-2 border-amber-500/40">
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-amber-500 text-slate-950">${movie.rating}</span>
               <span class="text-xs text-amber-400 font-mono">${movie.duration}</span>
               <span class="text-xs text-slate-400">• ${movie.format}</span>
             </div>
-            <h2 class="font-serif text-2xl font-bold text-white">${movie.title}</h2>
+            <h2 class="font-royal text-2xl font-bold text-white">${movie.title}</h2>
             <p class="text-xs text-slate-400">${movie.tagline}</p>
           </div>
         </div>
@@ -1654,12 +1615,11 @@ function openMovieDetails(movieId) {
           </div>
         </div>
 
-        <!-- Book CTA -->
         <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-end gap-3">
           <button 
             type="button" 
             onclick="closeMovieDetails(); openBookingModal('${movie.id}')"
-            class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
+            class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
           >
             <i data-lucide="ticket" class="w-4 h-4"></i>
             <span>Select Showtime & Book Seats</span>
@@ -1716,11 +1676,9 @@ function renderAdminHub() {
       <!-- Admin Header -->
       <div class="flex items-center justify-between pb-5 border-b border-white/10">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-xl">
-            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-          </div>
+          <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-10 h-10 object-contain rounded-xl bg-white p-0.5">
           <div>
-            <h3 class="font-serif text-xl font-bold text-white">Box Office Dispatch & Verification Hub</h3>
+            <h3 class="font-royal text-xl font-bold text-white">Box Office Dispatch & Verification Hub</h3>
             <span class="text-xs text-amber-400 font-mono">Tagged: [cimen-boxoffice] • Real-time Ledger</span>
           </div>
         </div>
@@ -1737,7 +1695,7 @@ function renderAdminHub() {
         <div class="p-4 rounded-2xl bg-slate-900 border border-white/5">
           <div class="text-xs text-slate-400 font-mono uppercase">Tickets Issued</div>
           <div class="text-2xl font-bold text-amber-400 font-mono mt-1">${totalTickets} Seats</div>
-          <span class="text-[10px] text-slate-500">Across Red & Blue Halls</span>
+          <span class="text-[10px] text-slate-500">Red & Blue Rooms Combined</span>
         </div>
         <div class="p-4 rounded-2xl bg-slate-900 border border-white/5">
           <div class="text-xs text-slate-400 font-mono uppercase">Turnstile Check-ins</div>
@@ -1817,7 +1775,7 @@ function renderAdminHub() {
                     <button 
                       type="button" 
                       onclick="openTicketModal(AppState.bookingsLedger.find(x => x.ref === '${b.ref}'))"
-                      class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px]"
+                      class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px]"
                     >
                       View Pass
                     </button>
@@ -1919,13 +1877,11 @@ function showToast(message, type = 'info') {
     window.lucide.createIcons();
   }
 
-  // Animate in
   setTimeout(() => {
     toast.classList.remove('translate-y-2', 'opacity-0');
     toast.classList.add('translate-y-0', 'opacity-100');
   }, 10);
 
-  // Remove after 4s
   setTimeout(() => {
     toast.classList.add('opacity-0', 'translate-y-2');
     setTimeout(() => toast.remove(), 300);
@@ -1937,7 +1893,6 @@ window.addEventListener('DOMContentLoaded', () => {
   initLedger();
   renderMoviesGrid();
 
-  // Keyboard shortcut: Alt + A opens Admin hub
   window.addEventListener('keydown', (e) => {
     if (e.altKey && (e.key === 'a' || e.key === 'A')) {
       e.preventDefault();

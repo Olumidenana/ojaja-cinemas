@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ojaja Cinemas — African Grandeur & Next-Gen Luxury Cinema Booking</title>
   <meta name="description" content="Experience world-class cinematic luxury at Ojaja Cinemas, African Village, Ife Grand Resort. Dual 4K Laser Projection, Dolby Atmos Sound, seamless Paystack ticket booking & VIP experiences.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="assets/ojaja-official-logo.png">
 
   <!-- Premier Google Fonts Matching the Royal Cinema & Olive Branch Aesthetic:
        - Cinzel: Regal classical Yoruba royalty & cinema grandeur
@@ -40,7 +41,8 @@
               onyx: '#080B12',
               slate: '#0E1524',
               surface: '#151F33',
-              atmos: '#0284C7'
+              atmos: '#0284C7',
+              royalPurple: '#CB33D3'
             }
           },
           fontFamily: {
@@ -58,45 +60,47 @@
 
   <!-- Top Announcement Bar -->
   <div class="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 py-1.5 px-4 text-center text-slate-950 font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2">
-    <span>👑 ROYAL CINEMA EXPERIENCE</span>
+    <span>👑 ROYAL CINEMA DESTINATION</span>
     <span>•</span>
-    <span>FEATURING DUAL 4K LASER (RED ROOM) & DOLBY ATMOS 7.1 (BLUE ROOM)</span>
+    <span>CHRISTIE DUAL 4K LASER (RED ROOM) & DOLBY ATMOS 7.1 (BLUE ROOM)</span>
     <span>•</span>
-    <span class="font-mono underline cursor-pointer" onclick="openAdminModal()">[BOX OFFICE HUB: ALT + A]</span>
+    <span class="font-mono underline cursor-pointer" onclick="openAdminModal()">[BOX OFFICE DISPATCH: ALT + A]</span>
   </div>
 
-  <!-- Primary Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-[#080B12]/90 backdrop-blur-xl border-b border-white/10">
+  <!-- Primary Navigation Bar with Official Ojaja Cinemas Logo -->
+  <header class="sticky top-0 z-40 bg-[#080B12]/95 backdrop-blur-xl border-b border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
-      <!-- Logo & Royal Crest -->
-      <a href="#" class="flex items-center gap-3 group">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
-          <div class="w-full h-full bg-[#080B12] rounded-[14px] flex items-center justify-center text-amber-400 font-royal font-black text-2xl">
-            👑
-          </div>
+      <!-- Official Logo & Branding -->
+      <a href="#" class="flex items-center gap-3.5 group">
+        <div class="w-12 h-12 rounded-2xl bg-white p-1 shadow-lg shadow-amber-500/10 border border-amber-500/30 group-hover:scale-105 transition-transform flex items-center justify-center">
+          <img 
+            src="assets/ojaja-official-logo.png" 
+            alt="Ojaja Cinemas Official Logo" 
+            class="w-full h-full object-contain"
+          >
         </div>
         <div>
-          <span class="font-royal text-xl sm:text-2xl font-black tracking-wider text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
+          <span class="font-royal text-xl sm:text-2xl font-black tracking-wider text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5 leading-none">
             OJAJA <span class="text-amber-400">CINEMAS</span>
           </span>
-          <span class="text-[10px] font-mono tracking-widest text-slate-400 uppercase block -mt-1">
-            African Village • Ile-Ife
+          <span class="text-[10px] font-mono tracking-widest text-slate-400 uppercase block mt-1">
+            African Village • Ile-Ife Grand Resort
           </span>
         </div>
       </a>
 
       <!-- Location / Branch Selector -->
-      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-white/10 text-xs">
+      <div class="hidden md:flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-900 border border-white/10 text-xs">
         <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
-        <span class="text-slate-400 font-mono">Location:</span>
+        <span class="text-slate-400 font-mono">Auditorium Campus:</span>
         <select 
           onchange="setBranch(this.value)"
           class="bg-transparent text-white font-semibold font-body focus:outline-none cursor-pointer pr-2"
         >
-          <option value="Ife Grand Resort (Flagship)" class="bg-slate-900 text-white">Ife Grand Resort (Flagship)</option>
-          <option value="Ojaja Lagos (Ajah)" class="bg-slate-900 text-white">Ojaja Lagos (Ajah)</option>
-          <option value="Ojaja Akure" class="bg-slate-900 text-white">Ojaja Akure</option>
+          <option value="Ojaja Ile-Ife (Grand Resort Flagship)" class="bg-slate-900 text-white">Ojaja Ile-Ife (Grand Resort Flagship)</option>
+          <option value="Ojaja Lagos (Ogombo Ajah)" class="bg-slate-900 text-white">Ojaja Lagos (Ogombo Ajah)</option>
+          <option value="Ojaja Akure (Alagbaka)" class="bg-slate-900 text-white">Ojaja Akure (Alagbaka)</option>
         </select>
       </div>
 
@@ -108,13 +112,13 @@
           class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-400 hover:text-amber-300 text-xs font-mono font-semibold flex items-center gap-2 transition-all"
         >
           <i data-lucide="terminal" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Admin Hub</span>
+          <span class="hidden sm:inline">Dispatch Hub</span>
           <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">[cimen]</span>
         </button>
 
         <a 
           href="#movies-section"
-          class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/25 transition-all hover:scale-105"
+          class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/25 transition-all hover:scale-105"
         >
           <i data-lucide="ticket" class="w-4 h-4"></i>
           <span>Book Tickets</span>
@@ -140,10 +144,10 @@
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
       <div class="max-w-3xl">
         
-        <!-- Eyebrow Tag -->
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold mb-6">
-          <i data-lucide="crown" class="w-3.5 h-3.5"></i>
-          <span>IFE GRAND RESORT & INDUSTRIAL HUB • ILE-IFE</span>
+        <!-- Official Logo Pill -->
+        <div class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-900/90 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold mb-6 shadow-xl">
+          <img src="assets/ojaja-official-logo.png" alt="Logo" class="w-5 h-5 rounded-full object-contain">
+          <span>AFRICAN VILLAGE • IFE GRAND RESORT & INDUSTRIAL HUB</span>
         </div>
 
         <h1 class="font-royal text-4xl sm:text-6xl font-black text-white tracking-tight leading-none mb-4">
@@ -154,7 +158,7 @@
         </h1>
 
         <p class="text-base sm:text-lg text-slate-300 font-light max-w-2xl leading-relaxed mb-8">
-          Welcome to Ojaja Cinemas. Designed to international standards, experience Africa’s premier film showcase across our cutting-edge <strong class="text-red-400 font-semibold">Red Room (4K Laser)</strong> and <strong class="text-sky-400 font-semibold">Blue Room (Dolby Atmos)</strong> with seamless Paystack automated ticketing and instant seat booking.
+          Welcome to the upgraded Ojaja Cinemas experience. International auditorium standards featuring the <strong class="text-red-400 font-semibold">Red Room (Christie 4K Laser)</strong> and <strong class="text-sky-400 font-semibold">Blue Room (Dolby Atmos Spatial Audio)</strong>, real-time sold-out capacity notifications with alternative showtime suggestions, and instant Paystack online ticketing.
         </p>
 
         <!-- CTA Buttons -->
@@ -169,12 +173,12 @@
 
           <button 
             type="button" 
-            onclick="openBookingModal('ori-rebirth', 'ori-2')"
+            onclick="openBookingModal('spiderman-brand-new-day', 'spidey-2')"
             class="px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-white font-semibold text-sm flex items-center gap-2.5 transition-all"
             title="Test Sold-Out Alternative Recommender"
           >
             <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i>
-            <span>Simulate Full Hall Recommender</span>
+            <span>Test "Hall is Full" Recommender</span>
           </button>
         </div>
 
@@ -182,7 +186,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12 pt-8 border-t border-white/10 font-mono text-xs">
           <div>
             <div class="text-amber-400 font-bold text-lg">4K DUAL</div>
-            <div class="text-slate-400">Laser Projection</div>
+            <div class="text-slate-400">Christie Laser Vision</div>
           </div>
           <div>
             <div class="text-amber-400 font-bold text-lg">DOLBY 7.1</div>
@@ -194,7 +198,7 @@
           </div>
           <div>
             <div class="text-amber-400 font-bold text-lg">VIP SUYA</div>
-            <div class="text-slate-400">& Gourmet Concessions</div>
+            <div class="text-slate-400">& Grand Concessions</div>
           </div>
         </div>
       </div>
@@ -212,7 +216,7 @@
           <span>Curated Daily Schedules</span>
         </div>
         <h2 class="font-royal text-3xl sm:text-4xl font-extrabold text-white">
-          Now Showing at <span id="current-branch-label" class="text-amber-400">Ife Grand Resort (Flagship)</span>
+          Now Showing at <span id="current-branch-label" class="text-amber-400">Ojaja Ile-Ife (Grand Resort Flagship)</span>
         </h2>
         <p class="text-xs sm:text-sm text-slate-400 mt-1">
           Select any showtime to reserve your seats. Real-time availability updates dynamically.
@@ -264,7 +268,7 @@
       </div>
     </div>
 
-    <!-- Movies Grid (Rendered Dynamically via app.js) -->
+    <!-- Movies Grid -->
     <div id="movies-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <!-- Injected by renderMoviesGrid() -->
     </div>
@@ -320,45 +324,49 @@
 
   </main>
 
-  <!-- Royal Footer -->
+  <!-- Royal Footer with Official Logo -->
   <footer class="bg-[#04060A] border-t border-white/10 py-12 text-slate-400 text-xs font-mono">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
       <div>
-        <div class="font-royal font-black text-lg text-white mb-2 flex items-center gap-2">
-          <span>👑 OJAJA CINEMAS</span>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center">
+            <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-full h-full object-contain">
+          </div>
+          <span class="font-royal font-black text-lg text-white">OJAJA CINEMAS</span>
         </div>
         <p class="text-slate-400 font-body text-xs leading-relaxed">
-          The official cinema destination of the Ife Grand Resort & Industrial Hub. Championing African cinematic excellence and Hollywood blockbusters.
+          The premier cinema destination of the Ife Grand Resort & Industrial Hub. Championing African cinematic excellence and global blockbusters under the auspices of the Ọọ̀ni of Ifẹ.
         </p>
         <div class="mt-4 text-[11px] text-amber-500/90">
-          Tag: [cimen-boxoffice]
+          Backend Ledger Tag: [cimen-boxoffice]
         </div>
       </div>
 
       <div>
-        <h5 class="text-white font-bold uppercase tracking-wider mb-3">Cinema Locations</h5>
+        <h5 class="text-white font-bold uppercase tracking-wider mb-3 font-mono">Cinema Locations</h5>
         <ul class="space-y-2 text-xs">
           <li>• African Village, Ife Grand Resort, Ile-Ife</li>
-          <li>• Ojaja Mall, Ajah, Lagos State</li>
-          <li>• Ojaja Mall, Akure, Ondo State</li>
+          <li>• Ojaja Park, Ogombo Ajah, Lagos State</li>
+          <li>• Ojaja Park, Alagbaka, Akure, Ondo State</li>
         </ul>
       </div>
 
       <div>
-        <h5 class="text-white font-bold uppercase tracking-wider mb-3">Direct Inquiries</h5>
+        <h5 class="text-white font-bold uppercase tracking-wider mb-3 font-mono">Direct Inquiries</h5>
         <ul class="space-y-2 text-xs">
           <li>Phone: +234 707 493 4531</li>
           <li>Email: ojajacinemas@gmail.com</li>
+          <li>Instagram: @ojaja_cinemas</li>
           <li>Hours: Mon – Sun: 10:00 AM – 11:30 PM</li>
         </ul>
       </div>
 
       <div>
-        <h5 class="text-white font-bold uppercase tracking-wider mb-3">System & Integrations</h5>
-        <div class="p-3 rounded-xl bg-slate-900 border border-white/5 space-y-1">
+        <h5 class="text-white font-bold uppercase tracking-wider mb-3 font-mono">System & Gateway</h5>
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-white/5 space-y-1">
           <div class="text-emerald-400 font-bold">● Paystack Verified Gateway</div>
           <div class="text-slate-300">Fast-Track Turnstile QR Validator</div>
-          <div class="text-[10px] text-slate-500">Ready for Vercel Edge Hosting</div>
+          <div class="text-[10px] text-slate-500">Zero-Config Vercel Edge Hosting</div>
         </div>
       </div>
     </div>
@@ -380,7 +388,6 @@
   <!-- 1. Interactive Booking & Seat Selection Modal -->
   <div id="booking-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 overflow-y-auto">
     <div class="relative bg-[#0E1524] rounded-3xl border border-amber-500/30 max-w-5xl w-full shadow-2xl flex flex-col max-h-[96vh] overflow-hidden my-auto">
-      <!-- Close Button -->
       <button 
         type="button" 
         onclick="closeBookingModal()"
@@ -389,7 +396,6 @@
         ✕
       </button>
 
-      <!-- Dynamic Content Body Container -->
       <div id="booking-modal-body" class="flex-1 flex flex-col overflow-y-auto">
         <!-- Injected by renderBookingModalContent() -->
       </div>
@@ -403,7 +409,7 @@
     </div>
   </div>
 
-  <!-- 3. Digital E-Ticket Pass Modal with Dynamic QR & Barcode -->
+  <!-- 3. Digital E-Ticket Pass Modal with Dynamic QR & Official Logo -->
   <div id="ticket-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md p-4 overflow-y-auto">
     <div id="ticket-modal-content" class="w-full max-w-lg my-auto">
       <!-- Injected by openTicketModal() -->
@@ -417,7 +423,7 @@
     </div>
   </div>
 
-  <!-- 5. High-Fidelity Paystack Simulation Modal (Fallback/Instant Testing) -->
+  <!-- 5. High-Fidelity Paystack Simulation Modal -->
   <div id="paystack-simulator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
     <div id="paystack-simulator-content" class="w-full flex justify-center">
       <!-- Injected by openSimulatedPaystackModal() -->
