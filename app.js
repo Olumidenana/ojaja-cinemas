@@ -1268,10 +1268,10 @@ function renderBookingModalContent() {
     </div>
 
     <!-- Booking Body Grid: Seat Map Left, Summary & Checkout Right -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-y-auto lg:overflow-hidden">
       
       <!-- Left Column: Interactive Seat Grid -->
-      <div class="lg:col-span-7 p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col items-center">
+      <div class="lg:col-span-7 p-3 sm:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/10 flex flex-col items-center">
         
         <!-- Screen Curve & Ambient Glow -->
         <div class="w-full max-w-lg cinema-screen-container text-center mb-8">
@@ -1559,22 +1559,22 @@ function renderSeatRows(showtime) {
     const tier = isVipRow ? 'VIP' : 'Standard';
 
     return `
-      <div class="flex items-center justify-center gap-1.5 sm:gap-2">
-        <span class="w-4 text-xs font-mono font-bold text-slate-500 text-center">${row}</span>
+      <div class="flex items-center justify-center gap-1 sm:gap-2 seat-row-wrapper">
+        <span class="w-3.5 sm:w-4 text-[10px] sm:text-xs font-mono font-bold text-slate-500 text-center seat-row-label">${row}</span>
         
-        <div class="flex items-center gap-1 sm:gap-1.5">
+        <div class="flex items-center gap-0.5 sm:gap-1.5">
           ${Array.from({ length: seatsPerRow }, (_, idx) => {
             const seatNumber = idx + 1;
             const seatId = `${row}${seatNumber}`;
             const isBooked = showtime.bookedSeats.includes(seatId);
             const isSelected = AppState.selectedSeats.some(s => s.id === seatId);
 
-            const aisleGap = seatNumber === 6 ? 'mr-3 sm:mr-5' : '';
+            const aisleGap = seatNumber === 6 ? 'mr-1.5 sm:mr-5 seat-aisle-gap' : '';
 
             if (isBooked) {
               return `
                 <div 
-                  class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-900 border border-red-500/30 text-red-500/70 text-[9px] flex items-center justify-center font-mono cursor-not-allowed ${aisleGap}"
+                  class="seat-occupied w-5 h-5 sm:w-7 sm:h-7 rounded sm:rounded-lg bg-slate-900 border border-red-500/30 text-red-500/70 text-[8px] sm:text-[9px] flex items-center justify-center font-mono cursor-not-allowed ${aisleGap}"
                   title="Seat ${seatId} (Occupied)"
                 >
                   ✕
@@ -1594,7 +1594,7 @@ function renderSeatRows(showtime) {
               <button 
                 type="button" 
                 onclick="toggleSeat('${seatId}', '${tier}', ${price})"
-                class="seat-btn w-6 h-6 sm:w-7 sm:h-7 rounded-lg border text-[10px] font-mono flex items-center justify-center transition-all ${seatClasses} ${aisleGap}"
+                class="seat-btn w-5 h-5 sm:w-7 sm:h-7 rounded sm:rounded-lg border text-[8px] sm:text-[10px] font-mono flex items-center justify-center transition-all ${seatClasses} ${aisleGap}"
                 title="${seatId} - ${tier} (${formatNaira(price)})"
               >
                 ${seatNumber}
@@ -1603,7 +1603,7 @@ function renderSeatRows(showtime) {
           }).join('')}
         </div>
 
-        <span class="w-4 text-xs font-mono font-bold text-slate-500 text-center">${row}</span>
+        <span class="w-3.5 sm:w-4 text-[10px] sm:text-xs font-mono font-bold text-slate-500 text-center seat-row-label">${row}</span>
       </div>
     `;
   }).join('');

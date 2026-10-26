@@ -42,8 +42,8 @@ class NumberedCanvas(canvas.Canvas):
         # Footer line
         self.line(36, 32, letter[0] - 36, 32)
         self.setFont("Helvetica", 8)
-        self.drawString(36, 22, "Prepared for: Executive Management, Ojaja Cinemas (Ife Grand Resort & Leisure, Osun State)")
-        page_text = f"Page {self._pageNumber} of {page_count}"
+        self.drawString(36, 22, "Prepared by Amazoe Solutions for Executive Management, Ojaja Cinemas (Ife Grand Resort)")
+        page_text = f"Amazoe Solutions • Page {self._pageNumber} of {page_count}"
         self.drawRightString(letter[0] - 36, 22, page_text)
         self.restoreState()
 
@@ -398,7 +398,8 @@ def build_pdf(filename="Ojaja_Cinemas_12_Hour_Upgrade_Brief.pdf"):
     • <b>₦2.5M – ₦4.2M Projected Additional Concessions Revenue:</b> Grand Resort suya and gourmet popcorn integrated into single checkout.<br/><br/>
     <b>Live Prototype Demonstration:</b><br/>
     The complete system is already live, operational, and accessible for executive evaluation.<br/>
-    • <b>Live Web Deployment:</b> <code>https://olumidenana.github.io/ojaja-cinemas/</code><br/>
+    • <b>Live Vercel Deployment:</b> <code>https://ojaja-cinemas-omega.vercel.app/</code><br/>
+    • <b>GitHub Pages Mirror:</b> <code>https://olumidenana.github.io/ojaja-cinemas/</code><br/>
     • <b>GitHub Production Codebase:</b> <code>https://github.com/Olumidenana/ojaja-cinemas</code><br/>
     • <b>Box Office Dispatch Console Shortcut:</b> Press <code>Alt + A</code> anywhere on the site to inspect the live turnstile scanner and ledger.<br/>
     • <b>Next Step:</b> Authorize Paystack API credential linking to commence the 12-hour go-live count.
@@ -411,7 +412,7 @@ def build_pdf(filename="Ojaja_Cinemas_12_Hour_Upgrade_Brief.pdf"):
                 [
                     Paragraph("<b>PROPOSAL AUTHORIZATION</b>", body_bold),
                     Spacer(1, 4),
-                    Paragraph("<b>Prepared by:</b> Olumide Adeyemi-nana<br/>Lead Cinema Systems Engineer", body),
+                    Paragraph("<b>Prepared by:</b> Amazoe Solutions<br/>Olumide Adeyemi-nana<br/>Lead Solutions Architect", body),
                     Spacer(1, 4),
                     Paragraph("<b>Client:</b> Ojaja Cinemas Management<br/>Ife Grand Resort & Leisure", body),
                     Spacer(1, 6),
