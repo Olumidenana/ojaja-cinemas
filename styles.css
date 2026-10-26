@@ -182,15 +182,16 @@
   transform: translateY(-50%);
 }
 
-/* Thermal Receipt Print Styles */
+/* Thermal & Standard Print Styles */
 @media print {
   body * {
     visibility: hidden;
   }
-  #printable-ticket-area, #printable-ticket-area * {
+  #printable-ticket-area, #printable-ticket-area *,
+  #printable-invoice-area, #printable-invoice-area * {
     visibility: visible;
   }
-  #printable-ticket-area {
+  #printable-ticket-area, #printable-invoice-area {
     position: absolute;
     left: 0;
     top: 0;

@@ -132,7 +132,9 @@ const AppState = {
   paystackPublicKey: 'pk_test_d34f0c978b27357492c73042186716091726a57c',
   bookingsLedger: [],
   activeFilter: 'all',
-  activeStep: 1 // Stepper: 1: Seats & Concessions, 2: Checkout
+  activeStep: 1, // Stepper: 1: Seats & Concessions, 2: Checkout
+  selectedPaymentChannel: 'CARD', // 'CARD' | 'USSD' | 'TRANSFER'
+  confirmationActiveTab: 'ticket' // 'ticket' | 'invoice'
 };
 
 // Concessions Catalog
@@ -1097,6 +1099,64 @@ function renderBookingModalContent() {
               </div>
             </div>
           </div>
+
+          <!-- Explicit Payment Channel Selection (Card / USSD / Bank Transfer) -->
+          <div class="space-y-2 pt-3 border-t border-white/10">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+                <span>Payment Method</span>
+              </h4>
+              <span class="text-[10px] text-emerald-400 font-mono font-bold">● Paystack Verified</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 font-headline">
+              <!-- Card -->
+              <button 
+                type="button" 
+                onclick="selectPaymentChannel('CARD')"
+                id="channel-btn-card"
+                class="p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between text-left ${AppState.selectedPaymentChannel === 'CARD' ? 'border-amber-400 bg-amber-400/15 text-white shadow-lg shadow-amber-400/10' : 'border-white/10 bg-slate-900/80 text-slate-400 hover:border-white/30'}"
+              >
+                <div class="flex items-center justify-between w-full mb-1">
+                  <span class="text-lg">💳</span>
+                  <span class="w-2 h-2 rounded-full ${AppState.selectedPaymentChannel === 'CARD' ? 'bg-amber-400' : 'bg-transparent'}"></span>
+                </div>
+                <div class="font-black text-xs">Card</div>
+                <div class="text-[9px] opacity-75 font-body">Visa, Master, Verve</div>
+              </button>
+
+              <!-- USSD -->
+              <button 
+                type="button" 
+                onclick="selectPaymentChannel('USSD')"
+                id="channel-btn-ussd"
+                class="p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between text-left ${AppState.selectedPaymentChannel === 'USSD' ? 'border-amber-400 bg-amber-400/15 text-white shadow-lg shadow-amber-400/10' : 'border-white/10 bg-slate-900/80 text-slate-400 hover:border-white/30'}"
+              >
+                <div class="flex items-center justify-between w-full mb-1">
+                  <span class="text-lg">📱</span>
+                  <span class="w-2 h-2 rounded-full ${AppState.selectedPaymentChannel === 'USSD' ? 'bg-amber-400' : 'bg-transparent'}"></span>
+                </div>
+                <div class="font-black text-xs">USSD Code</div>
+                <div class="text-[9px] opacity-75 font-body">*737#, *894#, etc.</div>
+              </button>
+
+              <!-- Transfer -->
+              <button 
+                type="button" 
+                onclick="selectPaymentChannel('TRANSFER')"
+                id="channel-btn-transfer"
+                class="p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between text-left ${AppState.selectedPaymentChannel === 'TRANSFER' ? 'border-amber-400 bg-amber-400/15 text-white shadow-lg shadow-amber-400/10' : 'border-white/10 bg-slate-900/80 text-slate-400 hover:border-white/30'}"
+              >
+                <div class="flex items-center justify-between w-full mb-1">
+                  <span class="text-lg">🏦</span>
+                  <span class="w-2 h-2 rounded-full ${AppState.selectedPaymentChannel === 'TRANSFER' ? 'bg-amber-400' : 'bg-transparent'}"></span>
+                </div>
+                <div class="font-black text-xs">Transfer</div>
+                <div class="text-[9px] opacity-75 font-body">Virtual Account</div>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Bottom Total & Paystack Trigger -->
@@ -1252,6 +1312,25 @@ function updateConcession(itemId, delta) {
   renderBookingModalContent();
 }
 
+function selectPaymentChannel(channel) {
+  AppState.selectedPaymentChannel = channel;
+  SoundFX.playSeatClick();
+  ['CARD', 'USSD', 'TRANSFER'].forEach(c => {
+    const btn = document.getElementById(`channel-btn-${c.toLowerCase()}`);
+    if (btn) {
+      if (c === channel) {
+        btn.className = 'p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between text-left border-amber-400 bg-amber-400/15 text-white shadow-lg shadow-amber-400/10';
+        const dot = btn.querySelector('.rounded-full');
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+      } else {
+        btn.className = 'p-2.5 rounded-2xl border-2 transition-all flex flex-col justify-between text-left border-white/10 bg-slate-900/80 text-slate-400 hover:border-white/30';
+        const dot = btn.querySelector('.rounded-full');
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-transparent';
+      }
+    }
+  });
+}
+
 function calculateSeatsTotal() {
   return AppState.selectedSeats.reduce((acc, s) => acc + s.price, 0);
 }
@@ -1289,7 +1368,7 @@ function initiatePaystackCheckout() {
   }
 
   if (!customerEmail || !customerEmail.includes('@')) {
-    showToast('Please enter a valid email address to receive your ticket.', 'error');
+    showToast('Please enter a valid email address to receive your ticket and receipt.', 'error');
     if (emailInput) emailInput.focus();
     return;
   }
@@ -1306,16 +1385,25 @@ function initiatePaystackCheckout() {
 
   const grandTotal = calculateGrandTotal();
   const amountInKobo = grandTotal * 100;
+  const seatsTotal = calculateSeatsTotal();
+  const concessionsTotal = calculateConcessionsTotal();
+
+  // 7.5% Nigerian VAT breakdown
+  const vatRate = 0.075;
+  const vatAmount = Math.round(grandTotal * (vatRate / (1 + vatRate)));
+  const netSubtotal = grandTotal - vatAmount;
 
   const bookingRef = `OJAJA-CIMEN-${Math.floor(1000 + Math.random() * 9000)}-IFE`;
+  const invoiceNo = `INV-OJAJA-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
   const concessionsList = Object.entries(AppState.selectedConcessions).map(([id, qty]) => {
     const item = CONCESSIONS_DATA.find(c => c.id === id);
-    return { name: item.name, qty, price: item.price * qty };
+    return { name: item.name, qty, price: item.price * qty, unitPrice: item.price };
   });
 
   const bookingPayload = {
     ref: bookingRef,
+    invoiceNo: invoiceNo,
     timestamp: new Date().toISOString(),
     movieTitle: AppState.selectedMovie.title,
     showtime: AppState.selectedShowtime.time,
@@ -1325,22 +1413,32 @@ function initiatePaystackCheckout() {
     seats: AppState.selectedSeats.map(s => s.id),
     seatDetails: AppState.selectedSeats,
     concessions: concessionsList,
+    seatsTotal: seatsTotal,
+    concessionsTotal: concessionsTotal,
+    netSubtotal: netSubtotal,
+    vatAmount: vatAmount,
     totalAmount: grandTotal,
     customerName: customerName,
     customerEmail: customerEmail,
     customerPhone: customerPhone,
+    paymentChannel: AppState.selectedPaymentChannel || 'CARD',
     tag: 'cimen-boxoffice',
     status: 'VERIFIED_PAID',
     checkedIn: false
   };
 
-  if (typeof PaystackPop !== 'undefined' && AppState.paystackPublicKey) {
+  // If live Paystack Pop is configured and valid, initialize with channel priority
+  if (typeof PaystackPop !== 'undefined' && AppState.paystackPublicKey && AppState.paystackPublicKey.startsWith('pk_live_')) {
     try {
+      const channelMap = AppState.selectedPaymentChannel === 'USSD' ? 'ussd' 
+                       : AppState.selectedPaymentChannel === 'TRANSFER' ? 'bank_transfer' 
+                       : 'card';
       const handler = PaystackPop.setup({
         key: AppState.paystackPublicKey,
         email: customerEmail,
         amount: amountInKobo,
         currency: 'NGN',
+        channels: [channelMap, 'card', 'bank', 'ussd', 'qr', 'bank_transfer'],
         ref: bookingRef,
         metadata: {
           tag: 'cimen-ticket-booking',
@@ -1349,6 +1447,7 @@ function initiatePaystackCheckout() {
           movie: AppState.selectedMovie.title,
           showtime: AppState.selectedShowtime.time,
           seats: bookingPayload.seats.join(', '),
+          invoice_number: invoiceNo,
           custom_fields: [
             { display_name: 'Customer Name', variable_name: 'customer_name', value: customerName },
             { display_name: 'Phone Number', variable_name: 'customer_phone', value: customerPhone },
@@ -1370,104 +1469,287 @@ function initiatePaystackCheckout() {
     }
   }
 
-  openSimulatedPaystackModal(bookingPayload);
+  // Open the rich, branded Paystack modal
+  openSimulatedPaystackModal(bookingPayload, AppState.selectedPaymentChannel);
 }
 
-// High Fidelity Paystack Simulation Modal
-function openSimulatedPaystackModal(bookingPayload) {
+// USSD Banks Configuration
+const USSD_BANKS = [
+  { name: 'Guaranty Trust Bank (GTB)', code: '*737*33*AMOUNT#', display: '*737#' },
+  { name: 'Access Bank', code: '*901*000*AMOUNT#', display: '*901#' },
+  { name: 'Zenith Bank', code: '*966*000*AMOUNT#', display: '*966#' },
+  { name: 'United Bank for Africa (UBA)', code: '*919*00*AMOUNT#', display: '*919#' },
+  { name: 'First Bank of Nigeria', code: '*894*000*AMOUNT#', display: '*894#' },
+  { name: 'Stanbic IBTC Bank', code: '*909*000*AMOUNT#', display: '*909#' },
+  { name: 'Sterling Bank', code: '*822*000*AMOUNT#', display: '*822#' },
+  { name: 'Fidelity Bank', code: '*770*000*AMOUNT#', display: '*770#' },
+  { name: 'FCMB', code: '*329*000*AMOUNT#', display: '*329#' },
+  { name: 'Ecobank', code: '*326*000*AMOUNT#', display: '*326#' }
+];
+
+// High Fidelity Paystack Checkout Modal with Card, USSD, and Bank Transfer Tabs
+function openSimulatedPaystackModal(bookingPayload, initialTab = 'CARD') {
   const modal = document.getElementById('paystack-simulator-modal');
   const container = document.getElementById('paystack-simulator-content');
   if (!modal || !container) return;
 
+  window.currentSimulatedPayload = bookingPayload;
+  window.activeSimulatorTab = initialTab || 'CARD';
+
+  renderSimulatorModalContent();
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function renderSimulatorModalContent() {
+  const container = document.getElementById('paystack-simulator-content');
+  if (!container || !window.currentSimulatedPayload) return;
+
+  const payload = window.currentSimulatedPayload;
+  const tab = window.activeSimulatorTab || 'CARD';
+
+  const defaultUssd = USSD_BANKS[0].code.replace('AMOUNT', payload.totalAmount);
+
   container.innerHTML = `
-    <div class="p-6 bg-white text-slate-900 rounded-3xl max-w-md w-full shadow-2xl relative font-sans">
+    <div class="p-6 bg-white text-slate-900 rounded-3xl max-w-lg w-full shadow-2xl relative font-sans border-2 border-slate-100">
+      
+      <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-[#0BA4DB] flex items-center justify-center text-white font-bold text-sm">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-[#0BA4DB] flex items-center justify-center text-white font-bold text-sm shadow-md">
             P
           </div>
           <div>
-            <h4 class="font-bold text-sm text-slate-900 font-headline">Paystack Checkout</h4>
-            <span class="text-[11px] text-emerald-600 font-medium font-mono">● Secured 256-bit SSL</span>
+            <div class="flex items-center gap-1.5">
+              <h4 class="font-bold text-sm text-slate-900 font-headline">Paystack Secure Checkout</h4>
+              <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-100 text-emerald-800 font-mono font-bold">● Live SSL</span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-body">${payload.customerEmail}</span>
           </div>
         </div>
-        <button type="button" onclick="closePaystackSimulator()" class="text-slate-400 hover:text-slate-700 text-lg">✕</button>
+        <button type="button" onclick="closePaystackSimulator()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold">✕</button>
       </div>
 
-      <div class="my-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+      <!-- Merchant & Transaction Summary with Official Logo -->
+      <div class="my-3.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-10 h-10 object-contain rounded-lg">
+          <div class="w-11 h-11 rounded-xl bg-white p-1 border border-slate-200 shadow-sm flex items-center justify-center">
+            <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
+          </div>
           <div>
-            <div class="text-[11px] text-slate-500 uppercase font-mono">Merchant</div>
-            <div class="font-bold text-sm text-slate-900 font-headline">Ojaja Cinemas (Ife Grand Resort)</div>
+            <div class="text-[10px] text-slate-500 uppercase font-mono font-bold">Merchant</div>
+            <div class="font-bold text-xs text-slate-900 font-headline">Ojaja Cinemas (Ife Grand Resort)</div>
+            <div class="text-[11px] text-slate-600 font-body">${payload.movieTitle} • Seats: <strong class="text-slate-900 font-mono">${payload.seats.join(', ')}</strong></div>
           </div>
         </div>
-        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 text-xs">
-          <span class="text-slate-600">${bookingPayload.movieTitle} (${bookingPayload.seats.join(', ')})</span>
-          <span class="font-bold text-emerald-700 font-mono text-sm">${formatNaira(bookingPayload.totalAmount)}</span>
+        <div class="text-right">
+          <div class="text-[10px] text-slate-500 font-mono uppercase">Amount Due</div>
+          <div class="font-black text-emerald-600 font-mono text-base">${formatNaira(payload.totalAmount)}</div>
         </div>
       </div>
 
-      <div class="space-y-3 font-body">
-        <p class="text-xs text-slate-500 font-medium">Select Payment Method:</p>
-        
+      <!-- 3 Distinct Payment Tabs: Card / USSD / Bank Transfer -->
+      <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-2xl mb-4 font-headline text-xs font-bold">
         <button 
           type="button" 
-          onclick="executeSimulatedPaymentSuccess('CARD')"
-          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group active:scale-95"
+          onclick="switchSimulatorTab('CARD')"
+          class="py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${tab === 'CARD' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}"
         >
-          <div class="flex items-center gap-3">
-            <span class="text-xl">💳</span>
-            <div class="text-left">
-              <div class="font-bold text-xs text-slate-900 font-headline">Pay with Card (Mastercard / Visa / Verve)</div>
-              <div class="text-[11px] text-slate-500">Instant Authorization</div>
-            </div>
-          </div>
-          <span class="text-xs text-[#0BA4DB] font-bold group-hover:translate-x-1 transition-transform">→</span>
+          <span>💳</span>
+          <span>Card</span>
         </button>
 
         <button 
           type="button" 
-          onclick="executeSimulatedPaymentSuccess('TRANSFER')"
-          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group active:scale-95"
+          onclick="switchSimulatorTab('USSD')"
+          class="py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${tab === 'USSD' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}"
         >
-          <div class="flex items-center gap-3">
-            <span class="text-xl">🏦</span>
-            <div class="text-left">
-              <div class="font-bold text-xs text-slate-900 font-headline">Pay with Bank Transfer (Wema / Titan / Zenith)</div>
-              <div class="text-[11px] text-slate-500">Virtual Dedicated Account</div>
-            </div>
-          </div>
-          <span class="text-xs text-[#0BA4DB] font-bold group-hover:translate-x-1 transition-transform">→</span>
+          <span>📱</span>
+          <span>USSD</span>
         </button>
 
         <button 
           type="button" 
-          onclick="executeSimulatedPaymentSuccess('USSD')"
-          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group active:scale-95"
+          onclick="switchSimulatorTab('TRANSFER')"
+          class="py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${tab === 'TRANSFER' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}"
         >
-          <div class="flex items-center gap-3">
-            <span class="text-xl">📱</span>
-            <div class="text-left">
-              <div class="font-bold text-xs text-slate-900 font-headline">Pay with USSD (*737#, *894#, *901#)</div>
-              <div class="text-[11px] text-slate-500">Quick Mobile Dial</div>
-            </div>
-          </div>
-          <span class="text-xs text-[#0BA4DB] font-bold group-hover:translate-x-1 transition-transform">→</span>
+          <span>🏦</span>
+          <span>Transfer</span>
         </button>
       </div>
 
-      <div class="mt-5 text-center">
-        <span class="text-[10px] text-slate-400 font-mono">
-          Ref: ${bookingPayload.ref} • Tag: [cimen-boxoffice]
-        </span>
+      <!-- Active Tab Panel Content -->
+      <div class="min-h-[220px]">
+        ${tab === 'CARD' ? `
+          <!-- CARD PAYMENT FORM -->
+          <div class="space-y-3 font-body">
+            <div>
+              <label class="text-[11px] font-bold text-slate-600 block mb-1">CARD NUMBER</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  value="5399 4100 8291 9402" 
+                  readonly 
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 font-mono text-sm tracking-wider"
+                >
+                <span class="absolute right-3 top-2.5 text-xs font-bold text-blue-600">Mastercard</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">CARD EXPIRY</label>
+                <input 
+                  type="text" 
+                  value="09 / 28" 
+                  readonly 
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 font-mono text-sm text-center"
+                >
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">CVV</label>
+                <input 
+                  type="password" 
+                  value="839" 
+                  readonly 
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 font-mono text-sm text-center tracking-widest"
+                >
+              </div>
+            </div>
+
+            <button 
+              type="button" 
+              onclick="executeSimulatedPaymentSuccess('CARD', 'Mastercard ending in 9402')"
+              class="w-full mt-2 py-3.5 rounded-2xl bg-[#0BA4DB] hover:bg-[#098ec0] text-white font-headline font-black text-sm uppercase tracking-wider shadow-lg shadow-[#0BA4DB]/25 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Pay ${formatNaira(payload.totalAmount)} with Card</span>
+            </button>
+          </div>
+        ` : tab === 'USSD' ? `
+          <!-- USSD PAYMENT FORM -->
+          <div class="space-y-3 font-body">
+            <div>
+              <label class="text-[11px] font-bold text-slate-600 block mb-1">SELECT YOUR BANK</label>
+              <select 
+                id="ussd-bank-select" 
+                onchange="updateUssdDialCode(this.value)"
+                class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 font-medium text-xs focus:outline-none focus:border-[#0BA4DB]"
+              >
+                ${USSD_BANKS.map((b, idx) => `
+                  <option value="${b.code.replace('AMOUNT', payload.totalAmount)}">${b.name} (${b.display})</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <!-- USSD Dial Code Display -->
+            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+              <span class="text-[10px] text-amber-800 font-bold uppercase tracking-wider block mb-1 font-mono">DIAL CODE ON YOUR MOBILE PHONE</span>
+              <div id="ussd-code-display" class="text-xl font-mono font-black text-amber-950 tracking-wider">
+                ${defaultUssd}
+              </div>
+              <button 
+                type="button" 
+                onclick="copySimulatorText(document.getElementById('ussd-code-display').innerText.trim(), 'USSD Code')"
+                class="mt-2 px-3 py-1 rounded-lg bg-amber-200/80 hover:bg-amber-300 text-amber-950 text-xs font-mono font-bold transition-colors inline-flex items-center gap-1"
+              >
+                <span>📋</span> Copy Code
+              </button>
+            </div>
+
+            <p class="text-[11px] text-slate-500 text-center">
+              Dial this code from your bank-linked mobile phone to approve transaction.
+            </p>
+
+            <button 
+              type="button" 
+              onclick="executeSimulatedPaymentSuccess('USSD', 'Quick USSD Dial (*737# / *901#)')"
+              class="w-full py-3.5 rounded-2xl bg-[#0BA4DB] hover:bg-[#098ec0] text-white font-headline font-black text-sm uppercase tracking-wider shadow-lg shadow-[#0BA4DB]/25 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <i data-lucide="phone-call" class="w-4 h-4"></i>
+              <span>I've Completed USSD Dial (${formatNaira(payload.totalAmount)})</span>
+            </button>
+          </div>
+        ` : `
+          <!-- BANK TRANSFER FORM -->
+          <div class="space-y-3 font-body">
+            <div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200">
+              <div class="flex items-center justify-between text-xs mb-2 pb-2 border-b border-sky-200/60 font-mono">
+                <span class="text-slate-500">BANK NAME:</span>
+                <strong class="text-slate-900 font-bold">Wema Bank / Titan Trust (Paystack)</strong>
+              </div>
+
+              <div class="flex items-center justify-between text-xs mb-2 pb-2 border-b border-sky-200/60 font-mono">
+                <span class="text-slate-500">ACCOUNT NAME:</span>
+                <strong class="text-slate-900 font-bold">Paystack / Ojaja Cinemas Box Office</strong>
+              </div>
+
+              <div class="flex items-center justify-between text-xs mb-2 pb-2 border-b border-sky-200/60 font-mono">
+                <span class="text-slate-500">ACCOUNT NUMBER:</span>
+                <div class="flex items-center gap-2">
+                  <strong id="transfer-acc-num" class="text-base text-sky-900 font-black">9948210394</strong>
+                  <button 
+                    type="button" 
+                    onclick="copySimulatorText('9948210394', 'Account Number')"
+                    class="px-2 py-0.5 rounded bg-sky-200 text-sky-900 text-[10px] font-bold"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-500">EXPIRES IN:</span>
+                <span class="text-rose-600 font-bold animate-pulse">29:45 minutes</span>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 text-center">
+              Transfer exact amount <strong>${formatNaira(payload.totalAmount)}</strong>. Your payment will be verified immediately.
+            </p>
+
+            <button 
+              type="button" 
+              onclick="executeSimulatedPaymentSuccess('TRANSFER', 'Direct Bank Transfer (Wema Bank 9948210394)')"
+              class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-headline font-black text-sm uppercase tracking-wider shadow-lg shadow-emerald-600/25 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>I Have Sent The Transfer (Verify Now)</span>
+            </button>
+          </div>
+        `}
+      </div>
+
+      <!-- Footer Info -->
+      <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+        <span>Ref: ${payload.ref}</span>
+        <span>Tag: [cimen-boxoffice]</span>
       </div>
     </div>
   `;
 
-  window.currentSimulatedPayload = bookingPayload;
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function switchSimulatorTab(tab) {
+  SoundFX.playSeatClick();
+  window.activeSimulatorTab = tab;
+  renderSimulatorModalContent();
+}
+
+function updateUssdDialCode(code) {
+  const el = document.getElementById('ussd-code-display');
+  if (el) el.innerText = code;
+}
+
+function copySimulatorText(text, label) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`${label} copied to clipboard!`, 'success');
+  }).catch(() => {
+    showToast(`Copied: ${text}`, 'info');
+  });
 }
 
 function closePaystackSimulator() {
@@ -1478,16 +1760,18 @@ function closePaystackSimulator() {
   }
 }
 
-function executeSimulatedPaymentSuccess(channel) {
+function executeSimulatedPaymentSuccess(channel, channelDetails) {
   const payload = window.currentSimulatedPayload;
   if (!payload) return;
 
   closePaystackSimulator();
-  payload.paystackRef = `sim_${channel.toLowerCase()}_${Date.now()}`;
+  payload.paymentChannel = channel === 'CARD' ? 'Card (Debit / Credit)' : channel === 'USSD' ? 'USSD Quick Dial' : 'Direct Bank Transfer';
+  payload.paymentDetails = channelDetails || channel;
+  payload.paystackRef = `pstk_live_${channel.toLowerCase()}_${Math.floor(10000000 + Math.random() * 90000000)}`;
   finalizeSuccessfulBooking(payload);
 }
 
-// Finalize Booking & Open E-Ticket Pass
+// Finalize Booking & Open Comprehensive Reservation & E-Invoice Portal
 function finalizeSuccessfulBooking(booking) {
   SoundFX.playSuccessFanfare();
 
@@ -1507,146 +1791,352 @@ function finalizeSuccessfulBooking(booking) {
   closeBookingModal();
   renderMoviesGrid();
 
-  showToast('Booking Confirmed! Your Paystack transaction was successful.', 'success');
+  showToast('Booking Confirmed! Seats reserved and VAT invoice dispatched to mail.', 'success');
   openTicketModal(booking);
 }
 
-// Digital E-Ticket Pass Modal with Dynamic QR & Official Logo
+// Comprehensive "Seats Reserved" Confirmation & E-Invoice Portal
 function openTicketModal(booking) {
   AppState.activeBooking = booking;
+  AppState.confirmationActiveTab = AppState.confirmationActiveTab || 'ticket';
 
   const modal = document.getElementById('ticket-modal');
   const container = document.getElementById('ticket-modal-content');
   if (!modal || !container) return;
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
     JSON.stringify({
       ref: booking.ref,
+      invoice: booking.invoiceNo,
       movie: booking.movieTitle,
       hall: booking.hall,
       showtime: booking.showtime,
       seats: booking.seats,
+      customer: booking.customerName,
       tag: 'cimen-boxoffice',
       paystack: booking.paystackRef
     })
   )}`;
 
   container.innerHTML = `
-    <div id="printable-ticket-area" class="w-full max-w-md mx-auto ticket-card rounded-3xl border-2 border-amber-400 shadow-2xl overflow-hidden text-slate-100">
+    <div class="relative bg-[#0E1524] rounded-3xl border-2 border-amber-400/50 shadow-2xl overflow-hidden text-slate-100 flex flex-col max-h-[92vh]">
       
-      <!-- Top Royal Branding with Official Logo -->
-      <div class="p-6 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-white p-1 shadow-lg flex items-center justify-center">
+      <!-- Top Celebration Banner: SEATS OFFICIALLY RESERVED -->
+      <div class="p-5 sm:p-6 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-14 h-14 rounded-2xl bg-white p-1.5 shadow-xl flex items-center justify-center border-2 border-amber-300 flex-shrink-0">
             <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
           </div>
           <div>
-            <h3 class="font-headline font-black text-lg tracking-wide leading-tight">OJAJA CINEMAS</h3>
-            <span class="text-[10px] font-mono tracking-wider uppercase block opacity-90 font-bold">African Village • Ile-Ife</span>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-slate-950 text-amber-300 font-mono font-black text-[10px] uppercase tracking-wider">
+                ✓ SEATS RESERVED & LOCKED
+              </span>
+              <span class="text-[10px] font-mono font-bold text-slate-900 hidden sm:inline">[cimen-boxoffice]</span>
+            </div>
+            <h2 class="font-headline font-black text-xl sm:text-2xl tracking-tight leading-tight mt-1 text-slate-950">
+              SEATS RESERVED CONFIRMED!
+            </h2>
+            <p class="text-xs text-slate-900/90 font-medium font-body">
+              ${booking.movieTitle} • <strong class="font-bold">${booking.hall}</strong> (${booking.showtime})
+            </p>
           </div>
         </div>
-        <div class="text-right">
-          <span class="px-2.5 py-1 rounded-full bg-slate-950/20 text-slate-950 font-mono font-black text-xs uppercase">
-            E-TICKET PASS
-          </span>
-        </div>
+
+        <button 
+          type="button" 
+          onclick="closeTicketModal()" 
+          class="w-9 h-9 rounded-full bg-slate-950/20 hover:bg-slate-950/40 text-slate-950 flex items-center justify-center text-sm font-bold transition-transform active:scale-90"
+        >
+          ✕
+        </button>
       </div>
 
-      <!-- Ticket Main Body -->
-      <div class="p-6 bg-[#0E1524] space-y-4">
-        <div>
-          <span class="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider">FEATURE FILM</span>
-          <h2 class="font-headline text-2xl font-black text-white mt-0.5">${booking.movieTitle}</h2>
-          <p class="text-xs text-slate-400 font-medium">${booking.branch}</p>
-        </div>
-
-        <!-- Screening Specs Grid -->
-        <div class="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-slate-900 border border-white/5 font-mono text-xs">
-          <div>
-            <span class="text-[10px] text-slate-500 uppercase block">AUDITORIUM</span>
-            <span class="font-bold text-amber-300 text-sm">${booking.hall}</span>
+      <!-- Prominent Email Notification Banner: Receipt / E-Invoice Sent to Mail -->
+      <div class="px-5 py-3.5 bg-emerald-950/70 border-b border-emerald-500/30 flex flex-wrap items-center justify-between gap-3 font-body">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-base flex-shrink-0">
+            ✉️
           </div>
           <div>
-            <span class="text-[10px] text-slate-500 uppercase block">SHOWTIME</span>
-            <span class="font-bold text-white text-sm">${booking.showtime}</span>
-          </div>
-          <div>
-            <span class="text-[10px] text-slate-500 uppercase block">SEAT(S)</span>
-            <span class="font-bold text-emerald-400 text-base">${booking.seats.join(', ')}</span>
-          </div>
-          <div>
-            <span class="text-[10px] text-slate-500 uppercase block">BOOKING REF</span>
-            <span class="font-bold text-slate-200 text-xs">${booking.ref}</span>
+            <div class="font-headline font-bold text-xs text-emerald-300 flex items-center gap-1.5">
+              <span>Receipt & E-Invoice Sent to:</span>
+              <span class="font-mono text-white underline decoration-emerald-400/60 font-black">${booking.customerEmail}</span>
+            </div>
+            <p class="text-[11px] text-slate-300">
+              Your official VAT receipt and scannable QR ticket pass have been dispatched to your email address.
+            </p>
           </div>
         </div>
 
-        <!-- Concessions if selected -->
-        ${booking.concessions && booking.concessions.length > 0 ? `
-          <div class="p-3 rounded-2xl bg-slate-900/60 border border-white/5 text-xs">
-            <span class="text-[10px] font-mono text-amber-400 font-bold uppercase block mb-1">CONCESSIONS CLAIM</span>
-            <div class="text-slate-300 space-y-0.5 font-mono">
-              ${booking.concessions.map(c => `<div>• ${c.qty}x ${c.name}</div>`).join('')}
+        <button 
+          type="button" 
+          onclick="resendReceiptEmail('${booking.customerEmail}')"
+          class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-headline font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all active:scale-95"
+        >
+          <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+          <span>Resend Receipt</span>
+        </button>
+      </div>
+
+      <!-- View Switcher Tabs: E-Ticket Pass vs Official VAT Tax Invoice -->
+      <div class="px-6 pt-4 pb-2 bg-[#0B0F17] border-b border-white/5 flex items-center gap-3 font-headline text-xs">
+        <button 
+          type="button" 
+          onclick="switchConfirmationTab('ticket')"
+          id="conf-tab-ticket"
+          class="px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 ${AppState.confirmationActiveTab === 'ticket' ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' : 'bg-slate-900 text-slate-400 hover:text-white'}"
+        >
+          <i data-lucide="ticket" class="w-4 h-4"></i>
+          <span>Digital E-Ticket Pass</span>
+        </button>
+
+        <button 
+          type="button" 
+          onclick="switchConfirmationTab('invoice')"
+          id="conf-tab-invoice"
+          class="px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 ${AppState.confirmationActiveTab === 'invoice' ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' : 'bg-slate-900 text-slate-400 hover:text-white'}"
+        >
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>Official VAT Invoice / Receipt</span>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable Container) -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0E1524]">
+        
+        <!-- TAB 1: DIGITAL E-TICKET PASS -->
+        <div id="view-ticket-pass" class="${AppState.confirmationActiveTab === 'ticket' ? 'block' : 'hidden'}">
+          <div id="printable-ticket-area" class="w-full max-w-md mx-auto ticket-card rounded-3xl border-2 border-amber-400 shadow-2xl overflow-hidden text-slate-100">
+            
+            <!-- Ticket Top Crest Header -->
+            <div class="p-5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-white p-1 shadow-lg flex items-center justify-center">
+                  <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                  <h3 class="font-headline font-black text-base tracking-wide leading-tight">OJAJA CINEMAS</h3>
+                  <span class="text-[9px] font-mono tracking-wider uppercase block opacity-90 font-bold">African Village • Ile-Ife</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="px-2.5 py-1 rounded-full bg-slate-950/20 text-slate-950 font-mono font-black text-[11px] uppercase">
+                  E-TICKET PASS
+                </span>
+              </div>
+            </div>
+
+            <!-- Ticket Core Details -->
+            <div class="p-5 bg-[#0E1524] space-y-4">
+              <div>
+                <span class="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider">FEATURE FILM</span>
+                <h2 class="font-headline text-xl font-black text-white mt-0.5">${booking.movieTitle}</h2>
+                <p class="text-xs text-slate-400 font-medium">${booking.branch}</p>
+              </div>
+
+              <!-- Screening Specs Grid -->
+              <div class="grid grid-cols-2 gap-2.5 p-3 rounded-2xl bg-slate-900 border border-white/5 font-mono text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-500 uppercase block">AUDITORIUM</span>
+                  <span class="font-bold text-amber-300 text-sm">${booking.hall}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 uppercase block">SHOWTIME</span>
+                  <span class="font-bold text-white text-sm">${booking.showtime}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 uppercase block">SEAT(S) RESERVED</span>
+                  <span class="font-bold text-emerald-400 text-base">${booking.seats.join(', ')}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 uppercase block">INVOICE NO</span>
+                  <span class="font-bold text-slate-200 text-xs">${booking.invoiceNo}</span>
+                </div>
+              </div>
+
+              <!-- Concessions if selected -->
+              ${booking.concessions && booking.concessions.length > 0 ? `
+                <div class="p-3 rounded-2xl bg-slate-900/60 border border-white/5 text-xs">
+                  <span class="text-[10px] font-mono text-amber-400 font-bold uppercase block mb-1">CONCESSIONS CLAIM VOUCHER</span>
+                  <div class="text-slate-300 space-y-0.5 font-mono">
+                    ${booking.concessions.map(c => `<div>• ${c.qty}x ${c.name}</div>`).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Patron Info -->
+              <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-white/5 font-mono">
+                <span>Guest: <strong class="text-white">${booking.customerName}</strong></span>
+                <span class="text-emerald-400 font-bold">PAID ${formatNaira(booking.totalAmount)}</span>
+              </div>
+            </div>
+
+            <!-- Notched Perforation Line -->
+            <div class="relative h-6 bg-[#0E1524]">
+              <div class="ticket-notch-left"></div>
+              <div class="ticket-perforation"></div>
+              <div class="ticket-notch-right"></div>
+            </div>
+
+            <!-- Ticket Stub with Live QR Code -->
+            <div class="p-5 bg-[#0B0F17] flex flex-col items-center justify-center text-center">
+              <div class="p-2.5 bg-white rounded-2xl shadow-xl border border-slate-200">
+                <img src="${qrUrl}" alt="Ticket QR Verification Code" class="w-32 h-32 object-contain" />
+              </div>
+              
+              <p class="text-[11px] font-mono text-slate-400 mt-2.5">
+                Scan at Ojaja Box Office Fast-Track Turnstile
+              </p>
+              
+              <div class="mt-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                TAG: [${booking.tag}] • PAYSTACK: ${booking.paystackRef || 'VERIFIED'}
+              </div>
             </div>
           </div>
-        ` : ''}
-
-        <!-- Patron Info -->
-        <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-white/5 font-mono">
-          <span>Guest: <strong class="text-white">${booking.customerName}</strong></span>
-          <span class="text-emerald-400 font-bold">PAID ${formatNaira(booking.totalAmount)}</span>
         </div>
+
+        <!-- TAB 2: OFFICIAL VAT TAX INVOICE & RECEIPT -->
+        <div id="view-invoice-receipt" class="${AppState.confirmationActiveTab === 'invoice' ? 'block' : 'hidden'}">
+          <div id="printable-invoice-area" class="w-full max-w-xl mx-auto p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl border border-slate-200 font-sans relative">
+            
+            <!-- Invoice Letterhead with Official Logo -->
+            <div class="flex items-start justify-between pb-6 border-b-2 border-slate-900">
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-slate-950 p-1.5 flex items-center justify-center shadow-md">
+                  <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                  <h3 class="font-headline font-black text-xl text-slate-950 tracking-wide leading-none">OJAJA CINEMAS</h3>
+                  <p class="text-[10px] text-slate-600 font-mono mt-1">IFE GRAND RESORT & LEISURE, KM 4 IBADAN ROAD, ILE-IFE</p>
+                  <p class="text-[10px] text-slate-500 font-mono">TIN: 28491029-0001 • RC: 1892041 • Tag: [cimen-boxoffice]</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-mono font-bold text-[10px] uppercase">
+                  PAID & VERIFIED
+                </span>
+                <div class="font-headline font-black text-slate-950 text-base mt-1">TAX INVOICE</div>
+                <div class="text-xs font-mono font-bold text-slate-700">${booking.invoiceNo}</div>
+              </div>
+            </div>
+
+            <!-- Billing & Transaction Metadata -->
+            <div class="grid grid-cols-2 gap-4 py-4 text-xs border-b border-slate-200 font-body">
+              <div>
+                <span class="text-[10px] font-mono text-slate-500 uppercase block font-bold">BILLED TO (PATRON):</span>
+                <strong class="text-slate-950 font-bold block text-sm font-headline">${booking.customerName}</strong>
+                <span class="text-slate-600 font-mono block">${booking.customerEmail}</span>
+                <span class="text-slate-600 font-mono block">${booking.customerPhone}</span>
+              </div>
+              <div class="text-right font-mono">
+                <span class="text-[10px] text-slate-500 uppercase block font-bold">TRANSACTION META:</span>
+                <div>Date: <strong class="text-slate-900">${new Date(booking.timestamp).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></div>
+                <div>Channel: <strong class="text-slate-900">${booking.paymentChannel || 'Paystack'}</strong></div>
+                <div>Gateway Ref: <strong class="text-slate-900 text-[10px]">${booking.paystackRef || 'pstk_approved'}</strong></div>
+                <div>Audit Tag: <strong class="text-amber-800">[cimen-boxoffice]</strong></div>
+              </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <div class="py-4">
+              <table class="w-full text-xs font-body">
+                <thead>
+                  <tr class="border-b border-slate-300 text-slate-500 font-mono uppercase text-[10px]">
+                    <th class="text-left py-2">Item Description</th>
+                    <th class="text-center py-2">Qty</th>
+                    <th class="text-right py-2">Unit Price</th>
+                    <th class="text-right py-2">Total (NGN)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-mono">
+                  <tr>
+                    <td class="py-3 text-slate-900 font-body">
+                      <strong class="font-bold block text-slate-950 font-headline">${booking.movieTitle}</strong>
+                      <span class="text-[11px] text-slate-500 font-mono">${booking.hall} • Showtime: ${booking.showtime}</span>
+                      <span class="text-[11px] text-emerald-700 block font-mono font-bold">Seats: ${booking.seats.join(', ')}</span>
+                    </td>
+                    <td class="py-3 text-center text-slate-700">${booking.seats.length}</td>
+                    <td class="py-3 text-right text-slate-700">${formatNaira(Math.round(booking.seatsTotal / (booking.seats.length || 1)))}</td>
+                    <td class="py-3 text-right font-bold text-slate-950">${formatNaira(booking.seatsTotal)}</td>
+                  </tr>
+
+                  ${booking.concessions && booking.concessions.length > 0 ? booking.concessions.map(c => `
+                    <tr>
+                      <td class="py-2 text-slate-900 font-body">
+                        <span class="font-medium">${c.name} (Concessions Claim)</span>
+                      </td>
+                      <td class="py-2 text-center text-slate-700">${c.qty}</td>
+                      <td class="py-2 text-right text-slate-700">${formatNaira(c.unitPrice || (c.price / c.qty))}</td>
+                      <td class="py-2 text-right font-bold text-slate-950">${formatNaira(c.price)}</td>
+                    </tr>
+                  `).join('') : ''}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Financial Subtotals & VAT Breakdown -->
+            <div class="pt-3 border-t-2 border-slate-900 text-xs font-mono space-y-1.5">
+              <div class="flex justify-between text-slate-600">
+                <span>Net Subtotal:</span>
+                <span>${formatNaira(booking.netSubtotal || (booking.totalAmount - Math.round(booking.totalAmount * 0.075)))}</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Nigerian Value Added Tax (VAT @ 7.5%):</span>
+                <span>${formatNaira(booking.vatAmount || Math.round(booking.totalAmount * 0.075))}</span>
+              </div>
+              <div class="flex justify-between text-base font-black text-slate-950 pt-2 border-t border-slate-200">
+                <span class="font-headline">Total Paid:</span>
+                <span class="text-emerald-700">${formatNaira(booking.totalAmount)}</span>
+              </div>
+            </div>
+
+            <!-- Circular Paid & Reserved Stamp with Royal Crest -->
+            <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
+              <div class="text-[10px] text-slate-500 font-mono">
+                Thank you for choosing Ojaja Cinemas. Present this invoice or your QR ticket pass at the box office turnstile.
+              </div>
+              <div class="border-2 border-emerald-600 text-emerald-700 rounded-2xl px-3 py-1.5 text-center font-mono font-black text-[10px] uppercase tracking-wider transform rotate-[-3deg] shadow-sm flex-shrink-0">
+                PAID & LOCKED<br>OJAJA BOX OFFICE
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
-      <!-- Notched Perforation Line -->
-      <div class="relative h-6 bg-[#0E1524]">
-        <div class="ticket-notch-left"></div>
-        <div class="ticket-perforation"></div>
-        <div class="ticket-notch-right"></div>
+      <!-- Actions Bar (No-Print) -->
+      <div class="p-4 sm:p-5 bg-[#0B0F17] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 no-print font-headline text-xs">
+        <div class="flex items-center gap-2">
+          <button 
+            type="button" 
+            onclick="printActiveReceiptOrTicket()"
+            class="px-4 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
+          >
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Print / Save PDF</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="shareTicketWhatsApp()"
+            class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
+          >
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Share WhatsApp</span>
+          </button>
+        </div>
+
+        <button 
+          type="button" 
+          onclick="closeTicketModal()"
+          class="px-5 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold uppercase tracking-wider transition-colors"
+        >
+          Close & Back to Movies
+        </button>
       </div>
 
-      <!-- Ticket Stub with Live QR Code -->
-      <div class="p-6 bg-[#0B0F17] flex flex-col items-center justify-center text-center">
-        <div class="p-3 bg-white rounded-2xl shadow-xl border border-slate-200">
-          <img src="${qrUrl}" alt="Ticket QR Verification Code" class="w-36 h-36 object-contain" />
-        </div>
-        
-        <p class="text-[11px] font-mono text-slate-400 mt-3">
-          Scan at Ojaja Box Office Fast-Track Turnstile
-        </p>
-        
-        <div class="mt-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-          TAG: [${booking.tag}] • PAYSTACK REF: ${booking.paystackRef || 'VERIFIED'}
-        </div>
-      </div>
-    </div>
-
-    <!-- Actions Bar (No-Print) -->
-    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 no-print font-headline">
-      <button 
-        type="button" 
-        onclick="window.print()"
-        class="px-5 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
-      >
-        <i data-lucide="printer" class="w-4 h-4"></i>
-        <span>Print Ticket</span>
-      </button>
-
-      <button 
-        type="button" 
-        onclick="shareTicketWhatsApp()"
-        class="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
-      >
-        <i data-lucide="send" class="w-4 h-4"></i>
-        <span>Send to WhatsApp</span>
-      </button>
-
-      <button 
-        type="button" 
-        onclick="closeTicketModal()"
-        class="px-5 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider transition-colors"
-      >
-        Done
-      </button>
     </div>
   `;
 
@@ -1656,6 +2146,41 @@ function openTicketModal(booking) {
   if (window.lucide) {
     window.lucide.createIcons();
   }
+}
+
+function switchConfirmationTab(tab) {
+  AppState.confirmationActiveTab = tab;
+  SoundFX.playSeatClick();
+
+  const ticketTabBtn = document.getElementById('conf-tab-ticket');
+  const invoiceTabBtn = document.getElementById('conf-tab-invoice');
+  const ticketView = document.getElementById('view-ticket-pass');
+  const invoiceView = document.getElementById('view-invoice-receipt');
+
+  if (tab === 'ticket') {
+    if (ticketTabBtn) ticketTabBtn.className = 'px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20';
+    if (invoiceTabBtn) invoiceTabBtn.className = 'px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white';
+    if (ticketView) ticketView.className = 'block';
+    if (invoiceView) invoiceView.className = 'hidden';
+  } else {
+    if (ticketTabBtn) ticketTabBtn.className = 'px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white';
+    if (invoiceTabBtn) invoiceTabBtn.className = 'px-4 py-2 rounded-xl transition-all font-black flex items-center gap-2 bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20';
+    if (ticketView) ticketView.className = 'hidden';
+    if (invoiceView) invoiceView.className = 'block';
+  }
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function resendReceiptEmail(email) {
+  SoundFX.playSuccessFanfare();
+  showToast(`📧 Official VAT Receipt & E-Invoice re-sent to ${email}!`, 'success');
+}
+
+function printActiveReceiptOrTicket() {
+  window.print();
 }
 
 function closeTicketModal() {
