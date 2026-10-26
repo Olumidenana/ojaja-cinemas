@@ -114,6 +114,236 @@ const SoundFX = {
   }
 };
 
+// =========================================================================
+// UNIVERSAL VIDEO & SOUND SYNCHRONIZATION MANAGER
+// Ensures modals, billboard trailers, and ambient tracks never clash or leak
+// =========================================================================
+const VideoSyncManager = {
+  isHeroReelPlaying: true,
+
+  pauseAllHeroVideos() {
+    const bgIframe = document.getElementById('hero-bg-video');
+    const reelIframe = document.getElementById('hero-featured-reel-video');
+    
+    if (bgIframe && bgIframe.contentWindow) {
+      bgIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      bgIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+    }
+    if (reelIframe && reelIframe.contentWindow) {
+      reelIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+    }
+  },
+
+  resumeAllHeroVideos() {
+    // Only resume if all interactive modals are closed
+    const modals = [
+      document.getElementById('movie-details-modal'),
+      document.getElementById('booking-modal'),
+      document.getElementById('hall-full-modal'),
+      document.getElementById('ticket-modal'),
+      document.getElementById('paystack-simulator-modal'),
+      document.getElementById('admin-modal')
+    ];
+    const anyOpen = modals.some(m => m && !m.classList.contains('hidden'));
+    if (anyOpen) return;
+
+    const bgIframe = document.getElementById('hero-bg-video');
+    const reelIframe = document.getElementById('hero-featured-reel-video');
+
+    if (bgIframe && bgIframe.contentWindow) {
+      bgIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+    }
+    if (reelIframe && reelIframe.contentWindow && VideoSyncManager.isHeroReelPlaying) {
+      reelIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+    }
+  },
+
+  toggleReelPlayPause() {
+    const reelIframe = document.getElementById('hero-featured-reel-video');
+    const playIcon = document.getElementById('featured-reel-play-icon');
+    const playLabel = document.getElementById('featured-reel-play-label');
+
+    VideoSyncManager.isHeroReelPlaying = !VideoSyncManager.isHeroReelPlaying;
+
+    if (reelIframe && reelIframe.contentWindow) {
+      if (VideoSyncManager.isHeroReelPlaying) {
+        reelIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        if (playIcon) playIcon.innerText = '⏸';
+        if (playLabel) playLabel.innerText = 'PAUSE';
+        showToast('Trailer resumed', 'info');
+      } else {
+        reelIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        if (playIcon) playIcon.innerText = '▶';
+        if (playLabel) playLabel.innerText = 'PLAY';
+        showToast('Trailer paused', 'info');
+      }
+    }
+  }
+};
+
+// =========================================================================
+// NETFLIX-STYLE ROTATING TRENDING REEL MANAGER (IN-VOGUE SHOWCASE)
+// =========================================================================
+const TRENDING_REELS = [
+  {
+    movieId: 'spiderman-brand-new-day',
+    title: 'Spider-Man: Brand New Day',
+    rankBadge: '🔥 #1 IN NIGERIA TODAY',
+    matchScore: '99% MATCH',
+    hallInfo: 'Red Room (Christie 4K Laser) & Blue Room (Dolby Atmos)',
+    rating: '12A',
+    runtime: '2h 18m',
+    price: 4000,
+    videoId: 'JfVOs4VSpmA',
+    shortName: 'Spider-Man'
+  },
+  {
+    movieId: 'onibon-oje',
+    title: 'Onibon-Oje (The Heir\'s Vow)',
+    rankBadge: '👑 #2 IN NIGERIA • ROYAL YORUBA EPIC',
+    matchScore: '98% MATCH',
+    hallInfo: 'Blue Room (Dolby Atmos 7.1 Master Track)',
+    rating: '15+',
+    runtime: '2h 25m',
+    price: 4000,
+    videoId: 's2v3fXyL7uM',
+    shortName: 'Onibon-Oje'
+  },
+  {
+    movieId: 'heart-of-the-beast',
+    title: 'Heart of the Beast',
+    rankBadge: '⚡ #3 TRENDING • SURVIVAL THRILLER',
+    matchScore: '96% MATCH',
+    hallInfo: 'Red Room (Christie Dual 4K Laser)',
+    rating: '16+',
+    runtime: '1h 55m',
+    price: 4000,
+    videoId: 'bLVZ6Kk3h5Q',
+    shortName: 'Heart of Beast'
+  },
+  {
+    movieId: 'street-fighter',
+    title: 'Street Fighter (Legendary Reborn)',
+    rankBadge: '💥 #4 IN ACTION • MARTIAL ARTS 4K',
+    matchScore: '95% MATCH',
+    hallInfo: 'Red Room (4K Laser) & Blue Room (Dolby 7.1)',
+    rating: '14+',
+    runtime: '2h 05m',
+    price: 4000,
+    videoId: '2vK-Xz7eQ80',
+    shortName: 'Street Fighter'
+  }
+];
+
+const TrendingReelManager = {
+  currentIndex: 0,
+  timer: null,
+
+  init() {
+    this.renderPills();
+    this.startAutoCycle();
+  },
+
+  renderPills() {
+    const container = document.getElementById('trending-pills-row');
+    if (!container) return;
+    container.innerHTML = TRENDING_REELS.map((item, idx) => {
+      const isActive = idx === this.currentIndex;
+      return `
+        <button 
+          type="button" 
+          onclick="TrendingReelManager.selectTrailer(${idx})"
+          class="py-1.5 px-2 rounded-xl transition-all text-center flex flex-col items-center justify-center border ${
+            isActive 
+              ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md shadow-amber-400/30 font-black' 
+              : 'bg-slate-900/90 text-slate-400 hover:text-white border-white/10 hover:border-amber-400/50'
+          }"
+          title="${item.title}"
+        >
+          <span class="text-[9px] uppercase tracking-wider block opacity-75">${idx + 1}. TRENDING</span>
+          <span class="text-[10px] truncate max-w-full">${item.shortName}</span>
+        </button>
+      `;
+    }).join('');
+  },
+
+  selectTrailer(index) {
+    this.currentIndex = index;
+    const item = TRENDING_REELS[index];
+    if (!item) return;
+
+    this.startAutoCycle();
+
+    const rankEl = document.getElementById('trending-rank-badge');
+    const matchEl = document.getElementById('trending-match-score');
+    const titleEl = document.getElementById('trending-movie-title');
+    const hallEl = document.getElementById('trending-movie-hall');
+    const ratingEl = document.getElementById('trending-movie-rating');
+    const runtimeEl = document.getElementById('trending-movie-runtime');
+    const exploreBtn = document.getElementById('trending-explore-btn');
+    const bookBtn = document.getElementById('trending-book-btn');
+
+    if (rankEl) rankEl.innerHTML = item.rankBadge;
+    if (matchEl) matchEl.innerText = item.matchScore;
+    if (titleEl) titleEl.innerText = item.title;
+    if (hallEl) hallEl.innerText = item.hallInfo;
+    if (ratingEl) ratingEl.innerText = item.rating;
+    if (runtimeEl) runtimeEl.innerText = item.runtime;
+
+    if (exploreBtn) exploreBtn.setAttribute('onclick', `openMovieScenes('${item.movieId}')`);
+    if (bookBtn) {
+      bookBtn.setAttribute('onclick', `openBookingModal('${item.movieId}')`);
+      bookBtn.innerHTML = `<i data-lucide="ticket" class="w-3.5 h-3.5"></i><span>Book Tickets (${formatNaira(item.price)})</span>`;
+    }
+
+    const iframe = document.getElementById('hero-featured-reel-video');
+    if (iframe) {
+      const isMuted = featuredReelMuted ? 1 : 0;
+      iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&mute=${isMuted}&loop=1&playlist=${item.videoId}&controls=1&showinfo=0&rel=0&playsinline=1&enablejsapi=1`;
+      
+      if (!featuredReelMuted) {
+        setTimeout(() => {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+            iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+          }
+        }, 500);
+      }
+    }
+
+    this.renderPills();
+
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  },
+
+  nextTrailer() {
+    const nextIdx = (this.currentIndex + 1) % TRENDING_REELS.length;
+    this.selectTrailer(nextIdx);
+  },
+
+  prevTrailer() {
+    const prevIdx = (this.currentIndex - 1 + TRENDING_REELS.length) % TRENDING_REELS.length;
+    this.selectTrailer(prevIdx);
+  },
+
+  startAutoCycle() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      const modals = [
+        document.getElementById('movie-details-modal'),
+        document.getElementById('booking-modal'),
+        document.getElementById('ticket-modal')
+      ];
+      const anyOpen = modals.some(m => m && !m.classList.contains('hidden'));
+      if (anyOpen) return;
+
+      this.nextTrailer();
+    }, 20000); // 20 seconds rotation between trending movies in vogue
+  }
+};
+
 // Featured Cinema Reel Audio Toggle (Right Column Hero Player)
 let featuredReelMuted = true;
 function toggleFeaturedReelAudio() {
@@ -132,16 +362,14 @@ function toggleFeaturedReelAudio() {
       if (icon) icon.innerText = '🔇';
       if (label) label.innerText = 'TAP FOR SOUND';
       if (btn) {
-        btn.className = 'px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse';
+        btn.className = 'pointer-events-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse';
       }
       showToast('Featured Reel Audio Muted', 'info');
     } else {
-      // User tapped button - authentic browser user activation gesture
       if (iframe.contentWindow) {
         iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
         iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
       }
-      // Guarantee sound by replacing mute=1 with mute=0 if present
       const curSrc = iframe.getAttribute('src') || '';
       if (curSrc.includes('mute=1')) {
         iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
@@ -149,7 +377,7 @@ function toggleFeaturedReelAudio() {
       if (icon) icon.innerText = '🔊';
       if (label) label.innerText = 'SOUND ON (100% DOLBY)';
       if (btn) {
-        btn.className = 'px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
+        btn.className = 'pointer-events-auto px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
       }
       SoundFX.playSuccessFanfare();
       showToast('🔊 Reel Audio Activated: Christie 4K & Dolby 7.1 Sound Active!', 'success');
@@ -1012,6 +1240,7 @@ function selectAlternativeShowtime(movieId, alternativeShowtimeId) {
 
 // Open Booking Modal
 function openBookingModal(movieId, preselectedShowtimeId = null) {
+  VideoSyncManager.pauseAllHeroVideos();
   SoundFX.playSeatClick();
   const movie = MOVIES_DATA.find(m => m.id === movieId);
   if (!movie) return;
@@ -1046,6 +1275,7 @@ function closeBookingModal() {
   }
   AppState.selectedSeats = [];
   AppState.selectedConcessions = {};
+  VideoSyncManager.resumeAllHeroVideos();
 }
 
 // Render the Entire Interactive Booking Modal
@@ -2397,6 +2627,7 @@ _Present this reference code or QR pass at the entrance turnstile._`;
 
 // Netflix-Style Movie Scenes & Video Trailer Modal
 function openMovieScenes(movieId, sceneIndex = 0) {
+  VideoSyncManager.pauseAllHeroVideos();
   SoundFX.playSeatClick();
   const movie = MOVIES_DATA.find(m => m.id === movieId);
   if (!movie) return;
@@ -2608,6 +2839,7 @@ function switchMovieScene(movieId, sceneIndex) {
 
 // Movie Details Modal
 function openMovieDetails(movieId) {
+  VideoSyncManager.pauseAllHeroVideos();
   SoundFX.playSeatClick();
   const movie = MOVIES_DATA.find(m => m.id === movieId);
   if (!movie) return;
@@ -2715,14 +2947,24 @@ function openMovieDetails(movieId) {
 
 function closeMovieDetails() {
   const modal = document.getElementById('movie-details-modal');
+  const iframe = document.getElementById('cinema-video-iframe');
+  if (iframe) {
+    iframe.src = 'about:blank';
+  }
+  const content = document.getElementById('movie-details-content');
+  if (content) {
+    content.innerHTML = '';
+  }
   if (modal) {
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
+  VideoSyncManager.resumeAllHeroVideos();
 }
 
 // Admin Box Office Hub & Verification Scanner Modal
 function openAdminModal() {
+  VideoSyncManager.pauseAllHeroVideos();
   SoundFX.playSeatClick();
   renderAdminHub();
   const modal = document.getElementById('admin-modal');
@@ -2738,6 +2980,7 @@ function closeAdminModal() {
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
+  VideoSyncManager.resumeAllHeroVideos();
 }
 
 function renderAdminHub() {
@@ -2989,6 +3232,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadVercelConfig();
   initLedger();
   renderMoviesGrid();
+  TrendingReelManager.init();
 
   window.addEventListener('keydown', (e) => {
     if (e.altKey && (e.key === 'a' || e.key === 'A')) {

@@ -32,7 +32,7 @@
   <script src="https://js.paystack.co/v1/inline.js"></script>
 
   <!-- Custom CSS for Screen Curve, Projector Beams & Bobble Animations -->
-  <link rel="stylesheet" href="styles.css?v=20261026_1545">
+  <link rel="stylesheet" href="styles.css?v=20261026_1600">
 
   <script>
     tailwind.config = {
@@ -254,57 +254,107 @@
           </div>
         </div>
 
-        <!-- Right Column: Interactive Featured Cinema Reel Card (5 Cols) -->
-        <div class="lg:col-span-5">
-          <div class="rounded-3xl bg-[#0E1524]/90 backdrop-blur-xl border-2 border-amber-400/40 p-4 sm:p-5 shadow-2xl shadow-amber-400/15 overflow-hidden">
+        <!-- Right Column: Netflix-Style Rotating Trending Billboard (5 Cols) -->
+        <div class="lg:col-span-5" id="hero-trending-showcase-container">
+          <div class="rounded-3xl bg-[#0E1524]/95 backdrop-blur-xl border-2 border-amber-400/50 p-4 sm:p-5 shadow-2xl shadow-amber-400/20 overflow-hidden relative">
+            
+            <!-- Top Bar: Trending Badge & Next/Prev Navigation -->
             <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
-                <span class="font-headline font-black text-xs text-white uppercase tracking-wider">FEATURED CINEMA REEL</span>
+                <span id="trending-rank-badge" class="font-headline font-black text-xs text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                  🔥 #1 IN NIGERIA TODAY
+                </span>
               </div>
-              <span class="text-[10px] font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/30">
-                CHRISTIE 4K MASTER
-              </span>
+              <div class="flex items-center gap-1.5">
+                <span id="trending-match-score" class="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                  99% MATCH
+                </span>
+                <button 
+                  type="button" 
+                  onclick="TrendingReelManager.prevTrailer()" 
+                  class="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs border border-white/10 transition-colors"
+                  title="Previous Trending Reel"
+                >
+                  ◀
+                </button>
+                <button 
+                  type="button" 
+                  onclick="TrendingReelManager.nextTrailer()" 
+                  class="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs border border-white/10 transition-colors"
+                  title="Next Trending Reel"
+                >
+                  ▶
+                </button>
+              </div>
             </div>
 
-            <!-- Embedded Live Video Player Preview with Active Audio Controls -->
+            <!-- Embedded Live Video Player Preview with Active Audio & Playback Controls -->
             <div class="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-inner border border-white/10 mb-3 group/reel">
               <iframe 
                 id="hero-featured-reel-video"
                 src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=1&showinfo=0&rel=0&playsinline=1&enablejsapi=1"
-                title="Spider-Man Featured Cinema Reel"
+                title="Featured Cinema Reel"
                 class="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
               ></iframe>
 
-              <!-- Floating Quick Audio / Sound Trigger Banner -->
-              <div class="absolute bottom-3 right-3 z-20 flex items-center gap-2">
+              <!-- Floating Top Badges -->
+              <div class="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 pointer-events-none">
+                <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[9px] font-mono font-bold text-amber-300 border border-amber-400/30">
+                  CHRISTIE 4K MASTER
+                </span>
+                <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[9px] font-mono font-bold text-cyan-300 border border-cyan-400/30">
+                  DOLBY 7.1
+                </span>
+              </div>
+
+              <!-- Floating Bottom Playback & Sound Control Bar -->
+              <div class="absolute bottom-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none">
+                <!-- Play/Pause Toggle -->
+                <button 
+                  type="button" 
+                  id="featured-reel-play-btn"
+                  onclick="VideoSyncManager.toggleReelPlayPause()"
+                  class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-black/80 hover:bg-black/95 text-white font-bold text-xs font-headline flex items-center gap-1.5 shadow-xl border border-white/20 transition-all hover:scale-105 active:scale-95 backdrop-blur-md"
+                  title="Play/Pause Reel"
+                >
+                  <span id="featured-reel-play-icon">⏸</span>
+                  <span id="featured-reel-play-label" class="hidden sm:inline">PAUSE</span>
+                </button>
+
+                <!-- Sound Toggle -->
                 <button 
                   type="button" 
                   id="featured-reel-sound-btn"
                   onclick="toggleFeaturedReelAudio()"
-                  class="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
-                  title="Unmute Dialogue and Soundstage Audio (Dolby Surround 7.1)"
+                  class="pointer-events-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
+                  title="Toggle Audio / Sound (Dolby Surround 7.1)"
                 >
                   <span id="featured-reel-sound-icon">🔊</span>
-                  <span id="featured-reel-sound-label">TAP FOR SOUND (DOLBY 7.1)</span>
+                  <span id="featured-reel-sound-label">TAP FOR SOUND</span>
                 </button>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-xs mb-3">
+            <!-- Title & Auditorium Information -->
+            <div class="flex items-start justify-between text-xs mb-3 gap-2">
               <div>
-                <h4 class="font-headline font-black text-white text-sm">Spider-Man: Brand New Day</h4>
-                <p class="text-[11px] text-slate-400 font-body">Now playing in Red Room (Christie 4K) & Blue Room (Dolby Atmos)</p>
+                <h4 id="trending-movie-title" class="font-headline font-black text-white text-base leading-tight">Spider-Man: Brand New Day</h4>
+                <p id="trending-movie-hall" class="text-[11px] text-slate-400 font-body mt-0.5">Now playing in Red Room (Christie 4K) & Blue Room (Dolby Atmos)</p>
               </div>
-              <span class="px-2 py-1 rounded bg-amber-400 text-slate-950 font-black text-xs font-headline">12A</span>
+              <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                <span id="trending-movie-rating" class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[11px] font-headline">12A</span>
+                <span id="trending-movie-runtime" class="text-[10px] font-mono text-slate-400">2h 18m</span>
+              </div>
             </div>
 
-            <!-- Quick Action Row -->
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 font-headline text-xs">
+            <!-- Action Row -->
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 font-headline text-xs mb-3">
               <button 
                 type="button" 
+                id="trending-explore-btn"
                 onclick="openMovieScenes('spiderman-brand-new-day')"
                 class="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold border border-white/10 flex items-center justify-center gap-1.5 transition-all"
               >
@@ -314,6 +364,7 @@
 
               <button 
                 type="button" 
+                id="trending-book-btn"
                 onclick="openBookingModal('spiderman-brand-new-day')"
                 class="py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black flex items-center justify-center gap-1.5 shadow-lg shadow-amber-400/20 transition-all active:scale-95"
               >
@@ -321,6 +372,18 @@
                 <span>Book Tickets</span>
               </button>
             </div>
+
+            <!-- Netflix-Style Trending Switcher Pills -->
+            <div class="pt-2 border-t border-white/10">
+              <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                <span>TRENDING REELS IN VOGUE:</span>
+                <span class="text-amber-400 font-bold">Auto-Cycles • Tap to Switch</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 text-[10px] font-headline font-bold" id="trending-pills-row">
+                <!-- Dynamically generated by TrendingReelManager -->
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -599,6 +662,6 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
   <!-- Application Logic (Cache-busted for Instant Live Reload) -->
-  <script src="app.js?v=20261026_1545"></script>
+  <script src="app.js?v=20261026_1600"></script>
 </body>
 </html>
