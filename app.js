@@ -114,6 +114,90 @@ const SoundFX = {
   }
 };
 
+// Featured Cinema Reel Audio Toggle (Right Column Hero Player)
+let featuredReelMuted = true;
+function toggleFeaturedReelAudio() {
+  const iframe = document.getElementById('hero-featured-reel-video');
+  const btn = document.getElementById('featured-reel-sound-btn');
+  const icon = document.getElementById('featured-reel-sound-icon');
+  const label = document.getElementById('featured-reel-sound-label');
+
+  featuredReelMuted = !featuredReelMuted;
+
+  if (iframe) {
+    if (featuredReelMuted) {
+      if (iframe.contentWindow) {
+        iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+      }
+      if (icon) icon.innerText = '🔇';
+      if (label) label.innerText = 'TAP FOR SOUND';
+      if (btn) {
+        btn.className = 'px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse';
+      }
+      showToast('Featured Reel Audio Muted', 'info');
+    } else {
+      // User tapped button - authentic browser user activation gesture
+      if (iframe.contentWindow) {
+        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+        iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+      }
+      // Guarantee sound by replacing mute=1 with mute=0 if present
+      const curSrc = iframe.getAttribute('src') || '';
+      if (curSrc.includes('mute=1')) {
+        iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
+      }
+      if (icon) icon.innerText = '🔊';
+      if (label) label.innerText = 'SOUND ON (100% DOLBY)';
+      if (btn) {
+        btn.className = 'px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
+      }
+      SoundFX.playSuccessFanfare();
+      showToast('🔊 Reel Audio Activated: Christie 4K & Dolby 7.1 Sound Active!', 'success');
+    }
+  }
+}
+
+// Modal Trailer Sound Toggle
+let modalVideoMuted = false;
+function toggleModalVideoAudio() {
+  const iframe = document.getElementById('cinema-video-iframe');
+  const btn = document.getElementById('modal-sound-btn');
+  const icon = document.getElementById('modal-sound-icon');
+  const label = document.getElementById('modal-sound-label');
+
+  if (!iframe) return;
+
+  modalVideoMuted = !modalVideoMuted;
+
+  if (modalVideoMuted) {
+    if (iframe.contentWindow) {
+      iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+    }
+    if (icon) icon.innerText = '🔇';
+    if (label) label.innerText = 'UNMUTE SOUND';
+    if (btn) {
+      btn.className = 'px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs font-headline flex items-center gap-1.5 border border-amber-400/40 transition-all';
+    }
+    showToast('Trailer sound muted', 'info');
+  } else {
+    if (iframe.contentWindow) {
+      iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+    }
+    const curSrc = iframe.getAttribute('src') || '';
+    if (curSrc.includes('mute=1')) {
+      iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
+    }
+    if (icon) icon.innerText = '🔊';
+    if (label) label.innerText = 'SOUND ACTIVE (DOLBY ATMOS 100%)';
+    if (btn) {
+      btn.className = 'px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
+    }
+    SoundFX.playSuccessFanfare();
+    showToast('🔊 Trailer Voice & Sound Activated in Dolby Atmos 7.1!', 'success');
+  }
+}
+
 // Ambient Hero Background Trailer Audio Toggle
 let heroVideoMuted = true;
 function toggleHeroVideoAudio() {
@@ -133,11 +217,15 @@ function toggleHeroVideoAudio() {
       showToast('Ambient Background Audio Muted', 'info');
     } else {
       iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[75]}', '*');
+      iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[85]}', '*');
+      const curSrc = iframe.getAttribute('src') || '';
+      if (curSrc.includes('mute=1')) {
+        iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
+      }
       if (icon) icon.innerText = '🔊';
       if (label) label.innerText = 'Mute';
       if (btn) btn.className = 'px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-amber-400/30';
-      showToast('🔊 Playing Spider-Man Trailer Audio (Dolby Atmos Simulation)', 'success');
+      showToast('🔊 Playing Spider-Man Ambient Audio (Dolby Atmos)', 'success');
       SoundFX.playSuccessFanfare();
     }
   }
@@ -193,7 +281,7 @@ const MOVIES_DATA = [
     tags: ['cimen', 'hollywood', 'featured', 'blue-room'],
     poster: 'assets/posters/spiderman-brand-new-day.webp',
     backdrop: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1600&auto=format&fit=crop',
-    trailerEmbed: 'https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=0&rel=0',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=0&controls=1&enablejsapi=1&rel=0',
     scenes: [
       { id: 'spidey-sc-1', title: 'Manhattan Skyline Aerial Swing', time: '02:15', badge: 'Christie 4K Laser', still: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1200&auto=format&fit=crop', desc: 'Peter Parker navigates high-altitude thunderclouds over Times Square with dual laser contrast clarity.' },
       { id: 'spidey-sc-2', title: 'The Under-Vault Syndicate Ambush', time: '01:45', badge: 'Dolby Atmos 7.1', still: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1200&auto=format&fit=crop', desc: 'Acoustic spatial isolation captures subterranean footsteps from overhead surround channels.' },
@@ -261,7 +349,7 @@ const MOVIES_DATA = [
     tags: ['cimen', 'action', 'red-room'],
     poster: 'assets/posters/heart-of-the-beast.webp',
     backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
-    trailerEmbed: 'https://www.youtube-nocookie.com/embed/bLVZ6Kk3h5Q?autoplay=1&mute=0&rel=0',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/bLVZ6Kk3h5Q?autoplay=1&mute=0&controls=1&enablejsapi=1&rel=0',
     scenes: [
       { id: 'hob-sc-1', title: 'Sub-Zero Transport Crash in Alaska', time: '02:30', badge: 'Dual 4K Laser', still: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', desc: 'Violent aircraft fuselage impact across Arctic ice plains with roaring theater sub-bass.' },
       { id: 'hob-sc-2', title: 'Odin Scent-Tracks Enemy Mercenaries', time: '01:50', badge: 'Dolby Atmos', still: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=1200&auto=format&fit=crop', desc: 'Stealth combat dog tactical signals and whisper-quiet pine forest rustling.' },
@@ -318,7 +406,7 @@ const MOVIES_DATA = [
     tags: ['cimen', 'featured', 'nollywood-epic', 'blue-room'],
     poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop',
     backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1600&auto=format&fit=crop',
-    trailerEmbed: 'https://www.youtube-nocookie.com/embed/s2v3fXyL7uM?autoplay=1&mute=0&rel=0',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/s2v3fXyL7uM?autoplay=1&mute=0&controls=1&enablejsapi=1&rel=0',
     scenes: [
       { id: 'onb-sc-1', title: 'Oracle Invocation at the Sacred Grove', time: '02:10', badge: 'Dolby Atmos Master Track', still: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop', desc: 'Traditional Yoruba ancestral percussion mastered across 12 discrete channels.' },
       { id: 'onb-sc-2', title: 'Savannah 200-Cavalry Warlord Charge', time: '03:15', badge: 'Christie 4K Laser', still: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop', desc: 'Armored horse brigades collision beneath fiery sunset clouds.' },
@@ -386,7 +474,7 @@ const MOVIES_DATA = [
     tags: ['cimen', 'nollywood-epic', 'blue-room'],
     poster: 'assets/posters/a-land-apart.webp',
     backdrop: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&auto=format&fit=crop',
-    trailerEmbed: 'https://www.youtube-nocookie.com/embed/kJQP7kiw5Fk?autoplay=1&mute=0&rel=0',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/kJQP7kiw5Fk?autoplay=1&mute=0&controls=1&enablejsapi=1&rel=0',
     scenes: [
       { id: 'ala-sc-1', title: 'The Agrarian Empire Megaharvester', time: '02:20', badge: 'Dolby Atmos Master', still: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop', desc: 'Golden soil harvesting complex sprawling across alternate sovereign Nigeria.' },
       { id: 'ala-sc-2', title: 'Dynasty Boardroom Succession Plot', time: '01:40', badge: '4K Ultra Color', still: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop', desc: 'Political betrayal between billionaire agriculture heirs.' },
@@ -443,7 +531,7 @@ const MOVIES_DATA = [
     tags: ['cimen', 'hollywood', 'action', 'red-room'],
     poster: 'assets/posters/street-fighter.webp',
     backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1600&auto=format&fit=crop',
-    trailerEmbed: 'https://www.youtube-nocookie.com/embed/2vK-Xz7eQ80?autoplay=1&mute=0&rel=0',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/2vK-Xz7eQ80?autoplay=1&mute=0&controls=1&enablejsapi=1&rel=0',
     scenes: [
       { id: 'stf-sc-1', title: 'Hadoken Collision in Neon Kyoto', time: '02:05', badge: 'Christie 4K Laser', still: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', desc: 'Ki energy shockwaves rippling through neon alleyways with brilliant cyan hues.' },
       { id: 'stf-sc-2', title: 'Chun-Li vs Vega Cage Tournament', time: '01:55', badge: 'Dolby Surround 7.1', still: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop', desc: 'Acrobatic wire-work and metallic claw sparks in close-quarter ring combat.' },
@@ -500,7 +588,7 @@ const MOVIES_DATA = [
     tags: ['cimen', 'thriller', 'red-room'],
     poster: 'assets/posters/verity.webp',
     backdrop: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1600&auto=format&fit=crop',
-    trailerEmbed: 'https://www.youtube-nocookie.com/embed/ScMzIvxBSi4?autoplay=1&mute=0&rel=0',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/ScMzIvxBSi4?autoplay=1&mute=0&controls=1&enablejsapi=1&rel=0',
     scenes: [
       { id: 'ver-sc-1', title: 'Unpublished Manuscript Discovery', time: '02:00', badge: 'Dolby Surround 7.1', still: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1200&auto=format&fit=crop', desc: 'A secluded office holds horrifying confessions typed in red ink.' },
       { id: 'ver-sc-2', title: 'Midnight Footsteps Across the Attic', time: '01:35', badge: 'Atmospheric Spatial 3D', still: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', desc: 'Chilling 360-degree footsteps echo directly behind the patron.' },
@@ -2230,6 +2318,15 @@ function openTicketModal(booking) {
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
+  // Attempt immediate audio unmute following active user click gesture
+  setTimeout(() => {
+    const modalIframe = document.getElementById('cinema-video-iframe');
+    if (modalIframe && modalIframe.contentWindow) {
+      modalIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      modalIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+    }
+  }, 450);
+
   if (window.lucide) {
     window.lucide.createIcons();
   }
@@ -2358,6 +2455,20 @@ function openMovieScenes(movieId, sceneIndex = 0) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
             ></iframe>
+
+            <!-- Floating Sound & Dolby Atmos Audio Button -->
+            <div class="absolute bottom-3 right-3 z-20 flex items-center gap-2">
+              <button 
+                type="button" 
+                id="modal-sound-btn"
+                onclick="toggleModalVideoAudio()"
+                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-2 shadow-2xl shadow-black/80 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
+                title="Toggle Voice & Soundstage Audio (Dolby Atmos)"
+              >
+                <span id="modal-sound-icon">🔊</span>
+                <span id="modal-sound-label">TAP TO UNMUTE SOUND</span>
+              </button>
+            </div>
           ` : `
             <div class="w-full h-full relative">
               <img src="${currentScene ? currentScene.still : movie.backdrop}" alt="${movie.title}" class="w-full h-full object-cover">
@@ -2476,6 +2587,15 @@ function openMovieScenes(movieId, sceneIndex = 0) {
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
+  // Attempt immediate audio unmute following active user click gesture
+  setTimeout(() => {
+    const modalIframe = document.getElementById('cinema-video-iframe');
+    if (modalIframe && modalIframe.contentWindow) {
+      modalIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      modalIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+    }
+  }, 450);
+
   if (window.lucide) {
     window.lucide.createIcons();
   }
@@ -2578,6 +2698,15 @@ function openMovieDetails(movieId) {
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
+
+  // Attempt immediate audio unmute following active user click gesture
+  setTimeout(() => {
+    const modalIframe = document.getElementById('cinema-video-iframe');
+    if (modalIframe && modalIframe.contentWindow) {
+      modalIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      modalIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+    }
+  }, 450);
 
   if (window.lucide) {
     window.lucide.createIcons();

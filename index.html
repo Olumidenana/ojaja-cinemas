@@ -32,7 +32,7 @@
   <script src="https://js.paystack.co/v1/inline.js"></script>
 
   <!-- Custom CSS for Screen Curve, Projector Beams & Bobble Animations -->
-  <link rel="stylesheet" href="styles.css?v=20261026_1526">
+  <link rel="stylesheet" href="styles.css?v=20261026_1545">
 
   <script>
     tailwind.config = {
@@ -267,15 +267,30 @@
               </span>
             </div>
 
-            <!-- Embedded Live Video Player Preview -->
+            <!-- Embedded Live Video Player Preview with Active Audio Controls -->
             <div class="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-inner border border-white/10 mb-3 group/reel">
               <iframe 
-                src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=1&showinfo=0&rel=0&playsinline=1"
+                id="hero-featured-reel-video"
+                src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=1&showinfo=0&rel=0&playsinline=1&enablejsapi=1"
                 title="Spider-Man Featured Cinema Reel"
                 class="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
               ></iframe>
+
+              <!-- Floating Quick Audio / Sound Trigger Banner -->
+              <div class="absolute bottom-3 right-3 z-20 flex items-center gap-2">
+                <button 
+                  type="button" 
+                  id="featured-reel-sound-btn"
+                  onclick="toggleFeaturedReelAudio()"
+                  class="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
+                  title="Unmute Dialogue and Soundstage Audio (Dolby Surround 7.1)"
+                >
+                  <span id="featured-reel-sound-icon">🔊</span>
+                  <span id="featured-reel-sound-label">TAP FOR SOUND (DOLBY 7.1)</span>
+                </button>
+              </div>
             </div>
 
             <div class="flex items-center justify-between text-xs mb-3">
@@ -312,11 +327,11 @@
       </div>
     </div>
 
-    <!-- Ambient Video Controls & Title Pill -->
-    <div class="absolute bottom-6 right-6 z-20 hidden md:flex items-center gap-3 bg-black/70 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 text-xs font-mono shadow-2xl">
+    <!-- Ambient Background Video Controls & Title Pill -->
+    <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-black/85 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 text-xs font-mono shadow-2xl">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-        <span class="text-slate-300 text-[11px]">TRAILER: <strong class="text-white">Spider-Man: Brand New Day (4K)</strong></span>
+        <span class="text-slate-300 text-[11px] hidden sm:inline">AMBIENT REEL: <strong class="text-white">Spider-Man (4K)</strong></span>
       </div>
       <button 
         type="button" 
@@ -584,6 +599,6 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
   <!-- Application Logic (Cache-busted for Instant Live Reload) -->
-  <script src="app.js?v=20261026_1526"></script>
+  <script src="app.js?v=20261026_1545"></script>
 </body>
 </html>
