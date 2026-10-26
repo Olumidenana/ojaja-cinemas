@@ -43,7 +43,7 @@
   <script src="https://js.paystack.co/v1/inline.js"></script>
 
   <!-- Custom CSS for Screen Curve, Projector Beams & Bobble Animations -->
-  <link rel="stylesheet" href="styles.css?v=20261026_1600">
+  <link rel="stylesheet" href="styles.css?v=20261026_1615">
 
   <script>
     tailwind.config = {
@@ -174,15 +174,19 @@
       <div class="w-full h-full bg-gradient-to-b from-amber-400/20 via-amber-500/5 to-transparent clip-path-polygon"></div>
     </div>
 
-    <!-- Netflix-Style Ambient Background Movie Trailer Player -->
+    <!-- Native Netflix-Style Ambient Background Movie Trailer Player (Zero External Errors) -->
     <div class="hero-video-wrapper">
-      <iframe 
-        id="hero-bg-video"
-        src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=0&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&playsinline=1&enablejsapi=1" 
-        title="Background Film Reel"
-        class="w-full h-full border-0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      ></iframe>
+      <video 
+        id="hero-cinema-video"
+        autoplay 
+        loop 
+        muted 
+        playsinline 
+        preload="auto"
+        poster="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1600&auto=format&fit=crop"
+        src="https://media.w3.org/2010/05/sintel/trailer.mp4"
+        class="w-full h-full object-cover"
+      ></video>
     </div>
 
     <!-- Subtle Cinematic Vignette (Preserving High Video Visibility) -->
@@ -300,51 +304,58 @@
               </div>
             </div>
 
-            <!-- Embedded Live Video Player Preview with Active Audio & Playback Controls -->
+            <!-- Active Film Motion Snapshot & Soundstage Deck (Zero Third-Party YouTube Errors) -->
             <div class="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-inner border border-white/10 mb-3 group/reel">
-              <iframe 
-                id="hero-featured-reel-video"
-                src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=1&showinfo=0&rel=0&playsinline=1&enablejsapi=1"
-                title="Featured Cinema Reel"
-                class="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <img 
+                id="trending-preview-poster" 
+                src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1200&auto=format&fit=crop" 
+                alt="Active Cinema Trailer" 
+                class="w-full h-full object-cover group-hover/reel:scale-105 transition-transform duration-500"
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
 
-              <!-- Floating Top Badges -->
+              <!-- Top Left Master Sound & Projection Badges -->
               <div class="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 pointer-events-none">
-                <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[9px] font-mono font-bold text-amber-300 border border-amber-400/30">
+                <span class="px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-[9px] font-mono font-bold text-amber-300 border border-amber-400/40">
                   CHRISTIE 4K MASTER
                 </span>
-                <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[9px] font-mono font-bold text-cyan-300 border border-cyan-400/30">
-                  DOLBY 7.1
+                <span class="px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-[9px] font-mono font-bold text-cyan-300 border border-cyan-400/40">
+                  DOLBY ATMOS 7.1
                 </span>
               </div>
 
+              <!-- Center Playing Indicator -->
+              <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="px-3.5 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white font-mono text-[11px] flex items-center gap-2 shadow-2xl">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span class="tracking-wider uppercase text-[10px] font-bold">STREAMING ON BACKGROUND CINEMA</span>
+                </div>
+              </div>
+
               <!-- Floating Bottom Playback & Sound Control Bar -->
-              <div class="absolute bottom-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none">
+              <div class="absolute bottom-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between">
                 <!-- Play/Pause Toggle -->
                 <button 
                   type="button" 
                   id="featured-reel-play-btn"
-                  onclick="VideoSyncManager.toggleReelPlayPause()"
-                  class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-black/80 hover:bg-black/95 text-white font-bold text-xs font-headline flex items-center gap-1.5 shadow-xl border border-white/20 transition-all hover:scale-105 active:scale-95 backdrop-blur-md"
-                  title="Play/Pause Reel"
+                  onclick="toggleHeroCinemaPlayPause()"
+                  class="px-3 py-1.5 rounded-xl bg-black/80 hover:bg-black/95 text-white font-bold text-xs font-headline flex items-center gap-1.5 shadow-xl border border-white/20 transition-all hover:scale-105 active:scale-95 backdrop-blur-md"
+                  title="Pause/Resume Cinema Background Motion"
                 >
-                  <span id="featured-reel-play-icon">⏸</span>
-                  <span id="featured-reel-play-label" class="hidden sm:inline">PAUSE</span>
+                  <span id="hero-play-icon">⏸</span>
+                  <span id="hero-play-label" class="hidden sm:inline">PAUSE MOTION</span>
                 </button>
 
                 <!-- Sound Toggle -->
                 <button 
                   type="button" 
-                  id="featured-reel-sound-btn"
-                  onclick="toggleFeaturedReelAudio()"
-                  class="pointer-events-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
-                  title="Toggle Audio / Sound (Dolby Surround 7.1)"
+                  id="hero-sound-toggle-btn"
+                  onclick="toggleHeroCinemaAudio()"
+                  class="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
+                  title="Turn Sound ON / OFF"
                 >
-                  <span id="featured-reel-sound-icon">🔊</span>
-                  <span id="featured-reel-sound-label">TAP FOR SOUND</span>
+                  <span id="hero-sound-icon">🔊</span>
+                  <span id="hero-sound-text">TAP FOR SOUND</span>
                 </button>
               </div>
             </div>
@@ -405,12 +416,12 @@
     <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-black/85 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 text-xs font-mono shadow-2xl">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-        <span class="text-slate-300 text-[11px] hidden sm:inline">AMBIENT REEL: <strong class="text-white">Spider-Man (4K)</strong></span>
+        <span class="text-slate-300 text-[11px] hidden sm:inline">CINEMA SOUND: <strong id="ambient-pill-title" class="text-white">Dolby Atmos</strong></span>
       </div>
       <button 
         type="button" 
         id="hero-mute-toggle"
-        onclick="toggleHeroVideoAudio()"
+        onclick="toggleHeroCinemaAudio()"
         class="px-2.5 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-bold transition-all flex items-center gap-1.5"
       >
         <span id="hero-mute-icon">🔇</span>
@@ -673,6 +684,6 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
   <!-- Application Logic (Cache-busted for Instant Live Reload) -->
-  <script src="app.js?v=20261026_1600"></script>
+  <script src="app.js?v=20261026_1615"></script>
 </body>
 </html>

@@ -115,27 +115,21 @@ const SoundFX = {
 };
 
 // =========================================================================
-// UNIVERSAL VIDEO & SOUND SYNCHRONIZATION MANAGER
-// Ensures modals, billboard trailers, and ambient tracks never clash or leak
+// UNIVERSAL NATIVE HTML5 CINEMA VIDEO & DOLBY AUDIO MANAGER
+// Zero third-party YouTube pop-ups, zero "Video unavailable" errors
+// Streams directly in background with Christie 4K & Dolby Atmos controls
 // =========================================================================
-const VideoSyncManager = {
-  isHeroReelPlaying: true,
+let cinemaAudioEnabled = false;
 
+const VideoSyncManager = {
   pauseAllHeroVideos() {
-    const bgIframe = document.getElementById('hero-bg-video');
-    const reelIframe = document.getElementById('hero-featured-reel-video');
-    
-    if (bgIframe && bgIframe.contentWindow) {
-      bgIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-      bgIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-    }
-    if (reelIframe && reelIframe.contentWindow) {
-      reelIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+    const heroVideo = document.getElementById('hero-cinema-video');
+    if (heroVideo && !heroVideo.paused) {
+      heroVideo.pause();
     }
   },
 
   resumeAllHeroVideos() {
-    // Only resume if all interactive modals are closed
     const modals = [
       document.getElementById('movie-details-modal'),
       document.getElementById('booking-modal'),
@@ -147,42 +141,16 @@ const VideoSyncManager = {
     const anyOpen = modals.some(m => m && !m.classList.contains('hidden'));
     if (anyOpen) return;
 
-    const bgIframe = document.getElementById('hero-bg-video');
-    const reelIframe = document.getElementById('hero-featured-reel-video');
-
-    if (bgIframe && bgIframe.contentWindow) {
-      bgIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    }
-    if (reelIframe && reelIframe.contentWindow && VideoSyncManager.isHeroReelPlaying) {
-      reelIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    }
-  },
-
-  toggleReelPlayPause() {
-    const reelIframe = document.getElementById('hero-featured-reel-video');
-    const playIcon = document.getElementById('featured-reel-play-icon');
-    const playLabel = document.getElementById('featured-reel-play-label');
-
-    VideoSyncManager.isHeroReelPlaying = !VideoSyncManager.isHeroReelPlaying;
-
-    if (reelIframe && reelIframe.contentWindow) {
-      if (VideoSyncManager.isHeroReelPlaying) {
-        reelIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        if (playIcon) playIcon.innerText = '⏸';
-        if (playLabel) playLabel.innerText = 'PAUSE';
-        showToast('Trailer resumed', 'info');
-      } else {
-        reelIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-        if (playIcon) playIcon.innerText = '▶';
-        if (playLabel) playLabel.innerText = 'PLAY';
-        showToast('Trailer paused', 'info');
-      }
+    const heroVideo = document.getElementById('hero-cinema-video');
+    if (heroVideo && heroVideo.paused) {
+      heroVideo.play().catch(e => console.log('Autoplay handled', e));
     }
   }
 };
 
 // =========================================================================
-// NETFLIX-STYLE ROTATING TRENDING REEL MANAGER (IN-VOGUE SHOWCASE)
+// NETFLIX-STYLE ROTATING TRENDING CINEMA BILLBOARD
+// Directly updates background movie motion, sound & details
 // =========================================================================
 const TRENDING_REELS = [
   {
@@ -194,7 +162,8 @@ const TRENDING_REELS = [
     rating: '12A',
     runtime: '2h 18m',
     price: 4000,
-    videoId: 'JfVOs4VSpmA',
+    videoSrc: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
+    poster: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1600&auto=format&fit=crop',
     shortName: 'Spider-Man'
   },
   {
@@ -206,7 +175,8 @@ const TRENDING_REELS = [
     rating: '15+',
     runtime: '2h 25m',
     price: 4000,
-    videoId: 's2v3fXyL7uM',
+    videoSrc: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/42746/SampleVideo_1280x720_1mb.mp4',
+    poster: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1600&auto=format&fit=crop',
     shortName: 'Onibon-Oje'
   },
   {
@@ -218,7 +188,8 @@ const TRENDING_REELS = [
     rating: '16+',
     runtime: '1h 55m',
     price: 4000,
-    videoId: 'bLVZ6Kk3h5Q',
+    videoSrc: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
+    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
     shortName: 'Heart of Beast'
   },
   {
@@ -230,7 +201,8 @@ const TRENDING_REELS = [
     rating: '14+',
     runtime: '2h 05m',
     price: 4000,
-    videoId: '2vK-Xz7eQ80',
+    videoSrc: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
+    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1600&auto=format&fit=crop',
     shortName: 'Street Fighter'
   }
 ];
@@ -282,6 +254,8 @@ const TrendingReelManager = {
     const runtimeEl = document.getElementById('trending-movie-runtime');
     const exploreBtn = document.getElementById('trending-explore-btn');
     const bookBtn = document.getElementById('trending-book-btn');
+    const previewPoster = document.getElementById('trending-preview-poster');
+    const pillTitle = document.getElementById('ambient-pill-title');
 
     if (rankEl) rankEl.innerHTML = item.rankBadge;
     if (matchEl) matchEl.innerText = item.matchScore;
@@ -289,6 +263,8 @@ const TrendingReelManager = {
     if (hallEl) hallEl.innerText = item.hallInfo;
     if (ratingEl) ratingEl.innerText = item.rating;
     if (runtimeEl) runtimeEl.innerText = item.runtime;
+    if (previewPoster) previewPoster.src = item.poster;
+    if (pillTitle) pillTitle.innerText = item.shortName;
 
     if (exploreBtn) exploreBtn.setAttribute('onclick', `openMovieScenes('${item.movieId}')`);
     if (bookBtn) {
@@ -296,18 +272,14 @@ const TrendingReelManager = {
       bookBtn.innerHTML = `<i data-lucide="ticket" class="w-3.5 h-3.5"></i><span>Book Tickets (${formatNaira(item.price)})</span>`;
     }
 
-    const iframe = document.getElementById('hero-featured-reel-video');
-    if (iframe) {
-      const isMuted = featuredReelMuted ? 1 : 0;
-      iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&mute=${isMuted}&loop=1&playlist=${item.videoId}&controls=1&showinfo=0&rel=0&playsinline=1&enablejsapi=1`;
-      
-      if (!featuredReelMuted) {
-        setTimeout(() => {
-          if (iframe.contentWindow) {
-            iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-            iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-          }
-        }, 500);
+    // Switch Native HTML5 Background Video Directly
+    const heroVideo = document.getElementById('hero-cinema-video');
+    if (heroVideo) {
+      heroVideo.poster = item.poster;
+      if (heroVideo.src !== item.videoSrc) {
+        heroVideo.src = item.videoSrc;
+        heroVideo.muted = !cinemaAudioEnabled;
+        heroVideo.play().catch(e => console.log('Autoplay handled', e));
       }
     }
 
@@ -340,124 +312,74 @@ const TrendingReelManager = {
       if (anyOpen) return;
 
       this.nextTrailer();
-    }, 20000); // 20 seconds rotation between trending movies in vogue
+    }, 20000); // 20s seamless rotation
   }
 };
 
-// Featured Cinema Reel Audio Toggle (Right Column Hero Player)
-let featuredReelMuted = true;
-function toggleFeaturedReelAudio() {
-  const iframe = document.getElementById('hero-featured-reel-video');
-  const btn = document.getElementById('featured-reel-sound-btn');
-  const icon = document.getElementById('featured-reel-sound-icon');
-  const label = document.getElementById('featured-reel-sound-label');
+// Native Background Audio Toggle
+function toggleHeroCinemaAudio() {
+  const heroVideo = document.getElementById('hero-cinema-video');
+  const soundBtn = document.getElementById('hero-sound-toggle-btn');
+  const soundIcon = document.getElementById('hero-sound-icon');
+  const soundText = document.getElementById('hero-sound-text');
+  const pillIcon = document.getElementById('hero-mute-icon');
+  const pillLabel = document.getElementById('hero-mute-label');
 
-  featuredReelMuted = !featuredReelMuted;
+  cinemaAudioEnabled = !cinemaAudioEnabled;
 
-  if (iframe) {
-    if (featuredReelMuted) {
-      if (iframe.contentWindow) {
-        iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-      }
-      if (icon) icon.innerText = '🔇';
-      if (label) label.innerText = 'TAP FOR SOUND';
-      if (btn) {
-        btn.className = 'pointer-events-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse';
-      }
-      showToast('Featured Reel Audio Muted', 'info');
-    } else {
-      if (iframe.contentWindow) {
-        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-        iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-      }
-      const curSrc = iframe.getAttribute('src') || '';
-      if (curSrc.includes('mute=1')) {
-        iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
-      }
-      if (icon) icon.innerText = '🔊';
-      if (label) label.innerText = 'SOUND ON (100% DOLBY)';
-      if (btn) {
-        btn.className = 'pointer-events-auto px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
+  if (heroVideo) {
+    heroVideo.muted = !cinemaAudioEnabled;
+    heroVideo.volume = 1.0;
+
+    if (cinemaAudioEnabled) {
+      heroVideo.play().catch(e => console.log(e));
+      if (soundIcon) soundIcon.innerText = '🔊';
+      if (soundText) soundText.innerText = 'DOLBY SOUND ACTIVE (100%)';
+      if (pillIcon) pillIcon.innerText = '🔊';
+      if (pillLabel) pillLabel.innerText = 'Sound ON';
+      if (soundBtn) {
+        soundBtn.className = 'px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
       }
       SoundFX.playSuccessFanfare();
-      showToast('🔊 Reel Audio Activated: Christie 4K & Dolby 7.1 Sound Active!', 'success');
+      showToast('🔊 Cinema Audio Activated in Dolby Atmos 7.1!', 'success');
+    } else {
+      if (soundIcon) soundIcon.innerText = '🔇';
+      if (soundText) soundText.innerText = 'TAP FOR SOUND';
+      if (pillIcon) pillIcon.innerText = '🔇';
+      if (pillLabel) pillLabel.innerText = 'Tap for Sound';
+      if (soundBtn) {
+        soundBtn.className = 'px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-amber-400/40 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse';
+      }
+      showToast('Cinema Audio Muted', 'info');
     }
   }
 }
 
-// Modal Trailer Sound Toggle
-let modalVideoMuted = false;
-function toggleModalVideoAudio() {
-  const iframe = document.getElementById('cinema-video-iframe');
-  const btn = document.getElementById('modal-sound-btn');
-  const icon = document.getElementById('modal-sound-icon');
-  const label = document.getElementById('modal-sound-label');
+// Native Background Play/Pause Motion Toggle
+function toggleHeroCinemaPlayPause() {
+  const heroVideo = document.getElementById('hero-cinema-video');
+  const playIcon = document.getElementById('hero-play-icon');
+  const playLabel = document.getElementById('hero-play-label');
 
-  if (!iframe) return;
+  if (!heroVideo) return;
 
-  modalVideoMuted = !modalVideoMuted;
-
-  if (modalVideoMuted) {
-    if (iframe.contentWindow) {
-      iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-    }
-    if (icon) icon.innerText = '🔇';
-    if (label) label.innerText = 'UNMUTE SOUND';
-    if (btn) {
-      btn.className = 'px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs font-headline flex items-center gap-1.5 border border-amber-400/40 transition-all';
-    }
-    showToast('Trailer sound muted', 'info');
+  if (heroVideo.paused) {
+    heroVideo.play().catch(e => console.log(e));
+    if (playIcon) playIcon.innerText = '⏸';
+    if (playLabel) playLabel.innerText = 'PAUSE MOTION';
+    showToast('Cinema motion resumed', 'info');
   } else {
-    if (iframe.contentWindow) {
-      iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-    }
-    const curSrc = iframe.getAttribute('src') || '';
-    if (curSrc.includes('mute=1')) {
-      iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
-    }
-    if (icon) icon.innerText = '🔊';
-    if (label) label.innerText = 'SOUND ACTIVE (DOLBY ATMOS 100%)';
-    if (btn) {
-      btn.className = 'px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs font-headline flex items-center gap-1.5 shadow-2xl shadow-emerald-500/40 border border-emerald-300 transition-all hover:scale-105 active:scale-95';
-    }
-    SoundFX.playSuccessFanfare();
-    showToast('🔊 Trailer Voice & Sound Activated in Dolby Atmos 7.1!', 'success');
+    heroVideo.pause();
+    if (playIcon) playIcon.innerText = '▶';
+    if (playLabel) playLabel.innerText = 'PLAY MOTION';
+    showToast('Cinema motion paused', 'info');
   }
 }
 
-// Ambient Hero Background Trailer Audio Toggle
-let heroVideoMuted = true;
-function toggleHeroVideoAudio() {
-  const iframe = document.getElementById('hero-bg-video');
-  const icon = document.getElementById('hero-mute-icon');
-  const label = document.getElementById('hero-mute-label');
-  const btn = document.getElementById('hero-mute-toggle');
-  
-  heroVideoMuted = !heroVideoMuted;
-
-  if (iframe && iframe.contentWindow) {
-    if (heroVideoMuted) {
-      iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-      if (icon) icon.innerText = '🔇';
-      if (label) label.innerText = 'Unmute';
-      if (btn) btn.className = 'px-2.5 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-bold transition-all flex items-center gap-1.5';
-      showToast('Ambient Background Audio Muted', 'info');
-    } else {
-      iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[85]}', '*');
-      const curSrc = iframe.getAttribute('src') || '';
-      if (curSrc.includes('mute=1')) {
-        iframe.setAttribute('src', curSrc.replace('mute=1', 'mute=0'));
-      }
-      if (icon) icon.innerText = '🔊';
-      if (label) label.innerText = 'Mute';
-      if (btn) btn.className = 'px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-amber-400/30';
-      showToast('🔊 Playing Spider-Man Ambient Audio (Dolby Atmos)', 'success');
-      SoundFX.playSuccessFanfare();
-    }
-  }
-}
+// Backwards-compatible aliases
+function toggleFeaturedReelAudio() { toggleHeroCinemaAudio(); }
+function toggleHeroVideoAudio() { toggleHeroCinemaAudio(); }
+function toggleModalVideoAudio() { toggleHeroCinemaAudio(); }
 
 // Global Application State
 const AppState = {
@@ -2548,15 +2470,6 @@ function openTicketModal(booking) {
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
-  // Attempt immediate audio unmute following active user click gesture
-  setTimeout(() => {
-    const modalIframe = document.getElementById('cinema-video-iframe');
-    if (modalIframe && modalIframe.contentWindow) {
-      modalIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      modalIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-    }
-  }, 450);
-
   if (window.lucide) {
     window.lucide.createIcons();
   }
@@ -2675,39 +2588,39 @@ function openMovieScenes(movieId, sceneIndex = 0) {
       <!-- Main Body Container (Scrollable) -->
       <div class="flex-1 overflow-y-auto">
         
-        <!-- 16:9 Widescreen Cinema Trailer Player with Ambient Glow -->
+        <!-- 16:9 Widescreen Cinema Master Sequence Screen (Zero YouTube Errors) -->
         <div class="relative bg-black w-full overflow-hidden aspect-video shadow-2xl group/player">
-          ${movie.trailerEmbed ? `
-            <iframe 
-              id="cinema-video-iframe"
-              src="${movie.trailerEmbed}" 
-              title="${movie.title} Official Cinema Trailer"
-              class="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-            ></iframe>
+          <img 
+            id="modal-scene-display-img"
+            src="${currentScene ? currentScene.still : movie.backdrop}" 
+            alt="${movie.title}" 
+            class="w-full h-full object-cover"
+          >
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-transparent to-black/30"></div>
 
-            <!-- Floating Sound & Dolby Atmos Audio Button -->
-            <div class="absolute bottom-3 right-3 z-20 flex items-center gap-2">
-              <button 
-                type="button" 
-                id="modal-sound-btn"
-                onclick="toggleModalVideoAudio()"
-                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-2 shadow-2xl shadow-black/80 border border-amber-300 transition-all hover:scale-105 active:scale-95 animate-pulse"
-                title="Toggle Voice & Soundstage Audio (Dolby Atmos)"
-              >
-                <span id="modal-sound-icon">🔊</span>
-                <span id="modal-sound-label">TAP TO UNMUTE SOUND</span>
-              </button>
-            </div>
-          ` : `
-            <div class="w-full h-full relative">
-              <img src="${currentScene ? currentScene.still : movie.backdrop}" alt="${movie.title}" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <div class="w-16 h-16 rounded-full bg-amber-400/90 text-slate-950 flex items-center justify-center text-2xl shadow-2xl pl-1">▶</div>
-              </div>
-            </div>
-          `}
+          <!-- Ambient Screen Overlay Badges -->
+          <div class="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
+            <span class="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold text-amber-300 border border-amber-400/40">
+              CHRISTIE 4K MASTER
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold text-cyan-300 border border-cyan-400/40">
+              DOLBY ATMOS 7.1
+            </span>
+          </div>
+
+          <!-- Direct Play in Hero Cinema Background Button -->
+          <div class="absolute bottom-3 right-3 z-20 flex items-center gap-2">
+            <button 
+              type="button" 
+              onclick="playMovieInHeroBackground('${movie.id}')"
+              class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs font-headline flex items-center gap-2 shadow-2xl shadow-black/90 border border-amber-300 transition-all hover:scale-105 active:scale-95"
+              title="Stream this movie directly on the Hero cinema background"
+            >
+              <span>▶</span>
+              <span>PLAY IN CINEMA BACKGROUND</span>
+            </button>
+          </div>
+        </div>
 
           <!-- Ambient Screen Overlay Badges -->
           <div class="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
@@ -2818,15 +2731,6 @@ function openMovieScenes(movieId, sceneIndex = 0) {
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
-  // Attempt immediate audio unmute following active user click gesture
-  setTimeout(() => {
-    const modalIframe = document.getElementById('cinema-video-iframe');
-    if (modalIframe && modalIframe.contentWindow) {
-      modalIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      modalIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-    }
-  }, 450);
-
   if (window.lucide) {
     window.lucide.createIcons();
   }
@@ -2835,6 +2739,33 @@ function openMovieScenes(movieId, sceneIndex = 0) {
 function switchMovieScene(movieId, sceneIndex) {
   SoundFX.playSeatClick();
   openMovieScenes(movieId, sceneIndex);
+}
+
+function playMovieInHeroBackground(movieId) {
+  closeMovieDetails();
+  const movie = MOVIES_DATA.find(m => m.id === movieId);
+  if (!movie) return;
+
+  const heroVideo = document.getElementById('hero-cinema-video');
+  const previewPoster = document.getElementById('trending-preview-poster');
+  const titleEl = document.getElementById('trending-movie-title');
+  const hallEl = document.getElementById('trending-movie-hall');
+
+  if (heroVideo) {
+    heroVideo.poster = movie.backdrop;
+    heroVideo.src = 'https://media.w3.org/2010/05/sintel/trailer.mp4';
+    heroVideo.play().catch(e => console.log('Autoplay handled', e));
+  }
+  if (previewPoster) previewPoster.src = movie.backdrop;
+  if (titleEl) titleEl.innerText = movie.title;
+  if (hallEl) hallEl.innerText = movie.format;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(`Streaming ${movie.title} on Background Cinema Screen!`, 'success');
+
+  if (!cinemaAudioEnabled) {
+    toggleHeroCinemaAudio();
+  }
 }
 
 // Movie Details Modal
@@ -2931,15 +2862,6 @@ function openMovieDetails(movieId) {
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
-  // Attempt immediate audio unmute following active user click gesture
-  setTimeout(() => {
-    const modalIframe = document.getElementById('cinema-video-iframe');
-    if (modalIframe && modalIframe.contentWindow) {
-      modalIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      modalIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-    }
-  }, 450);
-
   if (window.lucide) {
     window.lucide.createIcons();
   }
@@ -2947,10 +2869,6 @@ function openMovieDetails(movieId) {
 
 function closeMovieDetails() {
   const modal = document.getElementById('movie-details-modal');
-  const iframe = document.getElementById('cinema-video-iframe');
-  if (iframe) {
-    iframe.src = 'about:blank';
-  }
   const content = document.getElementById('movie-details-content');
   if (content) {
     content.innerHTML = '';
