@@ -164,6 +164,12 @@ const MOVIES_DATA = [
     tags: ['cimen', 'hollywood', 'featured', 'blue-room'],
     poster: 'assets/posters/spiderman-brand-new-day.webp',
     backdrop: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1600&auto=format&fit=crop',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=0&rel=0',
+    scenes: [
+      { id: 'spidey-sc-1', title: 'Manhattan Skyline Aerial Swing', time: '02:15', badge: 'Christie 4K Laser', still: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1200&auto=format&fit=crop', desc: 'Peter Parker navigates high-altitude thunderclouds over Times Square with dual laser contrast clarity.' },
+      { id: 'spidey-sc-2', title: 'The Under-Vault Syndicate Ambush', time: '01:45', badge: 'Dolby Atmos 7.1', still: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1200&auto=format&fit=crop', desc: 'Acoustic spatial isolation captures subterranean footsteps from overhead surround channels.' },
+      { id: 'spidey-sc-3', title: 'Climax Showdown at Queens Bridge', time: '03:10', badge: 'High Dynamic Range', still: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop', desc: 'High-voltage electromagnetic combat with vibrant neon reflections across the East River.' }
+    ],
     showtimes: [
       {
         id: 'spidey-1',
@@ -226,6 +232,12 @@ const MOVIES_DATA = [
     tags: ['cimen', 'action', 'red-room'],
     poster: 'assets/posters/heart-of-the-beast.webp',
     backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/bLVZ6Kk3h5Q?autoplay=1&mute=0&rel=0',
+    scenes: [
+      { id: 'hob-sc-1', title: 'Sub-Zero Transport Crash in Alaska', time: '02:30', badge: 'Dual 4K Laser', still: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', desc: 'Violent aircraft fuselage impact across Arctic ice plains with roaring theater sub-bass.' },
+      { id: 'hob-sc-2', title: 'Odin Scent-Tracks Enemy Mercenaries', time: '01:50', badge: 'Dolby Atmos', still: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=1200&auto=format&fit=crop', desc: 'Stealth combat dog tactical signals and whisper-quiet pine forest rustling.' },
+      { id: 'hob-sc-3', title: 'The Frozen Crevasse Last Stand', time: '02:45', badge: 'Christie Laser', still: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop', desc: 'Sniper exchange under sub-zero blizzard gusts.' }
+    ],
     showtimes: [
       {
         id: 'hob-1',
@@ -277,6 +289,12 @@ const MOVIES_DATA = [
     tags: ['cimen', 'featured', 'nollywood-epic', 'blue-room'],
     poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop',
     backdrop: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1600&auto=format&fit=crop',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/s2v3fXyL7uM?autoplay=1&mute=0&rel=0',
+    scenes: [
+      { id: 'onb-sc-1', title: 'Oracle Invocation at the Sacred Grove', time: '02:10', badge: 'Dolby Atmos Master Track', still: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop', desc: 'Traditional Yoruba ancestral percussion mastered across 12 discrete channels.' },
+      { id: 'onb-sc-2', title: 'Savannah 200-Cavalry Warlord Charge', time: '03:15', badge: 'Christie 4K Laser', still: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1200&auto=format&fit=crop', desc: 'Armored horse brigades collision beneath fiery sunset clouds.' },
+      { id: 'onb-sc-3', title: 'The Sovereign Palace Confrontation', time: '01:55', badge: 'Royal Grandeur HDR', still: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=1200&auto=format&fit=crop', desc: 'Ancient crowns and ceremonial swords presented before the high council.' }
+    ],
     showtimes: [
       {
         id: 'onb-1',
@@ -339,6 +357,12 @@ const MOVIES_DATA = [
     tags: ['cimen', 'nollywood-epic', 'blue-room'],
     poster: 'assets/posters/a-land-apart.webp',
     backdrop: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&auto=format&fit=crop',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/kJQP7kiw5Fk?autoplay=1&mute=0&rel=0',
+    scenes: [
+      { id: 'ala-sc-1', title: 'The Agrarian Empire Megaharvester', time: '02:20', badge: 'Dolby Atmos Master', still: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop', desc: 'Golden soil harvesting complex sprawling across alternate sovereign Nigeria.' },
+      { id: 'ala-sc-2', title: 'Dynasty Boardroom Succession Plot', time: '01:40', badge: '4K Ultra Color', still: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop', desc: 'Political betrayal between billionaire agriculture heirs.' },
+      { id: 'ala-sc-3', title: 'River Niger Armored Convoy Chase', time: '02:50', badge: 'High Velocity Laser', still: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1200&auto=format&fit=crop', desc: 'High-speed hovercraft battle down the river basin.' }
+    ],
     showtimes: [
       {
         id: 'ala-1',
@@ -390,6 +414,12 @@ const MOVIES_DATA = [
     tags: ['cimen', 'hollywood', 'action', 'red-room'],
     poster: 'assets/posters/street-fighter.webp',
     backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1600&auto=format&fit=crop',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/2vK-Xz7eQ80?autoplay=1&mute=0&rel=0',
+    scenes: [
+      { id: 'stf-sc-1', title: 'Hadoken Collision in Neon Kyoto', time: '02:05', badge: 'Christie 4K Laser', still: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', desc: 'Ki energy shockwaves rippling through neon alleyways with brilliant cyan hues.' },
+      { id: 'stf-sc-2', title: 'Chun-Li vs Vega Cage Tournament', time: '01:55', badge: 'Dolby Surround 7.1', still: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop', desc: 'Acrobatic wire-work and metallic claw sparks in close-quarter ring combat.' },
+      { id: 'stf-sc-3', title: 'Bison Shadaloo Citadel Showdown', time: '03:10', badge: 'Spatial Surround Bass', still: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop', desc: 'Psycho power blast shockwaves rattling the theater soundstage.' }
+    ],
     showtimes: [
       {
         id: 'stf-1',
@@ -441,6 +471,12 @@ const MOVIES_DATA = [
     tags: ['cimen', 'thriller', 'red-room'],
     poster: 'assets/posters/verity.webp',
     backdrop: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1600&auto=format&fit=crop',
+    trailerEmbed: 'https://www.youtube-nocookie.com/embed/ScMzIvxBSi4?autoplay=1&mute=0&rel=0',
+    scenes: [
+      { id: 'ver-sc-1', title: 'Unpublished Manuscript Discovery', time: '02:00', badge: 'Dolby Surround 7.1', still: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1200&auto=format&fit=crop', desc: 'A secluded office holds horrifying confessions typed in red ink.' },
+      { id: 'ver-sc-2', title: 'Midnight Footsteps Across the Attic', time: '01:35', badge: 'Atmospheric Spatial 3D', still: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop', desc: 'Chilling 360-degree footsteps echo directly behind the patron.' },
+      { id: 'ver-sc-3', title: 'The Lake House Confession Letter', time: '02:45', badge: 'Psychological Thrill HDR', still: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop', desc: 'Shocking revelation transforms everything you thought you knew.' }
+    ],
     showtimes: [
       {
         id: 'ver-1',
@@ -632,6 +668,28 @@ function renderMoviesGrid() {
             <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
               ${movie.tagline}
             </p>
+          </div>
+
+          <!-- Netflix-Style Watch Scenes & Trailer Bar -->
+          <div class="mt-4 pt-3 border-t border-white/5 flex items-center gap-2">
+            <button 
+              type="button" 
+              onclick="event.stopPropagation(); openMovieScenes('${movie.id}')"
+              class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-red-600/25 via-purple-600/25 to-amber-500/25 hover:from-red-600 hover:to-purple-600 text-amber-300 hover:text-white border border-amber-400/30 hover:border-transparent text-xs font-headline font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md"
+              title="Watch scenes and trailer"
+            >
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+              <span>Watch Scenes & Trailer</span>
+            </button>
+
+            <button 
+              type="button" 
+              onclick="event.stopPropagation(); openMovieDetails('${movie.id}')"
+              class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10 flex items-center justify-center text-xs transition-colors active:scale-90"
+              title="View Synopsis & Cast"
+            >
+              <i data-lucide="info" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
 
           <!-- Showtimes Row -->
@@ -2211,6 +2269,194 @@ _Present this reference code or QR pass at the entrance turnstile._`;
   window.open(url, '_blank');
 }
 
+// Netflix-Style Movie Scenes & Video Trailer Modal
+function openMovieScenes(movieId, sceneIndex = 0) {
+  SoundFX.playSeatClick();
+  const movie = MOVIES_DATA.find(m => m.id === movieId);
+  if (!movie) return;
+
+  window.activeSceneMovieId = movieId;
+  window.activeSceneIndex = sceneIndex;
+
+  const modal = document.getElementById('movie-details-modal');
+  const container = document.getElementById('movie-details-content');
+  if (!modal || !container) return;
+
+  const scenes = movie.scenes || [];
+  const currentScene = scenes[sceneIndex] || scenes[0];
+
+  container.innerHTML = `
+    <div class="relative bg-[#0B0F17] rounded-3xl border-2 border-amber-400/40 shadow-2xl max-w-4xl w-full overflow-hidden text-slate-100 flex flex-col my-auto max-h-[94vh]">
+      
+      <!-- Top Cinema Header Bar -->
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-slate-950 via-[#0E1524] to-slate-950 border-b border-white/10 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-md flex items-center justify-center flex-shrink-0">
+            <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Logo" class="w-full h-full object-contain">
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-red-600 text-white font-mono font-black text-[9px] uppercase tracking-wider flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                CINEMA STREAM PREVIEW
+              </span>
+              <span class="text-[10px] font-mono text-amber-400 font-bold hidden sm:inline">[cimen-trailers]</span>
+            </div>
+            <h3 class="font-headline font-black text-lg text-white leading-tight mt-0.5">${movie.title}</h3>
+          </div>
+        </div>
+
+        <button 
+          type="button" 
+          onclick="closeMovieDetails()"
+          class="w-9 h-9 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 active:scale-90 transition-transform"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Main Body Container (Scrollable) -->
+      <div class="flex-1 overflow-y-auto">
+        
+        <!-- 16:9 Widescreen Cinema Trailer Player with Ambient Glow -->
+        <div class="relative bg-black w-full overflow-hidden aspect-video shadow-2xl group/player">
+          ${movie.trailerEmbed ? `
+            <iframe 
+              id="cinema-video-iframe"
+              src="${movie.trailerEmbed}" 
+              title="${movie.title} Official Cinema Trailer"
+              class="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          ` : `
+            <div class="w-full h-full relative">
+              <img src="${currentScene ? currentScene.still : movie.backdrop}" alt="${movie.title}" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <div class="w-16 h-16 rounded-full bg-amber-400/90 text-slate-950 flex items-center justify-center text-2xl shadow-2xl pl-1">▶</div>
+              </div>
+            </div>
+          `}
+
+          <!-- Ambient Screen Overlay Badges -->
+          <div class="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
+            <span class="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-mono font-bold text-amber-300 border border-amber-400/30">
+              4K DUAL LASER
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-mono font-bold text-cyan-300 border border-cyan-400/30">
+              DOLBY ATMOS 7.1
+            </span>
+          </div>
+        </div>
+
+        <!-- Netflix-Style "Scenes & Key Sequences" Carousel -->
+        <div class="p-5 sm:p-6 bg-[#0E1524] space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-headline font-black text-sm uppercase text-amber-400 tracking-wider flex items-center gap-2">
+                <i data-lucide="clapperboard" class="w-4 h-4 text-amber-400"></i>
+                <span>Featured Film Sequences (Netflix Style)</span>
+              </h4>
+              <p class="text-xs text-slate-400 font-body mt-0.5">
+                Explore key moments remastered for the Christie 4K Laser & Dolby Atmos auditorium soundstage.
+              </p>
+            </div>
+            <span class="text-[10px] font-mono text-slate-500 uppercase font-bold hidden sm:inline">Tap scene to preview</span>
+          </div>
+
+          <!-- Scene Thumbnails Grid / Carousel -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            ${scenes.map((sc, idx) => {
+              const isSelected = idx === sceneIndex;
+              return `
+                <div 
+                  onclick="switchMovieScene('${movie.id}', ${idx})"
+                  class="cursor-pointer rounded-2xl border-2 transition-all p-2 bg-[#0B0F17] hover:border-amber-400 group/scene ${isSelected ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-white/10 opacity-75 hover:opacity-100'}"
+                >
+                  <div class="relative aspect-video rounded-xl overflow-hidden mb-2">
+                    <img src="${sc.still}" alt="${sc.title}" class="w-full h-full object-cover group-hover/scene:scale-105 transition-transform duration-300">
+                    <span class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-[9px] font-mono font-bold text-white">
+                      ${sc.time}
+                    </span>
+                    <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 text-[9px] font-mono font-black uppercase">
+                      ${sc.badge}
+                    </span>
+                  </div>
+                  <h5 class="font-headline font-bold text-xs text-white line-clamp-1 group-hover/scene:text-amber-300 transition-colors">
+                    ${sc.title}
+                  </h5>
+                  <p class="text-[11px] text-slate-400 font-body line-clamp-2 mt-0.5">
+                    ${sc.desc}
+                  </p>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Active Scene Detailed Spotlight Banner -->
+          ${currentScene ? `
+            <div id="active-scene-spotlight" class="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 flex items-center justify-between text-xs font-body">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">🎬</span>
+                <div>
+                  <span class="text-[10px] font-mono uppercase text-amber-400 font-bold block">ACTIVE SPOTLIGHT</span>
+                  <span class="font-bold text-white font-headline">${currentScene.title}</span>
+                  <span class="text-slate-400 text-[11px] block">${currentScene.desc}</span>
+                </div>
+              </div>
+              <div class="text-right font-mono flex-shrink-0">
+                <span class="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 text-[11px] font-bold border border-amber-400/30">
+                  ${currentScene.time} Runtime
+                </span>
+              </div>
+            </div>
+          ` : ''}
+
+        </div>
+      </div>
+
+      <!-- Bottom Sticky Action Bar -->
+      <div class="p-4 sm:p-5 bg-[#0B0F17] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 font-headline">
+        <div class="text-xs text-slate-400 font-body">
+          Experience this film live in <strong class="text-amber-400 font-bold">Red Room</strong> or <strong class="text-cyan-400 font-bold">Blue Room</strong>.
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button 
+            type="button" 
+            onclick="openMovieDetails('${movie.id}')"
+            class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-wider border border-white/10 transition-colors"
+          >
+            Full Synopsis & Cast
+          </button>
+
+          <button 
+            type="button" 
+            onclick="closeMovieDetails(); openBookingModal('${movie.id}')"
+            class="px-6 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-amber-400/20 transition-all hover:scale-105 active:scale-95"
+          >
+            <i data-lucide="ticket" class="w-4 h-4"></i>
+            <span>Book Tickets Now (${formatNaira(movie.showtimes[0].priceStandard)})</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function switchMovieScene(movieId, sceneIndex) {
+  SoundFX.playSeatClick();
+  openMovieScenes(movieId, sceneIndex);
+}
+
 // Movie Details Modal
 function openMovieDetails(movieId) {
   SoundFX.playSeatClick();
@@ -2222,7 +2468,7 @@ function openMovieDetails(movieId) {
   if (!modal || !container) return;
 
   container.innerHTML = `
-    <div class="relative bg-[#0E1524] rounded-3xl border border-white/10 shadow-2xl max-w-2xl w-full overflow-hidden text-slate-100">
+    <div class="relative bg-[#0E1524] rounded-3xl border border-white/10 shadow-2xl max-w-2xl w-full overflow-hidden text-slate-100 my-auto">
       <div class="relative h-60 w-full overflow-hidden">
         <img src="${movie.backdrop}" alt="${movie.title}" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-[#0E1524] via-[#0E1524]/60 to-transparent"></div>
@@ -2250,7 +2496,18 @@ function openMovieDetails(movieId) {
           </div>
         </div>
 
-        <div class="mt-6 space-y-4 font-body">
+        <div class="mt-5 flex items-center gap-2">
+          <button 
+            type="button" 
+            onclick="openMovieScenes('${movie.id}')"
+            class="py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white text-xs font-headline font-black flex items-center gap-2 shadow-lg shadow-red-600/20 active:scale-95 transition-transform"
+          >
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            <span>Watch Movie Scenes & Trailer</span>
+          </button>
+        </div>
+
+        <div class="mt-5 space-y-4 font-body">
           <div>
             <h4 class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider mb-1">Synopsis</h4>
             <p class="text-sm text-slate-300 leading-relaxed">${movie.synopsis}</p>
