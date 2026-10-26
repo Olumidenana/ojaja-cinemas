@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Ojaja Cinemas — African Grandeur & Next-Gen Luxury Cinema Booking</title>
   <meta name="description" content="Experience world-class cinematic luxury at Ojaja Cinemas, African Village, Ife Grand Resort. Dual 4K Laser Projection, Dolby Atmos Sound, seamless Paystack ticket booking & VIP experiences.">
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
@@ -29,7 +32,7 @@
   <script src="https://js.paystack.co/v1/inline.js"></script>
 
   <!-- Custom CSS for Screen Curve, Projector Beams & Bobble Animations -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261026_1526">
 
   <script>
     tailwind.config = {
@@ -171,82 +174,141 @@
       ></iframe>
     </div>
 
-    <!-- Cinematic Vignette & Gradient Overlays (Toned-down Luxury Dark Contrast) -->
-    <div class="absolute inset-0 z-[1] bg-gradient-to-t from-[#080B12] via-[#080B12]/80 to-[#080B12]/40"></div>
-    <div class="absolute inset-0 z-[1] bg-gradient-to-r from-[#080B12] via-[#080B12]/85 to-transparent"></div>
-    <div class="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_20%,#080B12_90%)] pointer-events-none"></div>
+    <!-- Subtle Cinematic Vignette (Preserving High Video Visibility) -->
+    <div class="absolute inset-0 z-[1] bg-gradient-to-t from-[#080B12] via-[#080B12]/50 to-transparent"></div>
+    <div class="absolute inset-0 z-[1] bg-gradient-to-r from-[#080B12] via-[#080B12]/60 to-transparent"></div>
 
-    <!-- Spotlight Content -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
-      <div class="max-w-3xl">
+    <!-- Spotlight Content (2-Column Desktop Grid for Live Trailer Showcase) -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
-        <!-- Royal Crest Eyebrow Badge -->
-        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-400/10 border-2 border-amber-400/40 text-amber-300 text-sm font-eyebrow tracking-wide mb-6 shadow-lg anim-bobble">
-          <img src="assets/ojaja-official-logo.png" alt="Logo" class="w-5 h-5 rounded-full object-contain">
-          <span>African Village • Ife Grand Resort & Industrial Hub</span>
+        <!-- Left Column: Copy & Booking CTAs (7 Cols) -->
+        <div class="lg:col-span-7">
+          
+          <!-- Royal Crest Eyebrow Badge -->
+          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-400/10 border-2 border-amber-400/40 text-amber-300 text-sm font-eyebrow tracking-wide mb-5 shadow-lg anim-bobble">
+            <img src="assets/ojaja-official-logo.png" alt="Logo" class="w-5 h-5 rounded-full object-contain">
+            <span>African Village • Ife Grand Resort & Industrial Hub</span>
+          </div>
+
+          <h1 class="font-headline text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.05] mb-5">
+            Cinematic Splendor, <br>
+            <span class="bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 bg-clip-text text-transparent drop-shadow-sm">
+              Royal Heritage.
+            </span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-slate-300 font-normal max-w-2xl leading-relaxed mb-7 font-body">
+            Welcome to Ojaja Cinemas. World-class auditorium entertainment featuring the <strong class="text-amber-400 font-bold">Red Room (Christie 4K Laser)</strong> and <strong class="text-cyan-400 font-bold">Blue Room (Dolby Atmos 7.1)</strong> with real-time capacity intelligence, automated alternative suggestions, and instant Paystack verification.
+          </p>
+
+          <!-- CTA Buttons (Unified Luxury Palette) -->
+          <div class="flex flex-wrap items-center gap-3.5 mb-10">
+            <a 
+              href="#movies-section"
+              class="px-7 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-headline font-black text-sm uppercase tracking-wider flex items-center gap-2.5 shadow-2xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95"
+            >
+              <i data-lucide="film" class="w-5 h-5"></i>
+              <span>Browse Now Showing</span>
+            </a>
+
+            <button 
+              type="button" 
+              onclick="openMovieScenes('spiderman-brand-new-day')"
+              class="px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-amber-300 hover:text-white border border-amber-400/40 hover:border-amber-400 font-headline font-black text-sm flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-amber-400/10"
+              title="Watch Official Film Scenes & Trailer (Netflix Style)"
+            >
+              <i data-lucide="play" class="w-4 h-4 text-amber-300 fill-amber-300"></i>
+              <span>Watch Movie Scenes</span>
+            </button>
+
+            <button 
+              type="button" 
+              onclick="openBookingModal('spiderman-brand-new-day', 'spidey-2')"
+              class="px-5 py-3.5 rounded-2xl bg-black/60 hover:bg-slate-900/90 border border-white/10 hover:border-red-500/50 text-slate-300 hover:text-white font-headline font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
+              title="Experience the Explainable Full-Hall Recommender"
+            >
+              <i data-lucide="alert-octagon" class="w-4 h-4 text-red-400 animate-pulse"></i>
+              <span>Test Sold-Out Alert</span>
+            </button>
+          </div>
+
+          <!-- Floating Interactive Badges (Refined Glassmorphic Cards) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/10">
+            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
+              <div class="text-amber-400 font-headline font-black text-lg">4K DUAL</div>
+              <div class="text-slate-400 text-[11px] font-eyebrow">Christie Laser</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
+              <div class="text-cyan-400 font-headline font-black text-lg">DOLBY 7.1</div>
+              <div class="text-slate-400 text-[11px] font-eyebrow">Atmos Sound</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
+              <div class="text-amber-400 font-headline font-black text-lg">PAYSTACK</div>
+              <div class="text-slate-400 text-[11px] font-eyebrow">Instant NGN</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
+              <div class="text-amber-400 font-headline font-black text-lg">VIP SUYA</div>
+              <div class="text-slate-400 text-[11px] font-eyebrow">Concessions</div>
+            </div>
+          </div>
         </div>
 
-        <h1 class="font-headline text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05] mb-5">
-          Cinematic Splendor, <br>
-          <span class="bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 bg-clip-text text-transparent drop-shadow-sm">
-            Royal Heritage.
-          </span>
-        </h1>
+        <!-- Right Column: Interactive Featured Cinema Reel Card (5 Cols) -->
+        <div class="lg:col-span-5">
+          <div class="rounded-3xl bg-[#0E1524]/90 backdrop-blur-xl border-2 border-amber-400/40 p-4 sm:p-5 shadow-2xl shadow-amber-400/15 overflow-hidden">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                <span class="font-headline font-black text-xs text-white uppercase tracking-wider">FEATURED CINEMA REEL</span>
+              </div>
+              <span class="text-[10px] font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/30">
+                CHRISTIE 4K MASTER
+              </span>
+            </div>
 
-        <p class="text-base sm:text-lg text-slate-300 font-normal max-w-2xl leading-relaxed mb-8 font-body">
-          Welcome to Ojaja Cinemas. World-class auditorium entertainment featuring the <strong class="text-amber-400 font-bold">Red Room (Christie 4K Laser)</strong> and <strong class="text-cyan-400 font-bold">Blue Room (Dolby Atmos 7.1)</strong> with real-time capacity intelligence, automated alternative suggestions, and instant Paystack verification.
-        </p>
+            <!-- Embedded Live Video Player Preview -->
+            <div class="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-inner border border-white/10 mb-3 group/reel">
+              <iframe 
+                src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=1&showinfo=0&rel=0&playsinline=1"
+                title="Spider-Man Featured Cinema Reel"
+                class="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
 
-        <!-- CTA Buttons (Unified Luxury Palette) -->
-        <div class="flex flex-wrap items-center gap-4">
-          <a 
-            href="#movies-section"
-            class="px-7 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-headline font-black text-sm uppercase tracking-wider flex items-center gap-2.5 shadow-2xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95"
-          >
-            <i data-lucide="film" class="w-5 h-5"></i>
-            <span>Browse Now Showing</span>
-          </a>
+            <div class="flex items-center justify-between text-xs mb-3">
+              <div>
+                <h4 class="font-headline font-black text-white text-sm">Spider-Man: Brand New Day</h4>
+                <p class="text-[11px] text-slate-400 font-body">Now playing in Red Room (Christie 4K) & Blue Room (Dolby Atmos)</p>
+              </div>
+              <span class="px-2 py-1 rounded bg-amber-400 text-slate-950 font-black text-xs font-headline">12A</span>
+            </div>
 
-          <button 
-            type="button" 
-            onclick="openMovieScenes('spiderman-brand-new-day')"
-            class="px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-amber-300 hover:text-white border border-amber-400/40 hover:border-amber-400 font-headline font-black text-sm flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-amber-400/10"
-            title="Watch Official Film Scenes & Trailer (Netflix Style)"
-          >
-            <i data-lucide="play" class="w-4 h-4 text-amber-300 fill-amber-300"></i>
-            <span>Watch Movie Scenes (Netflix Style)</span>
-          </button>
+            <!-- Quick Action Row -->
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 font-headline text-xs">
+              <button 
+                type="button" 
+                onclick="openMovieScenes('spiderman-brand-new-day')"
+                class="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold border border-white/10 flex items-center justify-center gap-1.5 transition-all"
+              >
+                <i data-lucide="clapperboard" class="w-3.5 h-3.5"></i>
+                <span>Explore Scenes</span>
+              </button>
 
-          <button 
-            type="button" 
-            onclick="openBookingModal('spiderman-brand-new-day', 'spidey-2')"
-            class="px-5 py-3.5 rounded-2xl bg-black/60 hover:bg-slate-900/90 border border-white/10 hover:border-red-500/50 text-slate-300 hover:text-white font-headline font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
-            title="Experience the Explainable Full-Hall Recommender"
-          >
-            <i data-lucide="alert-octagon" class="w-4 h-4 text-red-400 animate-pulse"></i>
-            <span>Test Sold-Out Alert</span>
-          </button>
-        </div>
-
-        <!-- Floating Interactive Badges (Refined Glassmorphic Cards) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-12 pt-8 border-t border-white/10">
-          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
-            <div class="text-amber-400 font-headline font-black text-xl">4K DUAL</div>
-            <div class="text-slate-400 text-xs font-eyebrow">Christie Laser Vision</div>
-          </div>
-          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
-            <div class="text-cyan-400 font-headline font-black text-xl">DOLBY 7.1</div>
-            <div class="text-slate-400 text-xs font-eyebrow">Atmos Immersion</div>
-          </div>
-          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
-            <div class="text-amber-400 font-headline font-black text-xl">PAYSTACK</div>
-            <div class="text-slate-400 text-xs font-eyebrow">Instant NGN Verification</div>
-          </div>
-          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
-            <div class="text-amber-400 font-headline font-black text-xl">VIP SUYA</div>
-            <div class="text-slate-400 text-xs font-eyebrow">& Fresh Concessions</div>
+              <button 
+                type="button" 
+                onclick="openBookingModal('spiderman-brand-new-day')"
+                class="py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black flex items-center justify-center gap-1.5 shadow-lg shadow-amber-400/20 transition-all active:scale-95"
+              >
+                <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
+                <span>Book Tickets</span>
+              </button>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -521,7 +583,7 @@
   <!-- Toast Notification Stack Container -->
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
-  <!-- Application Logic -->
-  <script src="app.js"></script>
+  <!-- Application Logic (Cache-busted for Instant Live Reload) -->
+  <script src="app.js?v=20261026_1526"></script>
 </body>
 </html>
