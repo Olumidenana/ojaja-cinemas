@@ -1125,7 +1125,7 @@ function renderBookingModalContent() {
               <input 
                 type="text" 
                 id="customer-name" 
-                placeholder="e.g. Olumide Adeleke" 
+                placeholder="e.g. Olumide Adeyemi-nana" 
                 value="${AppState.customer.name}"
                 oninput="AppState.customer.name = this.value"
                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-900 border-2 border-white/10 focus:border-amber-400 focus:outline-none text-xs text-white"
