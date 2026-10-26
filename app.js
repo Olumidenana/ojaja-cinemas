@@ -114,6 +114,35 @@ const SoundFX = {
   }
 };
 
+// Ambient Hero Background Trailer Audio Toggle
+let heroVideoMuted = true;
+function toggleHeroVideoAudio() {
+  const iframe = document.getElementById('hero-bg-video');
+  const icon = document.getElementById('hero-mute-icon');
+  const label = document.getElementById('hero-mute-label');
+  const btn = document.getElementById('hero-mute-toggle');
+  
+  heroVideoMuted = !heroVideoMuted;
+
+  if (iframe && iframe.contentWindow) {
+    if (heroVideoMuted) {
+      iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+      if (icon) icon.innerText = '🔇';
+      if (label) label.innerText = 'Unmute';
+      if (btn) btn.className = 'px-2.5 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-bold transition-all flex items-center gap-1.5';
+      showToast('Ambient Background Audio Muted', 'info');
+    } else {
+      iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      iframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[75]}', '*');
+      if (icon) icon.innerText = '🔊';
+      if (label) label.innerText = 'Mute';
+      if (btn) btn.className = 'px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-amber-400/30';
+      showToast('🔊 Playing Spider-Man Trailer Audio (Dolby Atmos Simulation)', 'success');
+      SoundFX.playSuccessFanfare();
+    }
+  }
+}
+
 // Global Application State
 const AppState = {
   currentBranch: 'Ojaja Ile-Ife (Grand Resort Flagship)',

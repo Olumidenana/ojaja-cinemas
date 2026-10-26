@@ -152,30 +152,35 @@
     </nav>
   </header>
 
-  <!-- Hero Spotlight Showcase with Floating Badges & Projector Beams -->
-  <section class="relative min-h-[660px] flex items-center justify-center overflow-hidden border-b border-white/10 pt-10">
+  <!-- Hero Spotlight Showcase with Netflix-Style Ambient Video & Atmospheric Beams -->
+  <section class="relative min-h-[680px] flex items-center justify-center overflow-hidden border-b border-white/10 pt-10">
     
     <!-- Ambient Projector Light Beams -->
     <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[700px] anim-projector-beam pointer-events-none z-0">
-      <div class="w-full h-full bg-gradient-to-b from-amber-400/25 via-amber-500/5 to-transparent clip-path-polygon"></div>
+      <div class="w-full h-full bg-gradient-to-b from-amber-400/20 via-amber-500/5 to-transparent clip-path-polygon"></div>
     </div>
 
-    <!-- Cinematic Backdrop Image -->
-    <div class="absolute inset-0 z-0">
-      <img 
-        src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2000&auto=format&fit=crop" 
-        alt="Ojaja Cinemas Hall" 
-        class="w-full h-full object-cover opacity-25 scale-105 filter brightness-75"
-      >
-      <div class="absolute inset-0 bg-gradient-to-t from-[#080B12] via-[#080B12]/80 to-transparent"></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-[#080B12] via-[#080B12]/60 to-transparent"></div>
+    <!-- Netflix-Style Ambient Background Movie Trailer Player -->
+    <div class="hero-video-wrapper">
+      <iframe 
+        id="hero-bg-video"
+        src="https://www.youtube-nocookie.com/embed/JfVOs4VSpmA?autoplay=1&mute=1&loop=1&playlist=JfVOs4VSpmA&controls=0&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&playsinline=1&enablejsapi=1" 
+        title="Background Film Reel"
+        class="w-full h-full border-0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      ></iframe>
     </div>
+
+    <!-- Cinematic Vignette & Gradient Overlays (Toned-down Luxury Dark Contrast) -->
+    <div class="absolute inset-0 z-[1] bg-gradient-to-t from-[#080B12] via-[#080B12]/80 to-[#080B12]/40"></div>
+    <div class="absolute inset-0 z-[1] bg-gradient-to-r from-[#080B12] via-[#080B12]/85 to-transparent"></div>
+    <div class="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_20%,#080B12_90%)] pointer-events-none"></div>
 
     <!-- Spotlight Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
       <div class="max-w-3xl">
         
-        <!-- Playful Hand-Lettered Eyebrow Badge -->
+        <!-- Royal Crest Eyebrow Badge -->
         <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-400/10 border-2 border-amber-400/40 text-amber-300 text-sm font-eyebrow tracking-wide mb-6 shadow-lg anim-bobble">
           <img src="assets/ojaja-official-logo.png" alt="Logo" class="w-5 h-5 rounded-full object-contain">
           <span>African Village • Ife Grand Resort & Industrial Hub</span>
@@ -189,14 +194,14 @@
         </h1>
 
         <p class="text-base sm:text-lg text-slate-300 font-normal max-w-2xl leading-relaxed mb-8 font-body">
-          Welcome to Ojaja Cinemas. World-class auditorium entertainment featuring the <strong class="text-red-400 font-bold">Red Room (Christie 4K Laser)</strong> and <strong class="text-sky-400 font-bold">Blue Room (Dolby Atmos 7.1)</strong> with real-time sold-out capacity notifications, automated alternative time suggestions, and seamless Paystack verification.
+          Welcome to Ojaja Cinemas. World-class auditorium entertainment featuring the <strong class="text-amber-400 font-bold">Red Room (Christie 4K Laser)</strong> and <strong class="text-cyan-400 font-bold">Blue Room (Dolby Atmos 7.1)</strong> with real-time capacity intelligence, automated alternative suggestions, and instant Paystack verification.
         </p>
 
-        <!-- CTA Buttons -->
+        <!-- CTA Buttons (Unified Luxury Palette) -->
         <div class="flex flex-wrap items-center gap-4">
           <a 
             href="#movies-section"
-            class="px-7 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-headline font-black text-sm uppercase tracking-wider flex items-center gap-2.5 shadow-2xl shadow-amber-400/30 transition-all hover:scale-105 active:scale-95"
+            class="px-7 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-headline font-black text-sm uppercase tracking-wider flex items-center gap-2.5 shadow-2xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95"
           >
             <i data-lucide="film" class="w-5 h-5"></i>
             <span>Browse Now Showing</span>
@@ -205,7 +210,7 @@
           <button 
             type="button" 
             onclick="openMovieScenes('spiderman-brand-new-day')"
-            class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white font-headline font-black text-sm flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-red-600/25"
+            class="px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-amber-300 hover:text-white border border-amber-400/40 hover:border-amber-400 font-headline font-black text-sm flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-amber-400/10"
             title="Watch Official Film Scenes & Trailer (Netflix Style)"
           >
             <i data-lucide="play" class="w-4 h-4 text-amber-300 fill-amber-300"></i>
@@ -215,7 +220,7 @@
           <button 
             type="button" 
             onclick="openBookingModal('spiderman-brand-new-day', 'spidey-2')"
-            class="px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-white/10 hover:border-red-500/40 text-white font-headline font-bold text-sm flex items-center gap-2 transition-all active:scale-95 shadow-lg"
+            class="px-5 py-3.5 rounded-2xl bg-black/60 hover:bg-slate-900/90 border border-white/10 hover:border-red-500/50 text-slate-300 hover:text-white font-headline font-bold text-sm flex items-center gap-2 transition-all active:scale-95"
             title="Experience the Explainable Full-Hall Recommender"
           >
             <i data-lucide="alert-octagon" class="w-4 h-4 text-red-400 animate-pulse"></i>
@@ -223,26 +228,43 @@
           </button>
         </div>
 
-        <!-- Floating Interactive Badges (School OS Style) -->
+        <!-- Floating Interactive Badges (Refined Glassmorphic Cards) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-12 pt-8 border-t border-white/10">
-          <div class="p-3 rounded-2xl bg-slate-900/80 border border-white/5 anim-bobble">
+          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
             <div class="text-amber-400 font-headline font-black text-xl">4K DUAL</div>
             <div class="text-slate-400 text-xs font-eyebrow">Christie Laser Vision</div>
           </div>
-          <div class="p-3 rounded-2xl bg-slate-900/80 border border-white/5 anim-bobble-delayed">
-            <div class="text-amber-400 font-headline font-black text-xl">DOLBY 7.1</div>
+          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
+            <div class="text-cyan-400 font-headline font-black text-xl">DOLBY 7.1</div>
             <div class="text-slate-400 text-xs font-eyebrow">Atmos Immersion</div>
           </div>
-          <div class="p-3 rounded-2xl bg-slate-900/80 border border-white/5 anim-bobble">
+          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble">
             <div class="text-amber-400 font-headline font-black text-xl">PAYSTACK</div>
             <div class="text-slate-400 text-xs font-eyebrow">Instant NGN Verification</div>
           </div>
-          <div class="p-3 rounded-2xl bg-slate-900/80 border border-white/5 anim-bobble-delayed">
+          <div class="p-3.5 rounded-2xl bg-[#0E1524]/80 backdrop-blur-md border border-white/10 anim-bobble-delayed">
             <div class="text-amber-400 font-headline font-black text-xl">VIP SUYA</div>
             <div class="text-slate-400 text-xs font-eyebrow">& Fresh Concessions</div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Ambient Video Controls & Title Pill -->
+    <div class="absolute bottom-6 right-6 z-20 hidden md:flex items-center gap-3 bg-black/70 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 text-xs font-mono shadow-2xl">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        <span class="text-slate-300 text-[11px]">TRAILER: <strong class="text-white">Spider-Man: Brand New Day (4K)</strong></span>
+      </div>
+      <button 
+        type="button" 
+        id="hero-mute-toggle"
+        onclick="toggleHeroVideoAudio()"
+        class="px-2.5 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-bold transition-all flex items-center gap-1.5"
+      >
+        <span id="hero-mute-icon">🔇</span>
+        <span id="hero-mute-label">Unmute</span>
+      </button>
     </div>
   </section>
 

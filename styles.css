@@ -84,6 +84,28 @@
   animation: floatDrift 14s ease-in-out infinite;
 }
 
+/* Ambient Netflix-Style Video Background Container */
+.hero-video-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 135%;
+  height: 135%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.hero-video-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.55;
+  filter: contrast(1.18) brightness(0.78);
+  transform: scale(1.15);
+}
+
 /* Screen Curve Perspective */
 .cinema-screen-container {
   perspective: 700px;
