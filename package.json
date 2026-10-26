@@ -1,0 +1,21 @@
+{
+  "name": "ojaja-cinemas",
+  "version": "1.0.0",
+  "description": "Next-Gen Ojaja Cinemas Luxury Booking & Capacity Management Engine with Paystack Integration",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx serve . -p 3000",
+    "build": "echo 'Ojaja Cinemas build ready for Vercel deployment'"
+  },
+  "author": "Olumide Adeyemi-Nana",
+  "license": "MIT",
+  "keywords": [
+    "ojaja-cinemas",
+    "ile-ife",
+    "nigeria",
+    "paystack",
+    "cinema-booking",
+    "seat-reservation",
+    "nollywood"
+  ]
+}

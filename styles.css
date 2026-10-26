@@ -1,0 +1,165 @@
+/* 
+  OJAJA CINEMAS — Luxury Royal Cinema Styling & Custom Micro-interactions
+  Location: African Village, Ife Grand Resort & Industrial Hub, Ile-Ife, Osun State
+  Styling: African Royal Grandeur x Ultramodern IMAX
+*/
+
+:root {
+  --bg-deep: #080B12;
+  --bg-surface: #0E1524;
+  --bg-card: #151F33;
+  --gold-primary: #F59E0B;
+  --gold-glow: rgba(245, 158, 11, 0.35);
+  --crimson-primary: #DC2626;
+  --crimson-glow: rgba(220, 38, 38, 0.4);
+  --atmos-blue: #0284C7;
+  --atmos-cyan: #06B6D4;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* Screen Curve Perspective */
+.cinema-screen-container {
+  perspective: 600px;
+}
+
+.cinema-screen-curve {
+  height: 14px;
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.8) 25%, #FFF 50%, rgba(245, 158, 11, 0.8) 75%, transparent 100%);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  box-shadow: 0 10px 40px rgba(245, 158, 11, 0.6), 0 0 20px rgba(255, 255, 255, 0.5);
+  transform: rotateX(-30deg);
+}
+
+.screen-light-glow {
+  background: radial-gradient(ellipse at 50% -20%, rgba(245, 158, 11, 0.25) 0%, rgba(220, 38, 38, 0.1) 40%, transparent 75%);
+}
+
+/* Seat Styling */
+.seat-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.seat-btn:hover:not(.seat-booked):not(.seat-selected) {
+  transform: scale(1.18) translateY(-2px);
+  filter: brightness(1.2);
+}
+
+.seat-selected {
+  transform: scale(1.12);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.9);
+}
+
+/* Pulse animation for VIP seats */
+@keyframes vipGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
+  }
+}
+
+.vip-seat-glow {
+  animation: vipGlow 3s infinite ease-in-out;
+}
+
+/* Ticket Notched Cutout */
+.ticket-card {
+  position: relative;
+  background: #111827;
+}
+
+.ticket-notch-left, .ticket-notch-right {
+  position: absolute;
+  top: 68%;
+  width: 24px;
+  height: 24px;
+  background: var(--bg-deep);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.ticket-notch-left {
+  left: -12px;
+}
+
+.ticket-notch-right {
+  right: -12px;
+}
+
+.ticket-perforation {
+  position: absolute;
+  top: 68%;
+  left: 14px;
+  right: 14px;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+  transform: translateY(-50%);
+}
+
+/* Thermal Receipt Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-ticket-area, #printable-ticket-area * {
+    visibility: visible;
+  }
+  #printable-ticket-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #FFF !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0.15) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2.5s infinite;
+}
