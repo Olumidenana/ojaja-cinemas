@@ -2028,8 +2028,25 @@ function showToast(message, type = 'info') {
   }, 4000);
 }
 
+// Fetch Vercel environment config if hosted on Vercel
+async function loadVercelConfig() {
+  try {
+    const res = await fetch('/api/config');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.paystackPublicKey) {
+        AppState.paystackPublicKey = data.paystackPublicKey;
+        console.log('Loaded Paystack Public Key from Vercel Environment:', data.environment);
+      }
+    }
+  } catch (e) {
+    // Local static preview fallback
+  }
+}
+
 // Initialize Application on Window Load
 window.addEventListener('DOMContentLoaded', () => {
+  loadVercelConfig();
   initLedger();
   renderMoviesGrid();
 
