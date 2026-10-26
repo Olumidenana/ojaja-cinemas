@@ -1,7 +1,10 @@
 /* 
-  OJAJA CINEMAS — Luxury Royal Cinema Styling & Custom Micro-interactions
-  Location: African Village, Ife Grand Resort & Industrial Hub, Ile-Ife, Osun State
-  Styling: African Royal Grandeur x Ultramodern IMAX
+  OJAJA CINEMAS — Luxury Royal Cinema Styling, Silky Animations & UX Polish
+  Inspired by the Olive Branch School OS expressive design system:
+  - Playful & prestigious typography
+  - Floating bobble animations & projector beams
+  - Glassmorphic curved capsules
+  - Authentic thermal receipt print styles
 */
 
 :root {
@@ -9,14 +12,13 @@
   --bg-surface: #0E1524;
   --bg-card: #151F33;
   --gold-primary: #F59E0B;
-  --gold-glow: rgba(245, 158, 11, 0.35);
+  --gold-glow: rgba(245, 158, 11, 0.4);
   --crimson-primary: #DC2626;
   --crimson-glow: rgba(220, 38, 38, 0.4);
+  --purple-royal: #CB33D3;
+  --purple-glow: rgba(203, 51, 211, 0.35);
   --atmos-blue: #0284C7;
   --atmos-cyan: #06B6D4;
-  --text-main: #F8FAFC;
-  --text-muted: #94A3B8;
-  --border-subtle: rgba(255, 255, 255, 0.08);
 }
 
 /* Custom Scrollbar */
@@ -29,57 +31,120 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #1E293B;
-  border-radius: 4px;
+  border-radius: 9999px;
+  border: 2px solid var(--bg-deep);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gold-primary);
 }
 
+/* Floating Bobble Animation (Inspired by School OS Mascot Bobble) */
+@keyframes bobble {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+.anim-bobble {
+  animation: bobble 4.5s ease-in-out infinite;
+}
+
+.anim-bobble-delayed {
+  animation: bobble 5.2s ease-in-out 1.5s infinite;
+}
+
+/* Projector Light Beam Effect */
+@keyframes beamSweep {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scaleX(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scaleX(1.08) rotate(1deg);
+  }
+}
+
+.anim-projector-beam {
+  animation: beamSweep 7s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* Floating Clouds / Ambient Particle Drift */
+@keyframes floatDrift {
+  0% { transform: translateX(-5%) translateY(0); }
+  50% { transform: translateX(5%) translateY(-6px); }
+  100% { transform: translateX(-5%) translateY(0); }
+}
+
+.anim-drift {
+  animation: floatDrift 14s ease-in-out infinite;
+}
+
 /* Screen Curve Perspective */
 .cinema-screen-container {
-  perspective: 600px;
+  perspective: 700px;
 }
 
 .cinema-screen-curve {
-  height: 14px;
-  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.8) 25%, #FFF 50%, rgba(245, 158, 11, 0.8) 75%, transparent 100%);
+  height: 16px;
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.85) 20%, #FFF 50%, rgba(245, 158, 11, 0.85) 80%, transparent 100%);
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  box-shadow: 0 10px 40px rgba(245, 158, 11, 0.6), 0 0 20px rgba(255, 255, 255, 0.5);
-  transform: rotateX(-30deg);
+  box-shadow: 0 12px 45px rgba(245, 158, 11, 0.7), 0 0 25px rgba(255, 255, 255, 0.6);
+  transform: rotateX(-32deg);
 }
 
 .screen-light-glow {
-  background: radial-gradient(ellipse at 50% -20%, rgba(245, 158, 11, 0.25) 0%, rgba(220, 38, 38, 0.1) 40%, transparent 75%);
+  background: radial-gradient(ellipse at 50% -20%, rgba(245, 158, 11, 0.3) 0%, rgba(203, 51, 211, 0.15) 45%, transparent 75%);
 }
 
-/* Seat Styling */
+/* Seat Interactive Styling */
 .seat-btn {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   user-select: none;
 }
 
 .seat-btn:hover:not(.seat-booked):not(.seat-selected) {
-  transform: scale(1.18) translateY(-2px);
-  filter: brightness(1.2);
+  transform: scale(1.22) translateY(-3px);
+  filter: brightness(1.25);
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.4);
+  z-index: 5;
 }
 
 .seat-selected {
-  transform: scale(1.12);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.9);
+  transform: scale(1.15) translateY(-2px);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.95), 0 4px 10px rgba(0, 0, 0, 0.5);
+  z-index: 10;
 }
 
-/* Pulse animation for VIP seats */
-@keyframes vipGlow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
-  }
+/* Gold Shimmer Sweep Effect */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-.vip-seat-glow {
-  animation: vipGlow 3s infinite ease-in-out;
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(245, 158, 11, 0.12) 30%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(245, 158, 11, 0.12) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 3s infinite;
 }
 
 /* Ticket Notched Cutout */
@@ -97,6 +162,7 @@
   border-radius: 50%;
   transform: translateY(-50%);
   z-index: 10;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .ticket-notch-left {
@@ -112,7 +178,7 @@
   top: 68%;
   left: 14px;
   right: 14px;
-  border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
   transform: translateY(-50%);
 }
 
@@ -137,29 +203,4 @@
   .no-print {
     display: none !important;
   }
-}
-
-/* Shimmer animation */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.animate-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.animate-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  transform: translateX(-100%);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.08) 20%,
-    rgba(255, 255, 255, 0.15) 60%,
-    rgba(255, 255, 255, 0)
-  );
-  animation: shimmer 2.5s infinite;
 }

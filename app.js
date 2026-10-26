@@ -4,9 +4,115 @@
  * Sub-branches: Ojaja Lagos (Ogombo Ajah) | Ojaja Akure (Alagbaka)
  * Verified Production Database ID: oja-fa0483dd
  * Official Logo: assets/ojaja-logo-transparent.png & assets/ojaja-official-logo.png
- * Integration: Paystack Inline (NGN Kobo) + Real-time Hall Capacity Intelligence
- * Backend Tagging: [cimen], [cimen-boxoffice], [cimen-online-reservation]
+ * Sound FX: Synthesized Web Audio API (Zero external assets required)
+ * UI/UX: Interactive Stepper, Explainable Full-Hall Intelligence & Paystack Integration
  */
+
+// Sound Synthesizer Engine (Web Audio API)
+const SoundFX = {
+  muted: false,
+  audioCtx: null,
+
+  init() {
+    if (!this.audioCtx && typeof window !== 'undefined') {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        this.audioCtx = new AudioContext();
+      }
+    }
+  },
+
+  playSeatClick() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.audioCtx) return;
+      if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, this.audioCtx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, this.audioCtx.currentTime + 0.08); // A5
+
+      gain.gain.setValueAtTime(0.12, this.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      osc.start();
+      osc.stop(this.audioCtx.currentTime + 0.08);
+    } catch (e) {
+      // Audio autoplay policy fallback
+    }
+  },
+
+  playSwitchTime() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.audioCtx) return;
+      if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+
+      const now = this.audioCtx.currentTime;
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.09); // E5
+
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      osc.start();
+      osc.stop(now + 0.22);
+    } catch (e) {}
+  },
+
+  playSuccessFanfare() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.audioCtx) return;
+      if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        const startTime = this.audioCtx.currentTime + idx * 0.09;
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        gain.gain.setValueAtTime(0.16, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + 0.25);
+      });
+    } catch (e) {}
+  },
+
+  toggleMute() {
+    this.muted = !this.muted;
+    const btn = document.getElementById('sound-toggle-btn');
+    if (btn) {
+      btn.innerHTML = this.muted
+        ? '<i data-lucide="volume-x" class="w-4 h-4 text-slate-400"></i><span class="hidden sm:inline">Muted</span>'
+        : '<i data-lucide="volume-2" class="w-4 h-4 text-amber-400"></i><span class="hidden sm:inline">Sound ON</span>';
+      if (window.lucide) window.lucide.createIcons();
+    }
+    showToast(this.muted ? 'Cinema Sound Effects Muted' : 'Cinema Sound Effects Enabled', 'info');
+  }
+};
 
 // Global Application State
 const AppState = {
@@ -25,17 +131,18 @@ const AppState = {
   activeBooking: null,
   paystackPublicKey: 'pk_test_d34f0c978b27357492c73042186716091726a57c',
   bookingsLedger: [],
-  activeFilter: 'all'
+  activeFilter: 'all',
+  activeStep: 1 // Stepper: 1: Seats & Concessions, 2: Checkout
 };
 
 // Concessions Catalog
 const CONCESSIONS_DATA = [
-  { id: 'popcorn-caramel', name: 'Royal Caramel Popcorn', size: 'Large Tub', price: 2500, emoji: '🍿' },
-  { id: 'popcorn-salted', name: 'Hot Buttery Cinema Popcorn', size: 'Large Tub', price: 2200, emoji: '🍿' },
-  { id: 'ife-suya-platter', name: 'Grand Resort Charcoal Suya Platter', size: 'Special', price: 4500, emoji: '🍢' },
-  { id: 'chapman-signature', name: 'Signature Nigerian Chilled Chapman', size: '750ml', price: 1800, emoji: '🍹' },
-  { id: 'hibiscus-zobo-slush', name: 'Ooni Royal Zobo Slushie (Zero Sugar)', size: '500ml', price: 1500, emoji: '🥤' },
-  { id: 'royal-couple-combo', name: 'Royal Duo Combo (2 Popcorn + 2 Drinks + Suya)', size: 'Bundle', price: 9500, emoji: '👑' }
+  { id: 'popcorn-caramel', name: 'Royal Caramel Popcorn', size: 'Large Tub', price: 2500, emoji: '🍿', desc: 'Freshly popped with caramelized brown sugar' },
+  { id: 'popcorn-salted', name: 'Hot Buttery Cinema Popcorn', size: 'Large Tub', price: 2200, emoji: '🍿', desc: 'Classic golden salted butter crunch' },
+  { id: 'ife-suya-platter', name: 'Grand Resort Charcoal Suya', size: 'Chef Platter', price: 4500, emoji: '🍢', desc: 'Slow-grilled spiced beef skewers with onions' },
+  { id: 'chapman-signature', name: 'Signature Nigerian Chilled Chapman', size: '750ml', price: 1800, emoji: '🍹', desc: 'Angostura bitters, cucumber, citrus & mint' },
+  { id: 'hibiscus-zobo-slush', name: 'Ooni Royal Zobo Slushie', size: '500ml', price: 1500, emoji: '🥤', desc: 'Infused spiced organic hibiscus, zero refined sugar' },
+  { id: 'royal-couple-combo', name: 'Royal Couple Feast Combo', size: 'Best Value Bundle', price: 9500, emoji: '👑', desc: '2 Popcorn + 2 Signature Drinks + Suya Platter' }
 ];
 
 // Verified Real Ojaja Cinemas Movie Lineup from oja-fa0483dd Database
@@ -73,7 +180,7 @@ const MOVIES_DATA = [
         hall: 'Red Room (4K Laser)',
         hallType: 'red',
         totalSeats: 84,
-        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // 100% full
+        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // 100% full for explanation demo
         status: 'sold_out',
         priceStandard: 5000,
         priceVip: 9000
@@ -248,7 +355,7 @@ const MOVIES_DATA = [
         hall: 'Red Room (4K Laser)',
         hallType: 'red',
         totalSeats: 84,
-        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`), // Full hall demo
+        bookedSeats: Array.from({ length: 84 }, (_, i) => `SEAT-${i}`),
         status: 'sold_out',
         priceStandard: 4500,
         priceVip: 8000
@@ -350,7 +457,7 @@ const MOVIES_DATA = [
         hall: 'Blue Room (Dolby Atmos)',
         hallType: 'blue',
         totalSeats: 72,
-        bookedSeats: Array.from({ length: 72 }, (_, i) => `SEAT-${i}`), // Full
+        bookedSeats: Array.from({ length: 72 }, (_, i) => `SEAT-${i}`),
         status: 'sold_out',
         priceStandard: 4500,
         priceVip: 8000
@@ -370,7 +477,7 @@ const MOVIES_DATA = [
   }
 ];
 
-// Seed initial bookings into ledger for realistic reporting
+// Seed initial bookings into ledger
 function initLedger() {
   const saved = localStorage.getItem('ojaja_cinemas_bookings');
   if (saved) {
@@ -382,7 +489,6 @@ function initLedger() {
     }
   }
 
-  // Pre-seed with realistic transactions tagged with cimen
   AppState.bookingsLedger = [
     {
       ref: 'OJAJA-CIMEN-8941-IFE',
@@ -431,7 +537,7 @@ function initLedger() {
       hallType: 'red',
       branch: 'Ojaja Ile-Ife (Grand Resort Flagship)',
       seats: ['C3', 'C4', 'C5'],
-      concessions: [{ name: 'Royal Duo Combo', qty: 1, price: 9500 }],
+      concessions: [{ name: 'Royal Couple Feast Combo', qty: 1, price: 9500 }],
       totalAmount: 23000,
       customerName: 'Tunde Bakare',
       customerEmail: 'tbakare@oauife.edu.ng',
@@ -449,12 +555,11 @@ function saveLedger() {
   localStorage.setItem('ojaja_cinemas_bookings', JSON.stringify(AppState.bookingsLedger));
 }
 
-// Format Currency to Naira
 function formatNaira(amount) {
   return '₦' + Number(amount).toLocaleString('en-NG');
 }
 
-// Render Movies Grid
+// Render Movies Grid with Rich Playful Typography & Badges
 function renderMoviesGrid() {
   const container = document.getElementById('movies-grid');
   if (!container) return;
@@ -470,7 +575,8 @@ function renderMoviesGrid() {
 
   container.innerHTML = filteredMovies.map(movie => {
     return `
-      <div class="group relative bg-[#0E1524] rounded-3xl border border-white/5 hover:border-amber-500/50 transition-all duration-300 overflow-hidden flex flex-col shadow-xl hover:shadow-2xl hover:shadow-amber-500/10">
+      <div class="group relative bg-[#0E1524] rounded-3xl border-2 border-white/5 hover:border-amber-500/50 transition-all duration-300 overflow-hidden flex flex-col shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1.5">
+        
         <!-- Poster & Badges -->
         <div class="relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="openBookingModal('${movie.id}')">
           <img 
@@ -481,19 +587,19 @@ function renderMoviesGrid() {
           >
           <div class="absolute inset-0 bg-gradient-to-t from-[#0E1524] via-transparent to-black/60"></div>
           
-          <!-- Format Badges -->
-          <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            <span class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-md bg-amber-500 text-slate-950 font-mono shadow-md">
+          <!-- Playful Eyebrow Tags -->
+          <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 font-headline">
+            <span class="px-2.5 py-1 text-xs font-black uppercase tracking-wider rounded-lg bg-amber-400 text-slate-950 shadow-md">
               ${movie.rating}
             </span>
-            <span class="px-2.5 py-1 text-xs font-semibold rounded-md bg-black/60 backdrop-blur-md text-amber-400 border border-amber-500/30 font-mono">
+            <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-black/70 backdrop-blur-md text-amber-300 border border-amber-500/40 font-mono">
               ${movie.duration}
             </span>
           </div>
 
           <div class="absolute top-3 right-3">
-            <span class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-red-600/90 text-white shadow-lg tracking-wide uppercase">
-              ${movie.tags.includes('featured') ? '★ ROYAL PICK' : 'NOW SHOWING'}
+            <span class="px-3 py-1 text-[11px] font-extrabold rounded-lg bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg tracking-wider font-headline uppercase">
+              ${movie.tags.includes('featured') ? '👑 ROYAL PICK' : 'NOW SHOWING'}
             </span>
           </div>
 
@@ -501,7 +607,7 @@ function renderMoviesGrid() {
           <button 
             type="button" 
             onclick="event.stopPropagation(); openMovieDetails('${movie.id}')"
-            class="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-amber-500/90 hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+            class="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95"
             title="Read Synopsis & Details"
           >
             <i data-lucide="info" class="w-5 h-5"></i>
@@ -509,28 +615,28 @@ function renderMoviesGrid() {
         </div>
 
         <!-- Details -->
-        <div class="p-5 flex-1 flex flex-col justify-between">
+        <div class="p-6 flex-1 flex flex-col justify-between">
           <div>
-            <div class="flex items-center gap-2 text-xs text-amber-400/90 font-medium mb-1.5 uppercase tracking-wide">
+            <div class="flex items-center gap-2 text-xs text-amber-400 font-bold mb-1.5 uppercase font-eyebrow tracking-wide">
               <span>${movie.genre}</span>
               <span>•</span>
               <span class="text-slate-400">${movie.format}</span>
             </div>
             
-            <h3 class="font-royal text-xl font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1">
+            <h3 class="font-headline text-2xl font-black text-white group-hover:text-amber-400 transition-colors line-clamp-1 leading-tight">
               ${movie.title}
             </h3>
             
-            <p class="text-xs text-slate-400 mt-1 line-clamp-2">
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
               ${movie.tagline}
             </p>
           </div>
 
           <!-- Showtimes Row -->
-          <div class="mt-4 pt-4 border-t border-white/5">
-            <div class="flex items-center justify-between text-xs text-slate-400 mb-2.5">
-              <span class="font-semibold text-slate-300">Today's Showtimes</span>
-              <span class="text-[11px] text-amber-500/90">Select to Book</span>
+          <div class="mt-5 pt-4 border-t border-white/5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2.5 font-headline">
+              <span class="font-bold text-slate-200">Daily Showtimes</span>
+              <span class="text-[11px] text-amber-400 font-eyebrow">Tap to Reserve</span>
             </div>
             
             <div class="grid grid-cols-2 gap-2">
@@ -538,26 +644,26 @@ function renderMoviesGrid() {
                 const isSoldOut = st.status === 'sold_out';
                 const isFillingFast = st.status === 'filling_fast';
                 
-                let badgeClass = 'bg-slate-800/80 hover:bg-amber-500 hover:text-slate-950 text-slate-200 border-white/10';
+                let badgeClass = 'bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 text-slate-200 border-white/10';
                 let indicator = '';
 
                 if (isSoldOut) {
-                  badgeClass = 'bg-red-950/40 border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer';
-                  indicator = '<span class="text-[9px] font-bold text-red-400 uppercase tracking-tighter block font-mono">HALL FULL</span>';
+                  badgeClass = 'bg-red-950/40 border-red-500/50 text-red-300 hover:bg-red-900/60 cursor-pointer';
+                  indicator = '<span class="text-[9px] font-black text-red-400 uppercase tracking-tight block font-mono">⚠️ 100% FULL</span>';
                 } else if (isFillingFast) {
-                  badgeClass = 'bg-amber-950/30 border-amber-500/30 text-amber-200 hover:bg-amber-500 hover:text-slate-950';
-                  indicator = '<span class="text-[9px] font-semibold text-amber-400 block font-mono">FILLING FAST</span>';
+                  badgeClass = 'bg-amber-950/30 border-amber-500/40 text-amber-200 hover:bg-amber-400 hover:text-slate-950';
+                  indicator = '<span class="text-[9px] font-bold text-amber-400 block font-mono">⚡ FAST FILL</span>';
                 }
 
                 return `
                   <button 
                     type="button" 
                     onclick="handleShowtimeClick('${movie.id}', '${st.id}')"
-                    class="p-2 rounded-xl text-left border transition-all duration-200 relative group/btn ${badgeClass}"
+                    class="p-2.5 rounded-2xl text-left border-2 transition-all duration-200 relative group/btn active:scale-95 ${badgeClass}"
                   >
                     <div class="flex items-center justify-between">
-                      <span class="font-bold text-xs tracking-tight font-mono">${st.time}</span>
-                      <span class="text-[10px] opacity-75 font-mono">${st.hallType === 'red' ? 'RED' : 'BLUE'}</span>
+                      <span class="font-black text-xs tracking-tight font-mono">${st.time}</span>
+                      <span class="text-[10px] opacity-80 font-mono font-bold">${st.hallType === 'red' ? 'RED' : 'BLUE'}</span>
                     </div>
                     ${indicator}
                   </button>
@@ -565,14 +671,14 @@ function renderMoviesGrid() {
               }).join('')}
             </div>
 
-            <!-- Book Button -->
+            <!-- Big Book Button -->
             <button 
               type="button" 
               onclick="openBookingModal('${movie.id}')"
-              class="mt-3 w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02]"
+              class="mt-3.5 w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-95 font-headline"
             >
               <i data-lucide="ticket" class="w-4 h-4"></i>
-              <span>Book Seats & Concessions</span>
+              <span>Select Seats & Concessions</span>
             </button>
           </div>
         </div>
@@ -585,8 +691,10 @@ function renderMoviesGrid() {
   }
 }
 
-// Showtime Click Handler with Automatic Capacity & Alternative Times Intelligence
+// Showtime Click Handler with Audio & Explainable Capacity Alert
 function handleShowtimeClick(movieId, showtimeId) {
+  SoundFX.playSeatClick();
+
   const movie = MOVIES_DATA.find(m => m.id === movieId);
   if (!movie) return;
 
@@ -601,8 +709,10 @@ function handleShowtimeClick(movieId, showtimeId) {
   openBookingModal(movieId, showtimeId);
 }
 
-// Show Intelligent Hall Full Alert with Alternatives
+// Show Explainable Hall Full Alert with Alternatives
 function showHallFullAlert(movie, fullShowtime) {
+  SoundFX.playSwitchTime();
+
   const alternatives = movie.showtimes.filter(st => st.id !== fullShowtime.id && st.status !== 'sold_out');
 
   const modalContainer = document.getElementById('hall-full-modal');
@@ -610,30 +720,47 @@ function showHallFullAlert(movie, fullShowtime) {
   if (!modalContainer || !modalContent) return;
 
   modalContent.innerHTML = `
-    <div class="relative p-6 sm:p-8 bg-[#0E1524] rounded-3xl border border-red-500/40 shadow-2xl max-w-lg w-full text-slate-100">
+    <div class="relative p-6 sm:p-8 bg-[#0E1524] rounded-3xl border-2 border-red-500/50 shadow-2xl max-w-lg w-full text-slate-100 anim-bobble">
       
-      <!-- Official Brand Logo in Alert -->
-      <div class="flex items-center justify-center mb-4">
-        <img src="assets/ojaja-logo-transparent.png" alt="Ojaja Cinemas" class="h-10 object-contain drop-shadow-md">
+      <!-- Brand Logo in Alert -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-md">
+          <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-full h-full object-contain">
+        </div>
+        <span class="px-3 py-1 text-xs font-mono font-bold uppercase rounded-full bg-red-900/50 text-red-400 border border-red-500/40">
+          ⚠️ Hall Capacity Reached
+        </span>
       </div>
 
-      <div class="text-center">
-        <span class="px-3 py-1 text-xs font-mono font-bold uppercase rounded-full bg-red-900/40 text-red-400 border border-red-500/30">
-          Hall Capacity Reached
-        </span>
-        <h3 class="font-royal text-2xl font-bold text-white mt-3">
-          ${fullShowtime.hall} is Full!
+      <!-- Explainable Diagnostic Breakdown -->
+      <div class="text-left mt-2">
+        <h3 class="font-headline text-2xl font-black text-white">
+          ${fullShowtime.hall} is 100% Sold Out
         </h3>
-        <p class="text-xs sm:text-sm text-slate-300 mt-2">
+        <p class="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed font-body">
           For the <strong class="text-amber-400">${fullShowtime.time}</strong> screening of <strong class="text-white">${movie.title}</strong>, all <strong class="text-red-400">${fullShowtime.totalSeats} seats</strong> have been booked.
         </p>
       </div>
 
-      <!-- Recommendation Section -->
-      <div class="mt-6 p-4 rounded-2xl bg-slate-900/80 border border-white/10">
-        <div class="flex items-center gap-2 text-xs font-semibold text-amber-400 mb-3 uppercase tracking-wider font-mono">
+      <!-- Live Capacity Bar Graphic -->
+      <div class="my-4 p-3.5 rounded-2xl bg-slate-900/80 border border-white/5">
+        <div class="flex justify-between text-xs font-mono mb-1.5">
+          <span class="text-slate-400">Current Occupancy:</span>
+          <span class="text-red-400 font-bold">${fullShowtime.totalSeats} / ${fullShowtime.totalSeats} (100% Full)</span>
+        </div>
+        <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-red-600 to-rose-500 rounded-full w-full"></div>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-2">
+          💡 <strong>Why you missed it:</strong> Weekend peak screenings in our Christie 4K Laser auditorium sell out ~45 mins before showtime.
+        </p>
+      </div>
+
+      <!-- Recommended Alternatives Section -->
+      <div class="mt-4 p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-amber-950/20 border border-amber-500/30">
+        <div class="flex items-center gap-2 text-xs font-black text-amber-400 mb-3 uppercase tracking-wider font-headline">
           <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>Available Alternative Times Today:</span>
+          <span>Recommended Alternative Times Today:</span>
         </div>
 
         ${alternatives.length > 0 ? `
@@ -641,20 +768,20 @@ function showHallFullAlert(movie, fullShowtime) {
             ${alternatives.map(alt => {
               const remaining = alt.totalSeats - alt.bookedSeats.length;
               return `
-                <div class="p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-white/5 hover:border-amber-500/50 transition-all flex items-center justify-between gap-3">
+                <div class="p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border-2 border-white/5 hover:border-amber-400 transition-all flex items-center justify-between gap-3 shadow-md">
                   <div>
                     <div class="flex items-center gap-2">
-                      <span class="font-bold text-base text-white font-mono">${alt.time}</span>
-                      <span class="text-xs px-2 py-0.5 rounded bg-white/5 text-amber-300 font-mono">${alt.hallType === 'red' ? 'Red Room' : 'Blue Room'}</span>
+                      <span class="font-black text-lg text-white font-mono">${alt.time}</span>
+                      <span class="text-xs px-2 py-0.5 rounded-md bg-white/10 text-amber-300 font-mono font-bold">${alt.hallType === 'red' ? 'Red Room (Laser)' : 'Blue Room (Atmos)'}</span>
                     </div>
-                    <div class="text-xs text-slate-400 mt-0.5">
-                      <span class="text-emerald-400 font-medium">${remaining} seats available</span> • From ${formatNaira(alt.priceStandard)}
+                    <div class="text-xs text-slate-400 mt-0.5 font-mono">
+                      <span class="text-emerald-400 font-bold">${remaining} seats available</span> • From ${formatNaira(alt.priceStandard)}
                     </div>
                   </div>
                   <button 
                     type="button" 
                     onclick="selectAlternativeShowtime('${movie.id}', '${alt.id}')"
-                    class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-transform hover:scale-105 shadow-md flex items-center gap-1.5"
+                    class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-1.5 font-headline"
                   >
                     <span>Switch</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -664,7 +791,7 @@ function showHallFullAlert(movie, fullShowtime) {
             }).join('')}
           </div>
         ` : `
-          <p class="text-xs text-slate-400 text-center py-2">
+          <p class="text-xs text-slate-400 text-center py-2 font-body">
             All screenings for today are currently fully booked. Please select tomorrow's schedule or check our Lagos/Akure branches.
           </p>
         `}
@@ -675,7 +802,7 @@ function showHallFullAlert(movie, fullShowtime) {
         <button 
           type="button" 
           onclick="closeHallFullAlert()"
-          class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold uppercase tracking-wider transition-colors"
+          class="px-5 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider transition-colors font-headline"
         >
           Close
         </button>
@@ -700,12 +827,15 @@ function closeHallFullAlert() {
 }
 
 function selectAlternativeShowtime(movieId, alternativeShowtimeId) {
+  SoundFX.playSwitchTime();
   closeHallFullAlert();
   openBookingModal(movieId, alternativeShowtimeId);
+  showToast('Switched to available alternative showtime!', 'success');
 }
 
 // Open Booking Modal
 function openBookingModal(movieId, preselectedShowtimeId = null) {
+  SoundFX.playSeatClick();
   const movie = MOVIES_DATA.find(m => m.id === movieId);
   if (!movie) return;
 
@@ -756,11 +886,11 @@ function renderBookingModalContent() {
         <img src="${movie.poster}" alt="${movie.title}" class="w-16 h-24 object-cover rounded-2xl shadow-lg border border-white/10">
         <div>
           <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-amber-500 text-slate-950">${movie.rating}</span>
-            <span class="text-xs text-amber-400 font-mono">${movie.duration}</span>
+            <span class="px-2.5 py-0.5 text-[10px] font-headline font-black uppercase rounded bg-amber-400 text-slate-950">${movie.rating}</span>
+            <span class="text-xs text-amber-300 font-mono font-bold">${movie.duration}</span>
             <span class="text-xs text-slate-400">• ${movie.format}</span>
           </div>
-          <h2 class="font-royal text-2xl font-bold text-white mt-1">${movie.title}</h2>
+          <h2 class="font-headline text-2xl font-black text-white mt-1 leading-tight">${movie.title}</h2>
           <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1.5 font-mono">
             <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
             <span>${AppState.currentBranch}</span>
@@ -770,7 +900,7 @@ function renderBookingModalContent() {
 
       <!-- Showtime Switcher Tabs -->
       <div class="w-full md:w-auto">
-        <span class="text-[11px] text-slate-400 block mb-1.5 font-medium uppercase tracking-wider font-mono">Select Showtime:</span>
+        <span class="text-[11px] text-slate-400 block mb-1.5 font-bold uppercase tracking-wider font-headline">Showtimes:</span>
         <div class="flex flex-wrap gap-2">
           ${movie.showtimes.map(st => {
             const isSelected = st.id === currentShowtime.id;
@@ -781,7 +911,7 @@ function renderBookingModalContent() {
                 <button 
                   type="button" 
                   onclick="showHallFullAlert(AppState.selectedMovie, AppState.selectedMovie.showtimes.find(s => s.id === '${st.id}'))"
-                  class="px-3 py-1.5 rounded-xl border border-red-500/40 bg-red-950/40 text-red-300 text-xs font-mono font-semibold opacity-75 hover:opacity-100 flex items-center gap-1.5"
+                  class="px-3 py-1.5 rounded-xl border-2 border-red-500/40 bg-red-950/40 text-red-300 text-xs font-mono font-bold opacity-80 hover:opacity-100 flex items-center gap-1.5"
                   title="Hall Full - Click for alternatives"
                 >
                   <i data-lucide="lock" class="w-3 h-3 text-red-400"></i>
@@ -794,10 +924,10 @@ function renderBookingModalContent() {
               <button 
                 type="button" 
                 onclick="changeModalShowtime('${st.id}')"
-                class="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
+                class="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all border-2 ${
                   isSelected 
-                    ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30' 
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-white/10'
+                    ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-lg shadow-amber-400/30 scale-105' 
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-white/10'
                 }"
               >
                 ${st.time} (${st.hallType === 'red' ? 'Red' : 'Blue'})
@@ -816,7 +946,7 @@ function renderBookingModalContent() {
         
         <!-- Screen Curve & Ambient Glow -->
         <div class="w-full max-w-lg cinema-screen-container text-center mb-8">
-          <div class="text-[11px] font-mono tracking-[0.25em] text-amber-400/80 mb-2 uppercase flex items-center justify-center gap-2">
+          <div class="text-[11px] font-mono font-bold tracking-[0.25em] text-amber-400 mb-2 uppercase flex items-center justify-center gap-2">
             <i data-lucide="film" class="w-3.5 h-3.5"></i>
             <span>CHRISTIE 4K DUAL LASER CURVED SCREEN</span>
           </div>
@@ -835,7 +965,7 @@ function renderBookingModalContent() {
             <span>Royal VIP (${formatNaira(currentShowtime.priceVip)})</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <div class="w-4 h-4 rounded bg-amber-500 border border-amber-400 shadow-sm shadow-amber-500"></div>
+            <div class="w-4 h-4 rounded bg-amber-400 border border-amber-300 shadow-sm shadow-amber-400"></div>
             <span class="text-amber-400 font-bold">Selected</span>
           </div>
           <div class="flex items-center gap-1.5">
@@ -850,7 +980,7 @@ function renderBookingModalContent() {
         </div>
 
         <!-- Hall Capacity Indicator -->
-        <div class="mt-6 w-full max-w-lg p-3 rounded-2xl bg-slate-900/60 border border-white/5 flex items-center justify-between text-xs font-mono">
+        <div class="mt-6 w-full max-w-lg p-3.5 rounded-2xl bg-slate-900/70 border border-white/10 flex items-center justify-between text-xs font-mono">
           <span class="text-slate-400">Auditorium: <strong class="text-white">${currentShowtime.hall}</strong></span>
           <span class="text-slate-400">Live Inventory: <strong class="text-emerald-400">${currentShowtime.totalSeats - currentShowtime.bookedSeats.length} / ${currentShowtime.totalSeats} seats open</strong></span>
         </div>
@@ -862,21 +992,21 @@ function renderBookingModalContent() {
           
           <!-- Selected Seats Display -->
           <div>
-            <h4 class="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider mb-2 flex items-center gap-1.5">
+            <h4 class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider mb-2 flex items-center gap-1.5">
               <i data-lucide="armchair" class="w-4 h-4"></i>
-              <span>Your Selected Seats (${AppState.selectedSeats.length})</span>
+              <span>Selected Seats (${AppState.selectedSeats.length})</span>
             </h4>
             
             ${AppState.selectedSeats.length === 0 ? `
-              <div class="p-4 rounded-2xl border border-dashed border-white/10 text-center text-xs text-slate-500">
+              <div class="p-4 rounded-2xl border-2 border-dashed border-white/10 text-center text-xs text-slate-500 font-body">
                 Please tap on any available seat in the auditorium map to reserve.
               </div>
             ` : `
               <div class="flex flex-wrap gap-2">
                 ${AppState.selectedSeats.map(seat => `
-                  <div class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center gap-2 text-xs font-mono text-amber-300">
+                  <div class="px-3 py-1.5 rounded-xl bg-amber-400/20 border-2 border-amber-400/50 flex items-center gap-2 text-xs font-mono text-amber-300">
                     <span class="font-bold">${seat.id}</span>
-                    <span class="text-[10px] opacity-75">(${seat.tier})</span>
+                    <span class="text-[10px] opacity-80">(${seat.tier})</span>
                     <button type="button" onclick="toggleSeat('${seat.id}', '${seat.tier}', ${seat.price})" class="text-amber-400 hover:text-white">✕</button>
                   </div>
                 `).join('')}
@@ -886,9 +1016,9 @@ function renderBookingModalContent() {
 
           <!-- Concessions / Snacks Selection -->
           <div>
-            <h4 class="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider mb-2 flex items-center gap-1.5">
+            <h4 class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider mb-2 flex items-center gap-1.5">
               <i data-lucide="coffee" class="w-4 h-4"></i>
-              <span>Concessions & Drinks (Ife Grand Resort)</span>
+              <span>Add Fresh Concessions (Grand Resort)</span>
             </h4>
             
             <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -897,10 +1027,10 @@ function renderBookingModalContent() {
                 return `
                   <div class="p-2.5 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-between text-xs">
                     <div class="flex items-center gap-2.5">
-                      <span class="text-xl">${item.emoji}</span>
+                      <span class="text-2xl">${item.emoji}</span>
                       <div>
-                        <div class="font-bold text-white">${item.name}</div>
-                        <div class="text-[11px] text-amber-400/90 font-mono">${formatNaira(item.price)} • ${item.size}</div>
+                        <div class="font-bold text-white font-headline">${item.name}</div>
+                        <div class="text-[11px] text-amber-400 font-mono">${formatNaira(item.price)} • ${item.size}</div>
                       </div>
                     </div>
                     
@@ -914,7 +1044,7 @@ function renderBookingModalContent() {
                       <button 
                         type="button" 
                         onclick="updateConcession('${item.id}', 1)"
-                        class="w-6 h-6 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm"
+                        class="w-6 h-6 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 flex items-center justify-center font-bold text-sm"
                       >+</button>
                     </div>
                   </div>
@@ -925,44 +1055,44 @@ function renderBookingModalContent() {
 
           <!-- Customer Details Form -->
           <div class="space-y-3 pt-2 border-t border-white/10">
-            <h4 class="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+            <h4 class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
               <i data-lucide="user" class="w-4 h-4"></i>
               <span>Patron Information & Digital Dispatch</span>
             </h4>
 
             <div>
-              <label class="text-[11px] text-slate-400 block mb-1">Full Name</label>
+              <label class="text-[11px] text-slate-400 block mb-1 font-body">Full Name</label>
               <input 
                 type="text" 
                 id="customer-name" 
                 placeholder="e.g. Olumide Adeleke" 
                 value="${AppState.customer.name}"
                 oninput="AppState.customer.name = this.value"
-                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
+                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-900 border-2 border-white/10 focus:border-amber-400 focus:outline-none text-xs text-white"
               >
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="text-[11px] text-slate-400 block mb-1">Email (for QR E-Ticket)</label>
+                <label class="text-[11px] text-slate-400 block mb-1 font-body">Email (for QR E-Ticket)</label>
                 <input 
                   type="email" 
                   id="customer-email" 
                   placeholder="name@gmail.com" 
                   value="${AppState.customer.email}"
                   oninput="AppState.customer.email = this.value"
-                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
+                  class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-900 border-2 border-white/10 focus:border-amber-400 focus:outline-none text-xs text-white"
                 >
               </div>
               <div>
-                <label class="text-[11px] text-slate-400 block mb-1">WhatsApp / Mobile Phone</label>
+                <label class="text-[11px] text-slate-400 block mb-1 font-body">WhatsApp / Mobile Phone</label>
                 <input 
                   type="tel" 
                   id="customer-phone" 
                   placeholder="080 1234 5678" 
                   value="${AppState.customer.phone}"
                   oninput="AppState.customer.phone = this.value"
-                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 focus:border-amber-500 focus:outline-none text-xs text-white"
+                  class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-900 border-2 border-white/10 focus:border-amber-400 focus:outline-none text-xs text-white"
                 >
               </div>
             </div>
@@ -982,11 +1112,11 @@ function renderBookingModalContent() {
             </div>
             <div class="flex justify-between">
               <span>Backend Tracking Tag:</span>
-              <span class="text-amber-400">[cimen-boxoffice]</span>
+              <span class="text-amber-400 font-bold">[cimen-boxoffice]</span>
             </div>
             <div class="flex justify-between text-base font-bold text-amber-400 pt-2 border-t border-white/10">
-              <span class="font-royal">Grand Total:</span>
-              <span>${formatNaira(calculateGrandTotal())}</span>
+              <span class="font-headline font-black">Grand Total:</span>
+              <span class="font-mono">${formatNaira(calculateGrandTotal())}</span>
             </div>
           </div>
 
@@ -995,14 +1125,14 @@ function renderBookingModalContent() {
             type="button" 
             onclick="initiatePaystackCheckout()"
             ${AppState.selectedSeats.length === 0 ? 'disabled' : ''}
-            class="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 transition-all hover:scale-[1.01]"
+            class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.01] active:scale-95 font-headline"
           >
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Pay With Paystack (${formatNaira(calculateGrandTotal())})</span>
           </button>
           
           <p class="text-[10px] text-center text-slate-500 mt-2 font-mono">
-            Secured by Paystack • Instant QR Turnstile Pass
+            Secured 256-bit SSL • Instant QR Turnstile Pass
           </p>
         </div>
       </div>
@@ -1016,6 +1146,7 @@ function renderBookingModalContent() {
 
 // Switch Showtime Inside Modal
 function changeModalShowtime(showtimeId) {
+  SoundFX.playSeatClick();
   const movie = AppState.selectedMovie;
   const newShowtime = movie.showtimes.find(st => st.id === showtimeId);
   if (!newShowtime) return;
@@ -1065,11 +1196,11 @@ function renderSeatRows(showtime) {
             }
 
             let seatClasses = isVipRow 
-              ? 'bg-amber-950/40 border-amber-500/60 text-amber-300 hover:bg-amber-500 hover:text-slate-950'
-              : 'bg-slate-800 border-white/20 text-slate-300 hover:bg-amber-500 hover:text-slate-950';
+              ? 'bg-amber-950/40 border-amber-500/60 text-amber-300 hover:bg-amber-400 hover:text-slate-950'
+              : 'bg-slate-800 border-white/20 text-slate-300 hover:bg-amber-400 hover:text-slate-950';
 
             if (isSelected) {
-              seatClasses = 'bg-amber-500 border-amber-400 text-slate-950 font-bold shadow-md shadow-amber-500/50 seat-selected';
+              seatClasses = 'bg-amber-400 border-amber-300 text-slate-950 font-bold shadow-md shadow-amber-400/50 seat-selected';
             }
 
             return `
@@ -1091,8 +1222,10 @@ function renderSeatRows(showtime) {
   }).join('');
 }
 
-// Seat Selection Toggle
+// Seat Selection Toggle with Audio
 function toggleSeat(seatId, tier, price) {
+  SoundFX.playSeatClick();
+
   const existingIndex = AppState.selectedSeats.findIndex(s => s.id === seatId);
   if (existingIndex >= 0) {
     AppState.selectedSeats.splice(existingIndex, 1);
@@ -1106,8 +1239,9 @@ function toggleSeat(seatId, tier, price) {
   renderBookingModalContent();
 }
 
-// Concession Increment / Decrement
+// Concession Increment / Decrement with Audio
 function updateConcession(itemId, delta) {
+  SoundFX.playSeatClick();
   const current = AppState.selectedConcessions[itemId] || 0;
   const next = Math.max(0, current + delta);
   if (next === 0) {
@@ -1118,7 +1252,6 @@ function updateConcession(itemId, delta) {
   renderBookingModalContent();
 }
 
-// Calculation Utilities
 function calculateSeatsTotal() {
   return AppState.selectedSeats.reduce((acc, s) => acc + s.price, 0);
 }
@@ -1254,8 +1387,8 @@ function openSimulatedPaystackModal(bookingPayload) {
             P
           </div>
           <div>
-            <h4 class="font-bold text-sm text-slate-900">Paystack Checkout</h4>
-            <span class="text-[11px] text-emerald-600 font-medium">● Secured 256-bit SSL</span>
+            <h4 class="font-bold text-sm text-slate-900 font-headline">Paystack Checkout</h4>
+            <span class="text-[11px] text-emerald-600 font-medium font-mono">● Secured 256-bit SSL</span>
           </div>
         </div>
         <button type="button" onclick="closePaystackSimulator()" class="text-slate-400 hover:text-slate-700 text-lg">✕</button>
@@ -1266,7 +1399,7 @@ function openSimulatedPaystackModal(bookingPayload) {
           <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-10 h-10 object-contain rounded-lg">
           <div>
             <div class="text-[11px] text-slate-500 uppercase font-mono">Merchant</div>
-            <div class="font-bold text-sm text-slate-900">Ojaja Cinemas (Ife Grand Resort)</div>
+            <div class="font-bold text-sm text-slate-900 font-headline">Ojaja Cinemas (Ife Grand Resort)</div>
           </div>
         </div>
         <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 text-xs">
@@ -1275,18 +1408,18 @@ function openSimulatedPaystackModal(bookingPayload) {
         </div>
       </div>
 
-      <div class="space-y-3">
+      <div class="space-y-3 font-body">
         <p class="text-xs text-slate-500 font-medium">Select Payment Method:</p>
         
         <button 
           type="button" 
           onclick="executeSimulatedPaymentSuccess('CARD')"
-          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
+          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group active:scale-95"
         >
           <div class="flex items-center gap-3">
             <span class="text-xl">💳</span>
             <div class="text-left">
-              <div class="font-bold text-xs text-slate-900">Pay with Card (Mastercard / Visa / Verve)</div>
+              <div class="font-bold text-xs text-slate-900 font-headline">Pay with Card (Mastercard / Visa / Verve)</div>
               <div class="text-[11px] text-slate-500">Instant Authorization</div>
             </div>
           </div>
@@ -1296,12 +1429,12 @@ function openSimulatedPaystackModal(bookingPayload) {
         <button 
           type="button" 
           onclick="executeSimulatedPaymentSuccess('TRANSFER')"
-          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
+          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group active:scale-95"
         >
           <div class="flex items-center gap-3">
             <span class="text-xl">🏦</span>
             <div class="text-left">
-              <div class="font-bold text-xs text-slate-900">Pay with Bank Transfer (Wema / Titan / Zenith)</div>
+              <div class="font-bold text-xs text-slate-900 font-headline">Pay with Bank Transfer (Wema / Titan / Zenith)</div>
               <div class="text-[11px] text-slate-500">Virtual Dedicated Account</div>
             </div>
           </div>
@@ -1311,12 +1444,12 @@ function openSimulatedPaystackModal(bookingPayload) {
         <button 
           type="button" 
           onclick="executeSimulatedPaymentSuccess('USSD')"
-          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group"
+          class="w-full p-3.5 rounded-2xl border border-slate-200 hover:border-[#0BA4DB] hover:bg-sky-50/50 flex items-center justify-between transition-all group active:scale-95"
         >
           <div class="flex items-center gap-3">
             <span class="text-xl">📱</span>
             <div class="text-left">
-              <div class="font-bold text-xs text-slate-900">Pay with USSD (*737#, *894#, *901#)</div>
+              <div class="font-bold text-xs text-slate-900 font-headline">Pay with USSD (*737#, *894#, *901#)</div>
               <div class="text-[11px] text-slate-500">Quick Mobile Dial</div>
             </div>
           </div>
@@ -1356,6 +1489,8 @@ function executeSimulatedPaymentSuccess(channel) {
 
 // Finalize Booking & Open E-Ticket Pass
 function finalizeSuccessfulBooking(booking) {
+  SoundFX.playSuccessFanfare();
+
   const showtime = AppState.selectedMovie.showtimes.find(st => st.id === AppState.selectedShowtime.id);
   if (showtime) {
     showtime.bookedSeats.push(...booking.seats);
@@ -1397,21 +1532,21 @@ function openTicketModal(booking) {
   )}`;
 
   container.innerHTML = `
-    <div id="printable-ticket-area" class="w-full max-w-md mx-auto ticket-card rounded-3xl border border-amber-500/40 shadow-2xl overflow-hidden text-slate-100">
+    <div id="printable-ticket-area" class="w-full max-w-md mx-auto ticket-card rounded-3xl border-2 border-amber-400 shadow-2xl overflow-hidden text-slate-100">
       
       <!-- Top Royal Branding with Official Logo -->
-      <div class="p-6 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-between">
+      <div class="p-6 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-2xl bg-white p-1 shadow-lg flex items-center justify-center">
             <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas Official Logo" class="w-full h-full object-contain">
           </div>
           <div>
-            <h3 class="font-royal font-bold text-base tracking-wide leading-tight">OJAJA CINEMAS</h3>
-            <span class="text-[10px] font-mono tracking-wider uppercase block opacity-90">African Village • Ile-Ife</span>
+            <h3 class="font-headline font-black text-lg tracking-wide leading-tight">OJAJA CINEMAS</h3>
+            <span class="text-[10px] font-mono tracking-wider uppercase block opacity-90 font-bold">African Village • Ile-Ife</span>
           </div>
         </div>
         <div class="text-right">
-          <span class="px-2.5 py-1 rounded bg-slate-950/20 text-slate-950 font-mono font-bold text-xs uppercase">
+          <span class="px-2.5 py-1 rounded-full bg-slate-950/20 text-slate-950 font-mono font-black text-xs uppercase">
             E-TICKET PASS
           </span>
         </div>
@@ -1421,7 +1556,7 @@ function openTicketModal(booking) {
       <div class="p-6 bg-[#0E1524] space-y-4">
         <div>
           <span class="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider">FEATURE FILM</span>
-          <h2 class="font-royal text-2xl font-bold text-white mt-0.5">${booking.movieTitle}</h2>
+          <h2 class="font-headline text-2xl font-black text-white mt-0.5">${booking.movieTitle}</h2>
           <p class="text-xs text-slate-400 font-medium">${booking.branch}</p>
         </div>
 
@@ -1447,7 +1582,7 @@ function openTicketModal(booking) {
 
         <!-- Concessions if selected -->
         ${booking.concessions && booking.concessions.length > 0 ? `
-          <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 text-xs">
+          <div class="p-3 rounded-2xl bg-slate-900/60 border border-white/5 text-xs">
             <span class="text-[10px] font-mono text-amber-400 font-bold uppercase block mb-1">CONCESSIONS CLAIM</span>
             <div class="text-slate-300 space-y-0.5 font-mono">
               ${booking.concessions.map(c => `<div>• ${c.qty}x ${c.name}</div>`).join('')}
@@ -1486,11 +1621,11 @@ function openTicketModal(booking) {
     </div>
 
     <!-- Actions Bar (No-Print) -->
-    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 no-print">
+    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 no-print font-headline">
       <button 
         type="button" 
         onclick="window.print()"
-        class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105"
+        class="px-5 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
       >
         <i data-lucide="printer" class="w-4 h-4"></i>
         <span>Print Ticket</span>
@@ -1499,7 +1634,7 @@ function openTicketModal(booking) {
       <button 
         type="button" 
         onclick="shareTicketWhatsApp()"
-        class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105"
+        class="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
       >
         <i data-lucide="send" class="w-4 h-4"></i>
         <span>Send to WhatsApp</span>
@@ -1508,7 +1643,7 @@ function openTicketModal(booking) {
       <button 
         type="button" 
         onclick="closeTicketModal()"
-        class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider transition-colors"
+        class="px-5 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider transition-colors"
       >
         Done
       </button>
@@ -1543,7 +1678,7 @@ function shareTicketWhatsApp() {
 💺 *Seats:* ${b.seats.join(', ')}
 💰 *Amount Paid:* ${formatNaira(b.totalAmount)}
 🔖 *Booking Ref:* ${b.ref}
-🏷️ *Backend Tag:* ${b.tag}
+🏷 *Backend Tag:* ${b.tag}
 
 _Present this reference code or QR pass at the entrance turnstile._`;
 
@@ -1553,6 +1688,7 @@ _Present this reference code or QR pass at the entrance turnstile._`;
 
 // Movie Details Modal
 function openMovieDetails(movieId) {
+  SoundFX.playSeatClick();
   const movie = MOVIES_DATA.find(m => m.id === movieId);
   if (!movie) return;
 
@@ -1577,21 +1713,21 @@ function openMovieDetails(movieId) {
 
       <div class="p-6 -mt-16 relative">
         <div class="flex items-end gap-5">
-          <img src="${movie.poster}" alt="${movie.title}" class="w-24 h-36 object-cover rounded-2xl shadow-2xl border-2 border-amber-500/40">
+          <img src="${movie.poster}" alt="${movie.title}" class="w-24 h-36 object-cover rounded-2xl shadow-2xl border-2 border-amber-400">
           <div>
             <div class="flex items-center gap-2 mb-1">
-              <span class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-amber-500 text-slate-950">${movie.rating}</span>
-              <span class="text-xs text-amber-400 font-mono">${movie.duration}</span>
+              <span class="px-2.5 py-0.5 text-xs font-headline font-black rounded bg-amber-400 text-slate-950">${movie.rating}</span>
+              <span class="text-xs text-amber-300 font-mono font-bold">${movie.duration}</span>
               <span class="text-xs text-slate-400">• ${movie.format}</span>
             </div>
-            <h2 class="font-royal text-2xl font-bold text-white">${movie.title}</h2>
-            <p class="text-xs text-slate-400">${movie.tagline}</p>
+            <h2 class="font-headline text-2xl font-black text-white leading-tight">${movie.title}</h2>
+            <p class="text-xs text-slate-400 font-body">${movie.tagline}</p>
           </div>
         </div>
 
-        <div class="mt-6 space-y-4">
+        <div class="mt-6 space-y-4 font-body">
           <div>
-            <h4 class="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider mb-1">Synopsis</h4>
+            <h4 class="text-xs font-headline font-black uppercase text-amber-400 tracking-wider mb-1">Synopsis</h4>
             <p class="text-sm text-slate-300 leading-relaxed">${movie.synopsis}</p>
           </div>
 
@@ -1615,11 +1751,11 @@ function openMovieDetails(movieId) {
           </div>
         </div>
 
-        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-end gap-3 font-headline">
           <button 
             type="button" 
             onclick="closeMovieDetails(); openBookingModal('${movie.id}')"
-            class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
+            class="w-full py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
           >
             <i data-lucide="ticket" class="w-4 h-4"></i>
             <span>Select Showtime & Book Seats</span>
@@ -1647,6 +1783,7 @@ function closeMovieDetails() {
 
 // Admin Box Office Hub & Verification Scanner Modal
 function openAdminModal() {
+  SoundFX.playSeatClick();
   renderAdminHub();
   const modal = document.getElementById('admin-modal');
   if (modal) {
@@ -1678,7 +1815,7 @@ function renderAdminHub() {
         <div class="flex items-center gap-3">
           <img src="assets/ojaja-official-logo.png" alt="Ojaja Cinemas" class="w-10 h-10 object-contain rounded-xl bg-white p-0.5">
           <div>
-            <h3 class="font-royal text-xl font-bold text-white">Box Office Dispatch & Verification Hub</h3>
+            <h3 class="font-headline text-xl font-black text-white">Box Office Dispatch & Verification Hub</h3>
             <span class="text-xs text-amber-400 font-mono">Tagged: [cimen-boxoffice] • Real-time Ledger</span>
           </div>
         </div>
@@ -1712,13 +1849,13 @@ function renderAdminHub() {
             type="text" 
             id="ticket-search-input" 
             placeholder="e.g. OJAJA-CIMEN-8941-IFE"
-            class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 focus:border-amber-500 focus:outline-none text-xs font-mono text-white"
+            class="w-full px-4 py-2.5 rounded-2xl bg-slate-950 border border-white/10 focus:border-amber-400 focus:outline-none text-xs font-mono text-white"
           >
         </div>
         <button 
           type="button" 
           onclick="searchAndCheckinTicket()"
-          class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-auto"
+          class="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-auto font-headline active:scale-95"
         >
           <i data-lucide="scan" class="w-4 h-4"></i>
           <span>Check In Patron</span>
@@ -1746,7 +1883,7 @@ function renderAdminHub() {
                 <tr class="hover:bg-slate-900/50">
                   <td class="p-3">
                     <span class="font-bold text-white">${b.ref}</span>
-                    <span class="text-[10px] text-amber-500/80 block">[${b.tag}]</span>
+                    <span class="text-[10px] text-amber-400 block">[${b.tag}]</span>
                   </td>
                   <td class="p-3">
                     <div class="text-white font-sans font-semibold">${b.customerName}</div>
@@ -1757,7 +1894,7 @@ function renderAdminHub() {
                     <div class="text-[11px] text-slate-400">${b.hall} (${b.showtime})</div>
                   </td>
                   <td class="p-3">
-                    <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">${b.seats.join(', ')}</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-400/10 text-amber-300 border border-amber-400/30">${b.seats.join(', ')}</span>
                   </td>
                   <td class="p-3 font-bold text-emerald-400">${formatNaira(b.totalAmount)}</td>
                   <td class="p-3">
@@ -1810,25 +1947,27 @@ function searchAndCheckinTicket() {
     return;
   }
 
+  SoundFX.playSuccessFanfare();
   booking.checkedIn = true;
   saveLedger();
   renderAdminHub();
   showToast(`Patron ${booking.customerName} checked in for ${booking.movieTitle}!`, 'success');
 }
 
-// Filter Tabs Handler
+// Filter Tabs Handler with Audio
 function setFilter(filterName) {
+  SoundFX.playSeatClick();
   AppState.activeFilter = filterName;
 
   document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.classList.remove('bg-amber-500', 'text-slate-950');
-    btn.classList.add('bg-slate-900', 'text-slate-300');
+    btn.classList.remove('bg-amber-400', 'text-slate-950', 'border-amber-400');
+    btn.classList.add('bg-slate-900', 'text-slate-300', 'border-white/10');
   });
 
   const activeBtn = document.getElementById(`filter-${filterName}`);
   if (activeBtn) {
-    activeBtn.classList.remove('bg-slate-900', 'text-slate-300');
-    activeBtn.classList.add('bg-amber-500', 'text-slate-950');
+    activeBtn.classList.remove('bg-slate-900', 'text-slate-300', 'border-white/10');
+    activeBtn.classList.add('bg-amber-400', 'text-slate-950', 'border-amber-400');
   }
 
   renderMoviesGrid();
@@ -1836,6 +1975,7 @@ function setFilter(filterName) {
 
 // Branch Switcher
 function setBranch(branchName) {
+  SoundFX.playSeatClick();
   AppState.currentBranch = branchName;
   const branchLabel = document.getElementById('current-branch-label');
   if (branchLabel) {
