@@ -137,8 +137,10 @@
           class="bg-transparent text-white font-headline font-black focus:outline-none cursor-pointer pr-2"
         >
           <option value="Ojaja Ile-Ife (Grand Resort Flagship)" class="bg-slate-900 text-white">Ojaja Ile-Ife (Grand Resort Flagship)</option>
-          <option value="Ojaja Lagos (Ogombo Ajah)" class="bg-slate-900 text-white">Ojaja Lagos (Ogombo Ajah)</option>
-          <option value="Ojaja Akure (Alagbaka)" class="bg-slate-900 text-white">Ojaja Akure (Alagbaka)</option>
+          <option value="Ojaja Lagos (Ojaja Mall, Ogombo Ajah)" class="bg-slate-900 text-white">Ojaja Lagos (Ojaja Mall, Ogombo Ajah)</option>
+          <option value="Ojaja Akure (Ojaja Park, Alagbaka)" class="bg-slate-900 text-white">Ojaja Akure (Ojaja Park, Alagbaka)</option>
+          <option value="Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)" class="bg-slate-900 text-white">Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)</option>
+          <option value="Ojaja Abere (Ojaja Mews, Secretariat Corridor)" class="bg-slate-900 text-white">Ojaja Abere (Ojaja Mews, Secretariat Corridor)</option>
         </select>
       </div>
 
@@ -449,32 +451,48 @@
           Select any showtime to reserve your seats. Real-time availability updates dynamically.
         </p>
 
-        <!-- Location Quick-Selector Tabs -->
+        <!-- Location Quick-Selector Tabs (All 5 Official Ojaja Landmarks) -->
         <div class="flex items-center gap-2 flex-wrap pt-3">
-          <span class="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-wider mr-1">Switch Location:</span>
+          <span class="text-[10px] font-mono text-amber-400 uppercase font-bold tracking-wider mr-1">5 Official Locations:</span>
           <button 
             type="button" 
             onclick="setBranch('Ojaja Ile-Ife (Grand Resort Flagship)')"
             data-branch="Ojaja Ile-Ife (Grand Resort Flagship)"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs font-headline border-2 border-amber-400 transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-amber-400/20"
           >
-            <span>👑 Ile-Ife (Grand Resort)</span>
+            <span>👑 1. Ile-Ife (Flagship)</span>
           </button>
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Lagos (Ogombo Ajah)')"
-            data-branch="Ojaja Lagos (Ogombo Ajah)"
+            onclick="setBranch('Ojaja Lagos (Ojaja Mall, Ogombo Ajah)')"
+            data-branch="Ojaja Lagos (Ojaja Mall, Ogombo Ajah)"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
           >
-            <span>🏙️ Lagos (Ogombo Ajah)</span>
+            <span>🏙️ 2. Lagos (Ojaja Mall, Ajah)</span>
           </button>
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Akure (Alagbaka)')"
-            data-branch="Ojaja Akure (Alagbaka)"
+            onclick="setBranch('Ojaja Akure (Ojaja Park, Alagbaka)')"
+            data-branch="Ojaja Akure (Ojaja Park, Alagbaka)"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
           >
-            <span>🌄 Akure (Alagbaka)</span>
+            <span>🌄 3. Akure (Ojaja Park)</span>
+          </button>
+          <button 
+            type="button" 
+            onclick="setBranch('Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)')"
+            data-branch="Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)"
+            class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
+          >
+            <span>🏛️ 4. Osogbo (Ojaja Arena)</span>
+          </button>
+          <button 
+            type="button" 
+            onclick="setBranch('Ojaja Abere (Ojaja Mews, Secretariat Corridor)')"
+            data-branch="Ojaja Abere (Ojaja Mews, Secretariat Corridor)"
+            class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
+          >
+            <span>🏰 5. Abere (Ojaja Mews)</span>
           </button>
         </div>
       </div>

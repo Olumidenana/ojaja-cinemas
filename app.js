@@ -419,7 +419,7 @@ const CONCESSIONS_DATA = [
 const MOVIES_DATA = [
   {
     id: 'spiderman-brand-new-day',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ogombo Ajah)', 'Ojaja Akure (Alagbaka)'],
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
     title: 'Spider-Man: Brand New Day',
     tagline: 'A Spectacular New Era of High-Flying Action',
     genre: 'Hollywood / Action / Sci-Fi',
@@ -488,7 +488,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'heart-of-the-beast',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Alagbaka)'],
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)'],
     title: 'Heart of the Beast',
     tagline: 'A Soldier, His War Dog, and The Frozen Wilderness',
     genre: 'Action / Military Thriller',
@@ -546,7 +546,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'onibon-oje',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Alagbaka)'],
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)'],
     title: 'Onibon Oje',
     tagline: 'When a Fierce Warlord Threatens the Sacred Kingdom',
     genre: 'Nollywood / Yoruba Cultural Epic',
@@ -615,7 +615,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'a-land-apart',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ogombo Ajah)'],
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
     title: 'A Land Apart',
     tagline: 'An Alternate Nigeria Where Soil is Gold',
     genre: 'Nollywood / Political Drama',
@@ -673,7 +673,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'street-fighter',
-    branches: ['Ojaja Lagos (Ogombo Ajah)', 'Ojaja Ile-Ife (Grand Resort Flagship)'],
+    branches: ['Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
     title: 'Street Fighter (Legendary Reborn)',
     tagline: 'Round One. Fight for Glory.',
     genre: 'Action / Martial Arts Blockbuster',
@@ -731,7 +731,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'verity',
-    branches: ['Ojaja Lagos (Ogombo Ajah)', 'Ojaja Akure (Alagbaka)'],
+    branches: ['Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
     title: 'Verity',
     tagline: 'The Truth Lies Between The Lines',
     genre: 'Psychological Thriller / Mystery',
