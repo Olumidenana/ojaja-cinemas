@@ -449,8 +449,29 @@
         </p>
       </div>
 
-      <!-- Filters (Horizontal Native Scrolling on Mobile) -->
-      <div class="flex items-center gap-2 text-xs font-headline font-bold overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
+      <!-- Search & Filters Row -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+        <!-- Live Movie Search Input -->
+        <div class="relative w-full sm:w-72">
+          <input 
+            type="text" 
+            id="movie-search-input"
+            oninput="handleMovieSearch(this.value)"
+            placeholder="Search films, cast, genres..."
+            class="w-full pl-9 pr-8 py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 border-2 border-white/10 focus:border-amber-400 focus:outline-none text-xs font-body text-white placeholder:text-slate-500 transition-all shadow-inner"
+          >
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+          <button 
+            type="button" 
+            id="clear-search-btn"
+            onclick="clearMovieSearch()" 
+            class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold"
+            title="Clear search"
+          >✕</button>
+        </div>
+
+        <!-- Filters (Horizontal Native Scrolling on Mobile) -->
+        <div class="flex items-center gap-2 text-xs font-headline font-bold overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
         <button 
           id="filter-all"
           type="button" 

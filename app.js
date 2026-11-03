@@ -399,6 +399,7 @@ const AppState = {
   paystackPublicKey: 'pk_test_d34f0c978b27357492c73042186716091726a57c',
   bookingsLedger: [],
   activeFilter: 'all',
+  searchQuery: '',
   activeStep: 1, // Stepper: 1: Seats & Concessions, 2: Checkout
   selectedPaymentChannel: 'CARD', // 'CARD' | 'USSD' | 'TRANSFER'
   confirmationActiveTab: 'ticket' // 'ticket' | 'invoice'
@@ -869,14 +870,57 @@ function renderMoviesGrid() {
   const container = document.getElementById('movies-grid');
   if (!container) return;
 
+  const q = (AppState.searchQuery || '').toLowerCase().trim();
+
   const filteredMovies = MOVIES_DATA.filter(movie => {
-    if (AppState.activeFilter === 'all') return true;
-    if (AppState.activeFilter === 'nollywood') return movie.genre.toLowerCase().includes('nollywood') || movie.genre.toLowerCase().includes('yoruba');
-    if (AppState.activeFilter === 'hollywood') return movie.genre.toLowerCase().includes('hollywood') || movie.genre.toLowerCase().includes('action');
-    if (AppState.activeFilter === 'red-room') return movie.showtimes.some(st => st.hallType === 'red');
-    if (AppState.activeFilter === 'blue-room') return movie.showtimes.some(st => st.hallType === 'blue');
+    // 1. Category Filter
+    let matchesCategory = true;
+    if (AppState.activeFilter === 'nollywood') {
+      matchesCategory = (movie.genre || '').toLowerCase().includes('nollywood') || (movie.genre || '').toLowerCase().includes('yoruba');
+    } else if (AppState.activeFilter === 'hollywood') {
+      matchesCategory = (movie.genre || '').toLowerCase().includes('hollywood') || (movie.genre || '').toLowerCase().includes('action');
+    } else if (AppState.activeFilter === 'red-room') {
+      matchesCategory = movie.showtimes && movie.showtimes.some(st => st.hallType === 'red');
+    } else if (AppState.activeFilter === 'blue-room') {
+      matchesCategory = movie.showtimes && movie.showtimes.some(st => st.hallType === 'blue');
+    }
+
+    if (!matchesCategory) return false;
+
+    // 2. Search Query Filter
+    if (q) {
+      const titleMatch = (movie.title || '').toLowerCase().includes(q);
+      const genreMatch = (movie.genre || '').toLowerCase().includes(q);
+      const synopsisMatch = (movie.synopsis || '').toLowerCase().includes(q);
+      const castMatch = movie.cast && Array.isArray(movie.cast) && movie.cast.some(actor => actor.toLowerCase().includes(q));
+      const hallMatch = (movie.hall || '').toLowerCase().includes(q);
+      return titleMatch || genreMatch || synopsisMatch || castMatch || hallMatch;
+    }
+
     return true;
   });
+
+  if (filteredMovies.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-16 px-4 bg-[#0E1524]/60 rounded-3xl border-2 border-dashed border-white/10">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-400/10 flex items-center justify-center text-3xl text-amber-400">
+          🎬
+        </div>
+        <h3 class="font-headline text-xl sm:text-2xl font-black text-white mb-2">No Movies Found</h3>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mb-6 font-body">
+          No screenings matched "${AppState.searchQuery}". Try searching for <strong>Spider-Man</strong>, <strong>Street Fighter</strong>, <strong>A Land Apart</strong>, or <strong>Verity</strong>.
+        </p>
+        <button 
+          type="button" 
+          onclick="clearMovieSearch()" 
+          class="px-5 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider font-headline active:scale-95 transition-all shadow-lg shadow-amber-400/20"
+        >
+          Reset Search & View All
+        </button>
+      </div>
+    `;
+    return;
+  }
 
   container.innerHTML = filteredMovies.map(movie => {
     return `
@@ -3215,3 +3259,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Live Movie Search Handlers
+function handleMovieSearch(query) {
+  AppState.searchQuery = query || '';
+  const clearBtn = document.getElementById('clear-search-btn');
+  if (clearBtn) {
+    if (query && query.trim() !== '') {
+      clearBtn.classList.remove('hidden');
+    } else {
+      clearBtn.classList.add('hidden');
+    }
+  }
+  renderMoviesGrid();
+}
+
+function clearMovieSearch() {
+  const input = document.getElementById('movie-search-input');
+  if (input) input.value = '';
+  handleMovieSearch('');
+}
