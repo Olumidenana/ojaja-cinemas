@@ -419,6 +419,7 @@ const CONCESSIONS_DATA = [
 const MOVIES_DATA = [
   {
     id: 'spiderman-brand-new-day',
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ogombo Ajah)', 'Ojaja Akure (Alagbaka)'],
     title: 'Spider-Man: Brand New Day',
     tagline: 'A Spectacular New Era of High-Flying Action',
     genre: 'Hollywood / Action / Sci-Fi',
@@ -487,6 +488,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'heart-of-the-beast',
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Alagbaka)'],
     title: 'Heart of the Beast',
     tagline: 'A Soldier, His War Dog, and The Frozen Wilderness',
     genre: 'Action / Military Thriller',
@@ -544,6 +546,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'onibon-oje',
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Alagbaka)'],
     title: 'Onibon Oje',
     tagline: 'When a Fierce Warlord Threatens the Sacred Kingdom',
     genre: 'Nollywood / Yoruba Cultural Epic',
@@ -612,6 +615,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'a-land-apart',
+    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ogombo Ajah)'],
     title: 'A Land Apart',
     tagline: 'An Alternate Nigeria Where Soil is Gold',
     genre: 'Nollywood / Political Drama',
@@ -669,6 +673,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'street-fighter',
+    branches: ['Ojaja Lagos (Ogombo Ajah)', 'Ojaja Ile-Ife (Grand Resort Flagship)'],
     title: 'Street Fighter (Legendary Reborn)',
     tagline: 'Round One. Fight for Glory.',
     genre: 'Action / Martial Arts Blockbuster',
@@ -726,6 +731,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'verity',
+    branches: ['Ojaja Lagos (Ogombo Ajah)', 'Ojaja Akure (Alagbaka)'],
     title: 'Verity',
     tagline: 'The Truth Lies Between The Lines',
     genre: 'Psychological Thriller / Mystery',
@@ -873,6 +879,11 @@ function renderMoviesGrid() {
   const q = (AppState.searchQuery || '').toLowerCase().trim();
 
   const filteredMovies = MOVIES_DATA.filter(movie => {
+    // 0. Location / Campus Filter
+    if (AppState.currentBranch && movie.branches && !movie.branches.includes(AppState.currentBranch)) {
+      return false;
+    }
+
     // 1. Category Filter
     let matchesCategory = true;
     if (AppState.activeFilter === 'nollywood') {
@@ -3182,7 +3193,26 @@ function setBranch(branchName) {
   if (branchLabel) {
     branchLabel.innerText = branchName;
   }
-  showToast(`Location switched to: ${branchName}`, 'info');
+  
+  // Update dropdown if present
+  const branchSelect = document.getElementById('campus-branch-selector');
+  if (branchSelect && branchSelect.value !== branchName) {
+    branchSelect.value = branchName;
+  }
+
+  // Update branch filter pills in UI
+  document.querySelectorAll('.branch-pill-btn').forEach(btn => {
+    if (btn.getAttribute('data-branch') === branchName) {
+      btn.classList.add('bg-amber-400', 'text-slate-950', 'border-amber-400', 'font-black');
+      btn.classList.remove('bg-slate-900', 'text-slate-300', 'border-white/10');
+    } else {
+      btn.classList.remove('bg-amber-400', 'text-slate-950', 'border-amber-400', 'font-black');
+      btn.classList.add('bg-slate-900', 'text-slate-300', 'border-white/10');
+    }
+  });
+
+  showToast(`Showing screenings for: ${branchName}`, 'info');
+  renderMoviesGrid();
 }
 
 // Toast Notifications
