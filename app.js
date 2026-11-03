@@ -1,3 +1,52 @@
+
+const OJAJA_LOCATIONS = [
+  {
+    id: 'ife',
+    name: 'OJAJA Ile-Ife',
+    tag: 'Flagship Hub',
+    city: 'Ile-Ife, Osun State',
+    address: 'African Village @ Ife Grand Resort & Industrial Hub',
+    screens: 'Red Room (4K Laser) & Blue Room (Dolby Atmos)',
+    moviesCount: 5
+  },
+  {
+    id: 'lagos',
+    name: 'OJAJA Lagos',
+    tag: 'Lekki / Ajah Screen',
+    city: 'Lagos State',
+    address: 'Ojaja Park, Ogombo Road (Off Abraham Adesanya), Ajah',
+    screens: 'Dolby Atmos Prime & VIP Recliner Hall',
+    moviesCount: 4
+  },
+  {
+    id: 'akure',
+    name: 'OJAJA Akure',
+    tag: 'Alagbaka / FUTA',
+    city: 'Akure, Ondo State',
+    address: 'Ojaja Park, Alagbaka, Akure',
+    screens: 'Christie 4K Screen & Hall 2',
+    moviesCount: 4
+  },
+  {
+    id: 'ado',
+    name: 'OJAJA Ado-Ekiti',
+    tag: 'Adire Hub',
+    city: 'Ado-Ekiti, Ekiti State',
+    address: 'Beside Adire Hub, Ado Road, Ado-Ekiti',
+    screens: 'Executive Screen 1 & 2',
+    moviesCount: 3
+  },
+  {
+    id: 'ph',
+    name: 'OJAJA Port Harcourt',
+    tag: 'Garden City',
+    city: 'Port Harcourt, Rivers State',
+    address: 'Abekoko, Port Harcourt',
+    screens: 'Atmos Hall 1 & Action Screen',
+    moviesCount: 4
+  }
+];
+
 /**
  * OJAJA CINEMAS — Core Application & Booking Engine
  * Flagship Location: African Village, Ife Grand Resort & Industrial Hub, Ile-Ife, Osun State
@@ -383,7 +432,7 @@ function toggleModalVideoAudio() { toggleHeroCinemaAudio(); }
 
 // Global Application State
 const AppState = {
-  currentBranch: 'Ojaja Ile-Ife (Grand Resort Flagship)',
+  currentBranch: 'OJAJA Ile-Ife',
   currentDate: 'today',
   selectedMovie: null,
   selectedShowtime: null,
@@ -419,7 +468,7 @@ const CONCESSIONS_DATA = [
 const MOVIES_DATA = [
   {
     id: 'spiderman-brand-new-day',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
+    branches: ['OJAJA Ile-Ife', 'OJAJA Lagos', 'OJAJA Akure', 'OJAJA Ado-Ekiti', 'OJAJA Port Harcourt'],
     title: 'Spider-Man: Brand New Day',
     tagline: 'A Spectacular New Era of High-Flying Action',
     genre: 'Hollywood / Action / Sci-Fi',
@@ -488,7 +537,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'heart-of-the-beast',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)'],
+    branches: ['OJAJA Ile-Ife', 'OJAJA Akure', 'OJAJA Port Harcourt'],
     title: 'Heart of the Beast',
     tagline: 'A Soldier, His War Dog, and The Frozen Wilderness',
     genre: 'Action / Military Thriller',
@@ -546,7 +595,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'onibon-oje',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)'],
+    branches: ['OJAJA Ile-Ife', 'OJAJA Akure', 'OJAJA Ado-Ekiti'],
     title: 'Onibon Oje',
     tagline: 'When a Fierce Warlord Threatens the Sacred Kingdom',
     genre: 'Nollywood / Yoruba Cultural Epic',
@@ -615,7 +664,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'a-land-apart',
-    branches: ['Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
+    branches: ['OJAJA Ile-Ife', 'OJAJA Lagos', 'OJAJA Ado-Ekiti'],
     title: 'A Land Apart',
     tagline: 'An Alternate Nigeria Where Soil is Gold',
     genre: 'Nollywood / Political Drama',
@@ -673,7 +722,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'street-fighter',
-    branches: ['Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Ile-Ife (Grand Resort Flagship)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
+    branches: ['OJAJA Lagos', 'OJAJA Ile-Ife', 'OJAJA Port Harcourt'],
     title: 'Street Fighter (Legendary Reborn)',
     tagline: 'Round One. Fight for Glory.',
     genre: 'Action / Martial Arts Blockbuster',
@@ -731,7 +780,7 @@ const MOVIES_DATA = [
   },
   {
     id: 'verity',
-    branches: ['Ojaja Lagos (Ojaja Mall, Ogombo Ajah)', 'Ojaja Akure (Ojaja Park, Alagbaka)', 'Ojaja Abere (Ojaja Mews, Secretariat Corridor)'],
+    branches: ['OJAJA Lagos', 'OJAJA Akure', 'OJAJA Port Harcourt'],
     title: 'Verity',
     tagline: 'The Truth Lies Between The Lines',
     genre: 'Psychological Thriller / Mystery',
@@ -3193,6 +3242,14 @@ function setBranch(branchName) {
   if (branchLabel) {
     branchLabel.innerText = branchName;
   }
+  const navLocLabel = document.getElementById('nav-location-label');
+  if (navLocLabel) {
+    navLocLabel.innerText = branchName;
+  }
+  const mobileNavLabel = document.getElementById('mobile-nav-location-label');
+  if (mobileNavLabel) {
+    mobileNavLabel.innerText = branchName.replace('OJAJA ', '');
+  }
   
   // Update dropdown if present
   const branchSelect = document.getElementById('campus-branch-selector');
@@ -3279,6 +3336,28 @@ async function loadVercelConfig() {
 window.addEventListener('DOMContentLoaded', () => {
   loadVercelConfig();
   initLedger();
+
+  // Restore preferred location from localStorage if saved
+  let savedLoc = null;
+  try {
+    savedLoc = localStorage.getItem('ojaja_preferred_location');
+  } catch(e){}
+
+  if (savedLoc && ['OJAJA Ile-Ife', 'OJAJA Lagos', 'OJAJA Akure', 'OJAJA Ado-Ekiti', 'OJAJA Port Harcourt'].includes(savedLoc)) {
+    AppState.currentBranch = savedLoc;
+  } else {
+    // If not selected yet, prompt user with the location gate modal
+    setTimeout(() => {
+      openLocationGate();
+    }, 450);
+  }
+
+  // Update UI indicators
+  const navLocLabel = document.getElementById('nav-location-label');
+  if (navLocLabel) navLocLabel.innerText = AppState.currentBranch;
+  const branchLabel = document.getElementById('current-branch-label');
+  if (branchLabel) branchLabel.innerText = AppState.currentBranch;
+
   renderMoviesGrid();
   TrendingReelManager.init();
 
@@ -3308,4 +3387,50 @@ function clearMovieSearch() {
   const input = document.getElementById('movie-search-input');
   if (input) input.value = '';
   handleMovieSearch('');
+}
+
+// Location Gate Handlers
+function openLocationGate() {
+  const gate = document.getElementById('location-gate-modal');
+  if (gate) {
+    gate.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    const input = document.getElementById('location-search-input');
+    if (input) input.focus();
+  }
+}
+
+function closeLocationGate() {
+  const gate = document.getElementById('location-gate-modal');
+  if (gate) {
+    gate.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  }
+}
+
+function selectLocationAndClose(branchName) {
+  setBranch(branchName);
+  closeLocationGate();
+  try {
+    localStorage.setItem('ojaja_preferred_location', branchName);
+  } catch(e){}
+  
+  // Smooth scroll to movies section
+  const section = document.getElementById('movies-section');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function filterLocationCards(query) {
+  const q = (query || '').toLowerCase().trim();
+  const cards = document.querySelectorAll('.location-card-item');
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    if (!q || text.includes(q)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
 }

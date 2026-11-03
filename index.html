@@ -127,22 +127,18 @@
         </div>
       </a>
 
-      <!-- Campus / Location Selector -->
-      <div class="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-900 border border-white/10 text-xs">
-        <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
-        <span class="text-slate-400 font-headline font-bold">Campus:</span>
-        <select 
-          id="campus-branch-selector"
-          onchange="setBranch(this.value)"
-          class="bg-transparent text-white font-headline font-black focus:outline-none cursor-pointer pr-2"
-        >
-          <option value="Ojaja Ile-Ife (Grand Resort Flagship)" class="bg-slate-900 text-white">Ojaja Ile-Ife (Grand Resort Flagship)</option>
-          <option value="Ojaja Lagos (Ojaja Mall, Ogombo Ajah)" class="bg-slate-900 text-white">Ojaja Lagos (Ojaja Mall, Ogombo Ajah)</option>
-          <option value="Ojaja Akure (Ojaja Park, Alagbaka)" class="bg-slate-900 text-white">Ojaja Akure (Ojaja Park, Alagbaka)</option>
-          <option value="Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)" class="bg-slate-900 text-white">Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)</option>
-          <option value="Ojaja Abere (Ojaja Mews, Secretariat Corridor)" class="bg-slate-900 text-white">Ojaja Abere (Ojaja Mews, Secretariat Corridor)</option>
-        </select>
-      </div>
+      <!-- Campus / Location Selector with 1-Click Modal Trigger -->
+      <button 
+        type="button" 
+        onclick="openLocationGate()"
+        class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-amber-400/40 text-xs font-headline font-bold text-white transition-all shadow-md group"
+        title="Change your cinema location"
+      >
+        <span class="text-amber-400">📍</span>
+        <span class="text-slate-400 font-normal">Location:</span>
+        <span id="nav-location-label" class="text-amber-300 font-black group-hover:underline">OJAJA Ile-Ife</span>
+        <span class="px-1.5 py-0.5 rounded-md bg-amber-400/20 text-amber-400 text-[10px] uppercase font-mono">Switch</span>
+      </button>
 
       <!-- Quick Actions -->
       <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
@@ -445,7 +441,7 @@
           <span>Curated Daily Schedules</span>
         </div>
         <h2 class="font-headline text-2xl sm:text-4xl font-black text-white">
-          Now Showing at <span id="current-branch-label" class="text-amber-400">Ojaja Ile-Ife (Grand Resort Flagship)</span>
+          Now Showing at <span id="current-branch-label" class="text-amber-400">OJAJA Ile-Ife</span>
         </h2>
         <p class="text-xs sm:text-sm text-slate-400 mt-1 font-body">
           Select any showtime to reserve your seats. Real-time availability updates dynamically.
@@ -453,46 +449,60 @@
 
         <!-- Location Quick-Selector Tabs (All 5 Official Ojaja Landmarks) -->
         <div class="flex items-center gap-2 flex-wrap pt-3">
-          <span class="text-[10px] font-mono text-amber-400 uppercase font-bold tracking-wider mr-1">5 Official Locations:</span>
+          <span class="text-[10px] font-mono text-amber-400 uppercase font-bold tracking-wider mr-1">5 Official Branches:</span>
+          
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Ile-Ife (Grand Resort Flagship)')"
-            data-branch="Ojaja Ile-Ife (Grand Resort Flagship)"
+            onclick="setBranch('OJAJA Ile-Ife')"
+            data-branch="OJAJA Ile-Ife"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs font-headline border-2 border-amber-400 transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-amber-400/20"
           >
             <span>👑 1. Ile-Ife (Flagship)</span>
           </button>
+
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Lagos (Ojaja Mall, Ogombo Ajah)')"
-            data-branch="Ojaja Lagos (Ojaja Mall, Ogombo Ajah)"
+            onclick="setBranch('OJAJA Lagos')"
+            data-branch="OJAJA Lagos"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
           >
-            <span>🏙️ 2. Lagos (Ojaja Mall, Ajah)</span>
+            <span>🏙️ 2. Lagos (Ajah)</span>
           </button>
+
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Akure (Ojaja Park, Alagbaka)')"
-            data-branch="Ojaja Akure (Ojaja Park, Alagbaka)"
+            onclick="setBranch('OJAJA Akure')"
+            data-branch="OJAJA Akure"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
           >
-            <span>🌄 3. Akure (Ojaja Park)</span>
+            <span>🌄 3. Akure (Alagbaka)</span>
           </button>
+
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)')"
-            data-branch="Ojaja Osogbo (Ojaja Arena, Ogo-Oluwa)"
+            onclick="setBranch('OJAJA Ado-Ekiti')"
+            data-branch="OJAJA Ado-Ekiti"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
           >
-            <span>🏛️ 4. Osogbo (Ojaja Arena)</span>
+            <span>🏛️ 4. Ado-Ekiti (Adire Hub)</span>
           </button>
+
           <button 
             type="button" 
-            onclick="setBranch('Ojaja Abere (Ojaja Mews, Secretariat Corridor)')"
-            data-branch="Ojaja Abere (Ojaja Mews, Secretariat Corridor)"
+            onclick="setBranch('OJAJA Port Harcourt')"
+            data-branch="OJAJA Port Harcourt"
             class="branch-pill-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-300 font-bold text-xs font-headline border-2 border-white/10 hover:border-amber-400/50 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
           >
-            <span>🏰 5. Abere (Ojaja Mews)</span>
+            <span>🌊 5. Port Harcourt (Garden City)</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="openLocationGate()"
+            class="px-3 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-mono font-bold transition-all flex items-center gap-1 ml-auto"
+            title="Open Full Cinema Selector Modal"
+          >
+            <span>📍 Change Location Modal ↗</span>
           </button>
         </div>
       </div>
@@ -760,6 +770,10 @@
       <i data-lucide="ticket" class="w-4 h-4"></i>
       <span>Book</span>
     </button>
+    <button type="button" onclick="openLocationGate()" class="flex flex-col items-center gap-1 text-slate-300 hover:text-amber-400 active:scale-95 transition-transform" title="Switch Cinema Location">
+      <span class="text-xs leading-none">📍</span>
+      <span id="mobile-nav-location-label" class="text-amber-400 font-bold truncate max-w-[55px]">Ife</span>
+    </button>
     <a href="#signature-auditoriums" class="flex flex-col items-center gap-1 text-slate-300 hover:text-amber-400 active:scale-95 transition-transform">
       <i data-lucide="sparkles" class="w-4 h-4"></i>
       <span>Halls</span>
@@ -775,5 +789,152 @@
 
   <!-- Application Logic (Cache-busted for Instant Live Reload) -->
   <script src="app.js?v=20261026_1830"></script>
+
+  <!-- =========================================================================
+       LOCATION GATE MODAL ("Select Cinema Location" from ojaja-cinemas.vercel.app)
+       Directly merged so users choose their theater and see real movies playing!
+       ========================================================================= -->
+  <div id="location-gate-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-xl p-4 overflow-y-auto">
+    <div class="relative w-full max-w-4xl rounded-3xl bg-[#0B0F1A] border-2 border-amber-400/40 p-6 sm:p-10 shadow-2xl my-8 text-center animate-fade-in">
+      
+      <!-- Close Button -->
+      <button 
+        type="button" 
+        onclick="closeLocationGate()"
+        class="absolute top-5 right-5 w-10 h-10 rounded-full bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold transition-all"
+        title="Close"
+      >✕</button>
+
+      <!-- Brand Logo -->
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white p-2 shadow-lg border-2 border-amber-400 flex items-center justify-center">
+        <img src="assets/ojaja-official-logo.png" alt="OJAJA Cinemas" class="w-full h-full object-contain">
+      </div>
+
+      <h2 class="font-headline text-3xl sm:text-5xl font-black text-white tracking-tight">
+        Select Cinema Location
+      </h2>
+      <p class="mt-2 text-xs sm:text-sm text-slate-400 max-w-md mx-auto font-body">
+        Choose the OJAJA cinema closest to you to see what’s showing and book your seats with instant Paystack checkout.
+      </p>
+
+      <!-- Search Location Input -->
+      <div class="relative mt-6 max-w-md mx-auto">
+        <input 
+          id="location-search-input"
+          type="text" 
+          oninput="filterLocationCards(this.value)"
+          placeholder="Search location (Ife, Lagos, Akure, Ado-Ekiti, Port Harcourt)..."
+          class="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-900/90 border-2 border-white/10 focus:border-amber-400 focus:outline-none text-xs text-white placeholder:text-slate-500 font-body transition-all"
+        >
+        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+      </div>
+
+      <!-- 5 Official Location Cards Grid -->
+      <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+        
+        <!-- 1. Ile-Ife -->
+        <button 
+          type="button"
+          onclick="selectLocationAndClose('OJAJA Ile-Ife')"
+          class="location-card-item group p-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border-2 border-amber-400/40 hover:border-amber-400 transition-all flex flex-col justify-between text-left shadow-lg hover:-translate-y-1"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 rounded-md bg-amber-400/10 text-amber-400 text-[10px] font-mono font-bold uppercase border border-amber-400/30">FLAGSHIP HUB</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <h3 class="font-headline text-lg font-black text-white group-hover:text-amber-400 transition-colors">OJAJA Ile-Ife</h3>
+            <p class="text-[11px] text-slate-400 font-body mt-1">African Village @ Ife Grand Resort &amp; Industrial Hub, Ile-Ife, Osun State</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-amber-300">
+            <span>Red Room (4K Laser) &amp; Blue Room</span>
+            <span>Select →</span>
+          </div>
+        </button>
+
+        <!-- 2. Lagos -->
+        <button 
+          type="button"
+          onclick="selectLocationAndClose('OJAJA Lagos')"
+          class="location-card-item group p-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border-2 border-white/10 hover:border-amber-400 transition-all flex flex-col justify-between text-left shadow-lg hover:-translate-y-1"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-mono font-bold uppercase border border-blue-500/30">LEKKI / AJAH</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h3 class="font-headline text-lg font-black text-white group-hover:text-amber-400 transition-colors">OJAJA Lagos</h3>
+            <p class="text-[11px] text-slate-400 font-body mt-1">Ojaja Park, Ogombo Road (Off Abraham Adesanya), Ajah, Lagos</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-amber-300">
+            <span>Dolby Atmos Prime &amp; VIP Lounge</span>
+            <span>Select →</span>
+          </div>
+        </button>
+
+        <!-- 3. Akure -->
+        <button 
+          type="button"
+          onclick="selectLocationAndClose('OJAJA Akure')"
+          class="location-card-item group p-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border-2 border-white/10 hover:border-amber-400 transition-all flex flex-col justify-between text-left shadow-lg hover:-translate-y-1"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 text-[10px] font-mono font-bold uppercase border border-purple-500/30">ALAGBAKA / FUTA</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h3 class="font-headline text-lg font-black text-white group-hover:text-amber-400 transition-colors">OJAJA Akure</h3>
+            <p class="text-[11px] text-slate-400 font-body mt-1">Ojaja Park, Alagbaka, Akure, Ondo State</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-amber-300">
+            <span>Christie 4K Screen &amp; Hall 2</span>
+            <span>Select →</span>
+          </div>
+        </button>
+
+        <!-- 4. Ado-Ekiti -->
+        <button 
+          type="button"
+          onclick="selectLocationAndClose('OJAJA Ado-Ekiti')"
+          class="location-card-item group p-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border-2 border-white/10 hover:border-amber-400 transition-all flex flex-col justify-between text-left shadow-lg hover:-translate-y-1"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold uppercase border border-emerald-500/30">ADIRE HUB</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h3 class="font-headline text-lg font-black text-white group-hover:text-amber-400 transition-colors">OJAJA Ado-Ekiti</h3>
+            <p class="text-[11px] text-slate-400 font-body mt-1">Beside Adire Hub, Ado Road, Ado-Ekiti, Ekiti State</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-amber-300">
+            <span>Executive Screens 1 &amp; 2</span>
+            <span>Select →</span>
+          </div>
+        </button>
+
+        <!-- 5. Port Harcourt -->
+        <button 
+          type="button"
+          onclick="selectLocationAndClose('OJAJA Port Harcourt')"
+          class="location-card-item group p-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border-2 border-white/10 hover:border-amber-400 transition-all flex flex-col justify-between text-left shadow-lg hover:-translate-y-1"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 text-[10px] font-mono font-bold uppercase border border-rose-500/30">GARDEN CITY</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h3 class="font-headline text-lg font-black text-white group-hover:text-amber-400 transition-colors">OJAJA Port Harcourt</h3>
+            <p class="text-[11px] text-slate-400 font-body mt-1">Abekoko, Port Harcourt, Rivers State</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-amber-300">
+            <span>Atmos Hall 1 &amp; Action Screen</span>
+            <span>Select →</span>
+          </div>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
